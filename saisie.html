@@ -63,7 +63,11 @@
   </form>
 
   <script>
+    
     function chargerListes() {
+      const fabricants = JSON.parse(localStorage.getItem('fabricants') || '[]');
+      window.fabricants = fabricants;
+    
       const types = JSON.parse(localStorage.getItem('types') || '[]');
       const prestations = JSON.parse(localStorage.getItem('prestations') || '[]');
       const techniciens = JSON.parse(localStorage.getItem('techniciens') || '[]');
@@ -94,6 +98,13 @@
 
       div.innerHTML = `
         <label>N° Extincteur : <input type="text" required></label>
+        <label>Fabricant :
+          <select class="fabricantSelect" onchange="checkNewFabricant(this)">
+            <option value="">-- Sélectionner ou ajouter --</option>
+            ${fabricants.map(f => `<option>${f}</option>`).join('')}
+            <option value="__new__">+ Ajouter un fabricant</option>
+          </select>
+        </label>
         <label>Type :
           <select>${typeOptions}</select>
         </label>
@@ -110,7 +121,23 @@
     }
 
     chargerListes();
-  </script>
+  
+    function checkNewFabricant(select) {
+      if (select.value === '__new__') {
+        const nom = prompt("Nom du nouveau fabricant :");
+        if (nom && nom.trim()) {
+          let list = JSON.parse(localStorage.getItem('fabricants') || '[]');
+          list.push(nom.trim());
+          localStorage.setItem('fabricants', JSON.stringify(list));
+          select.innerHTML = list.map(f => `<option>${f}</option>`).join('') + '<option value="__new__">+ Ajouter un fabricant</option>';
+          select.value = nom.trim();
+        } else {
+          select.value = "";
+        }
+      }
+    }
+    </script>
+
 
 </body>
 </html>

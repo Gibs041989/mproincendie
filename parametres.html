@@ -41,6 +41,14 @@
   <input type="text" id="newTech" placeholder="Nom du technicien" />
   <button onclick="addItem('techniciens', 'newTech')">Ajouter</button>
   <ul id="techniciensList"></ul>
+
+</section>
+
+<section>
+  <h2>Fabricants</h2>
+  <input type="text" id="newFab" placeholder="Nom du fabricant" />
+  <button onclick="addItem('fabricants', 'newFab')">Ajouter</button>
+  <ul id="fabricantsList"></ul>
 </section>
 
 <a class="back" href="index.html">⬅ Retour à l'accueil</a>
@@ -75,7 +83,7 @@ function removeItem(key, index) {
   loadList(key, key + 'List');
 }
 
-['types', 'prestations', 'techniciens'].forEach(k => loadList(k, k + 'List'));
+['types', 'prestations', 'techniciens', 'fabricants'].forEach(k => loadList(k, k + 'List'));
 </script>
 
 </body>
