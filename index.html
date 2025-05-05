@@ -1,86 +1,55 @@
 
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#cc0000" />
-  <title>Mproincendie - Accueil</title>
+  <title>Mproincendie</title>
   <link rel="manifest" href="/manifest.json" />
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #f7f7f7;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    header {
-      background-color: #cc0000;
-      color: white;
-      display: flex;
-      align-items: center;
-      padding: 10px 20px;
-    }
-    header img {
-      height: 50px;
-      margin-right: 15px;
-    }
-    h1 {
-      margin: 0;
-      font-size: 1.5rem;
-    }
-    main {
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 20px;
-      gap: 20px;
-    }
-    .menu-button {
-      padding: 20px 30px;
-      font-size: 18px;
-      background-color: #fff;
-      border: 2px solid #cc0000;
-      color: #cc0000;
-      border-radius: 8px;
-      cursor: pointer;
-      width: 80%;
-      max-width: 400px;
-      text-align: center;
-      transition: background-color 0.3s, color 0.3s;
-    }
-    .menu-button:hover {
-      background-color: #cc0000;
-      color: #fff;
-    }
-    footer {
-      text-align: center;
-      padding: 10px;
-      font-size: 12px;
-      color: #999;
-    }
-  </style>
 </head>
-<body>
+<body style="font-family: sans-serif; padding: 20px;">
 
-  <header>
-    <img src="logo_mproincendie.png" alt="Logo Mproincendie" />
-    <h1>Mproincendie</h1>
-  </header>
+  <h1>Mproincendie - Compte rendu extincteur</h1>
 
-  <main>
-    <button class="menu-button" onclick="window.location.href='saisie.html'">🔧 Saisir un compte rendu</button>
-    <button class="menu-button" onclick="window.location.href='clients.html'">📂 Accéder aux clients</button>
-    <button class="menu-button" onclick="window.location.href='parametres.html'">⚙️ Paramètres</button>
-  </main>
+  <form onsubmit="event.preventDefault(); alert('Compte rendu enregistré (simulation)')">
+    <label>N° Extincteur :</label><br>
+    <input type="text" name="numero" required><br><br>
 
-  <footer>&copy; 2025 Mproincendie. Tous droits réservés.</footer>
+    <label>Type d'Extincteur :</label><br>
+    <select name="type" required>
+      <option value="">-- Choisir --</option>
+      <option value="Eau">Eau pulvérisée</option>
+      <option value="Poudre">Poudre</option>
+      <option value="CO2">CO2</option>
+    </select><br><br>
 
+    <label><input type="checkbox" name="pp"> Pression Permanente (PP)</label><br><br>
+
+    <label>Millésime MES :</label><br>
+    <input type="text" name="mes" placeholder="Ex: 2021"><br><br>
+
+    <label>Emplacement :</label><br>
+    <input type="text" name="emplacement"><br><br>
+
+    <label>Opérations réalisées :</label><br>
+    <label><input type="checkbox" name="operations" value="Vérification"> Vérification</label><br>
+    <label><input type="checkbox" name="operations" value="Recharge"> Recharge</label><br>
+    <label><input type="checkbox" name="operations" value="Remplacement"> Remplacement</label><br>
+    <label><input type="checkbox" name="operations" value="Réparation"> Réparation</label><br><br>
+
+    <label>Observations diverses :</label><br>
+    <textarea name="observations" rows="4" cols="40"></textarea><br><br>
+
+    <button type="submit">Valider le compte rendu</button>
+  </form>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(reg => console.log('Service Worker enregistré', reg))
+        .catch(err => console.error('Service Worker erreur', err));
+    }
+  </script>
 </body>
 </html>
