@@ -2,7 +2,7 @@
 {
   "name": "Mproincendie",
   "short_name": "Mpro",
-  "start_url": "/",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#cc0000",
