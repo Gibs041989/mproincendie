@@ -94,30 +94,50 @@
   <template id="extincteur-template">
     <div class="p-4 border rounded-lg bg-gray-50 space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input type="text" placeholder="Extincteur N°" class="border p-2 rounded w-full" />
-        <select class="border p-2 rounded w-full">
-          <option selected disabled>Type d'extincteur</option>
-          <option>Eau pulvérisée</option>
-          <option>Poudre ABC</option>
-          <option>CO₂</option>
-          <option>Autre</option>
-        </select>
-        <select class="border p-2 rounded w-full mise-en-service text-sm">
-          <option selected disabled>Mise en service</option>
-        </select>
-        <input type="text" placeholder="Fabricant" class="border p-2 rounded w-full" />
-        <input type="text" placeholder="Emplacement" class="border p-2 rounded w-full" />
-        <select multiple class="border p-2 rounded w-full text-sm h-32">
-          <option disabled>Opération(s) effectuée(s)</option>
-          <option>Vérification</option>
-          <option>Recharge</option>
-          <option>Révision quinquennale</option>
-          <option>Mise en service ce-jour</option>
-          <option>Remplacement standard</option>
-          <option>Autre</option>
-        </select>
+        <div>
+          <label class="block text-sm font-medium mb-1">Extincteur N°</label>
+          <input type="text" class="border p-2 rounded w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Type d'extincteur</label>
+          <select class="border p-2 rounded w-full">
+            <option selected disabled>Choisir</option>
+            <option>Eau pulvérisée</option>
+            <option>Poudre ABC</option>
+            <option>CO₂</option>
+            <option>Autre</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Mise en service</label>
+          <select class="border p-2 rounded w-full mise-en-service text-sm">
+            <option selected disabled>Choisir</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Fabricant</label>
+          <input type="text" class="border p-2 rounded w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Emplacement</label>
+          <input type="text" class="border p-2 rounded w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Opérations effectuées</label>
+          <div class="space-y-1">
+            <label class="flex items-center"><input type="checkbox" class="mr-2"> Vérification</label>
+            <label class="flex items-center"><input type="checkbox" class="mr-2"> Recharge</label>
+            <label class="flex items-center"><input type="checkbox" class="mr-2"> Révision quinquennale</label>
+            <label class="flex items-center"><input type="checkbox" class="mr-2"> Mise en service ce-jour</label>
+            <label class="flex items-center"><input type="checkbox" class="mr-2"> Remplacement standard</label>
+            <label class="flex items-center"><input type="checkbox" class="mr-2"> Autre</label>
+          </div>
+        </div>
       </div>
-      <textarea class="border p-2 rounded w-full" rows="2" placeholder="Observation pour cet extincteur"></textarea>
+      <div>
+        <label class="block text-sm font-medium mb-1">Observation pour cet extincteur</label>
+        <textarea class="border p-2 rounded w-full" rows="2"></textarea>
+      </div>
     </div>
   </template>
 
