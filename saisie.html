@@ -35,13 +35,11 @@
     <fieldset>
       <legend>Intervention</legend>
       <label>Date : <input type="date"></label>
-      <label>Technicien : <input type="text"></label>
+      <label>Technicien :
+        <select id="technicienSelect"></select>
+      </label>
       <label>Type d'intervention :
-        <select>
-          <option>Vérification</option>
-          <option>Maintenance</option>
-          <option>Remplacement</option>
-        </select>
+        <select id="prestationSelect"></select>
       </label>
     </fieldset>
 
@@ -65,31 +63,53 @@
   </form>
 
   <script>
+    function chargerListes() {
+      const types = JSON.parse(localStorage.getItem('types') || '[]');
+      const prestations = JSON.parse(localStorage.getItem('prestations') || '[]');
+      const techniciens = JSON.parse(localStorage.getItem('techniciens') || '[]');
+
+      const prestationSelect = document.getElementById('prestationSelect');
+      prestations.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = opt.text = p;
+        prestationSelect.appendChild(opt);
+      });
+
+      const technicienSelect = document.getElementById('technicienSelect');
+      techniciens.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = opt.text = t;
+        technicienSelect.appendChild(opt);
+      });
+
+      window.extincteurTypes = types;
+    }
+
     function ajouterExtincteur() {
       const container = document.getElementById('extincteurs');
       const div = document.createElement('div');
       div.className = 'extincteur';
+
+      const typeOptions = (window.extincteurTypes || []).map(t => '<option>' + t + '</option>').join('');
+
       div.innerHTML = `
         <label>N° Extincteur : <input type="text" required></label>
         <label>Type :
-          <select>
-            <option>Eau</option>
-            <option>Poudre</option>
-            <option>CO2</option>
-          </select>
+          <select>${typeOptions}</select>
         </label>
         <label>Pression Permanente (PP) : <input type="checkbox"></label>
         <label>Millésime MES : <input type="text" placeholder="Ex: 2020"></label>
         <label>Emplacement : <input type="text"></label>
         <label>Opérations :</label>
-        <label><input type="checkbox"> Vérification</label>
-        <label><input type="checkbox"> Recharge</label>
-        <label><input type="checkbox"> Remplacement</label>
-        <label><input type="checkbox"> Réparation</label>
+        <div id="ops">
+          ${(JSON.parse(localStorage.getItem('prestations') || '[]') || []).map(op => '<label><input type="checkbox"> ' + op + '</label>').join('')}
+        </div>
         <label>Observations : <textarea rows="2"></textarea></label>
       `;
       container.appendChild(div);
     }
+
+    chargerListes();
   </script>
 
 </body>
