@@ -11,28 +11,41 @@
       const template = document.getElementById('extincteur-template');
       const clone = template.content.cloneNode(true);
       container.appendChild(clone);
+      populateMisesEnService(clone.querySelector('.mise-en-service'));
     }
 
-    function populateMillesimes() {
-      const selects = document.querySelectorAll('.millesime');
+    function populateMisesEnService(selectElement = null) {
       const currentYear = new Date().getFullYear();
+      const options = [];
       for (let i = currentYear; i >= 2000; i--) {
-        selects.forEach(select => {
-          const option = document.createElement('option');
-          option.value = i;
-          option.textContent = i;
-          select.appendChild(option);
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i;
+        options.push(option);
+      }
+      if (selectElement) {
+        options.forEach(opt => selectElement.appendChild(opt));
+      } else {
+        document.querySelectorAll('.mise-en-service').forEach(select => {
+          if (select.children.length < 2) {
+            options.forEach(opt => select.appendChild(opt.cloneNode(true)));
+          }
         });
       }
     }
 
-    document.addEventListener('DOMContentLoaded', populateMillesimes);
+    document.addEventListener('DOMContentLoaded', () => {
+      populateMisesEnService();
+    });
   </script>
 </head>
 <body class="bg-gray-100 p-4 text-gray-800">
 
   <div class="max-w-5xl mx-auto bg-white p-6 rounded-xl shadow-lg space-y-6">
-    <h1 class="text-2xl font-bold text-center text-red-600">Compte Rendu de Maintenance</h1>
+    <div class="flex justify-between items-center">
+      <h1 class="text-2xl font-bold text-red-600">Compte Rendu de Maintenance</h1>
+      <a href="index.html" class="text-blue-600 underline hover:text-blue-800">← Retour à l'accueil</a>
+    </div>
 
     <!-- Infos client -->
     <section>
@@ -81,7 +94,7 @@
   <template id="extincteur-template">
     <div class="p-4 border rounded-lg bg-gray-50 space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input type="text" placeholder="Numéro extincteur" class="border p-2 rounded w-full" />
+        <input type="text" placeholder="Extincteur N°" class="border p-2 rounded w-full" />
         <input type="text" placeholder="Emplacement" class="border p-2 rounded w-full" />
         <input type="text" placeholder="Fabricant" class="border p-2 rounded w-full" />
         <select class="border p-2 rounded w-full">
@@ -91,11 +104,11 @@
           <option>CO₂</option>
           <option>Autre</option>
         </select>
-        <select class="border p-2 rounded w-full millesime">
-          <option selected disabled>Millésime</option>
+        <select class="border p-2 rounded w-full mise-en-service">
+          <option selected disabled>Mise en service</option>
         </select>
-        <select class="border p-2 rounded w-full">
-          <option selected disabled>Opération effectuée</option>
+        <select class="border p-2 rounded w-full" multiple size="5">
+          <option disabled>Opération(s) effectuée(s)</option>
           <option>Vérification</option>
           <option>Recharge</option>
           <option>Révision quinquennale</option>
