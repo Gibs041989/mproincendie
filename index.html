@@ -49,4 +49,64 @@
     <section>
       <h2 class="text-xl font-semibold mb-2">Détails de l'Intervention</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input type="date" class="border p-2 rounded w-full
+        <input type="date" class="border p-2 rounded w-full" />
+        <input type="text" placeholder="Nom du technicien" class="border p-2 rounded w-full" />
+      </div>
+    </section>
+
+    <!-- Extincteurs -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Extincteurs</h2>
+      <div id="extincteurs-container" class="space-y-6"></div>
+      <button onclick="addExtincteur()" type="button" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        ➕ Ajouter un extincteur
+      </button>
+    </section>
+
+    <!-- Observations générales -->
+    <section>
+      <h2 class="text-xl font-semibold mb-2">Observations Générales</h2>
+      <textarea class="border p-2 rounded w-full" rows="4" placeholder="Remarques générales…"></textarea>
+    </section>
+
+    <!-- Valider -->
+    <div class="text-center">
+      <button class="bg-red-600 text-white px-6 py-2 rounded-xl hover:bg-red-700">
+        Générer le PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- Template d'un extincteur -->
+  <template id="extincteur-template">
+    <div class="p-4 border rounded-lg bg-gray-50 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="text" placeholder="Numéro extincteur" class="border p-2 rounded w-full" />
+        <input type="text" placeholder="Emplacement" class="border p-2 rounded w-full" />
+        <input type="text" placeholder="Fabricant" class="border p-2 rounded w-full" />
+        <select class="border p-2 rounded w-full">
+          <option selected disabled>Type d'extincteur</option>
+          <option>Eau pulvérisée</option>
+          <option>Poudre ABC</option>
+          <option>CO₂</option>
+          <option>Autre</option>
+        </select>
+        <select class="border p-2 rounded w-full millesime">
+          <option selected disabled>Millésime</option>
+        </select>
+        <select class="border p-2 rounded w-full">
+          <option selected disabled>Opération effectuée</option>
+          <option>Vérification</option>
+          <option>Recharge</option>
+          <option>Révision quinquennale</option>
+          <option>Mise en service ce-jour</option>
+          <option>Remplacement standard</option>
+          <option>Autre</option>
+        </select>
+      </div>
+      <textarea class="border p-2 rounded w-full" rows="2" placeholder="Observation pour cet extincteur"></textarea>
+    </div>
+  </template>
+
+</body>
+</html>
