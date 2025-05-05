@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#cc0000" />
+  <title>Mproincendie - Accueil</title>
+  <link rel="manifest" href="/manifest.json" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background-color: #cc0000;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+    }
+    header img {
+      height: 50px;
+      margin-right: 15px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    .settings {
+      font-size: 24px;
+      color: white;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    main {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      gap: 20px;
+    }
+    .menu-button {
+      padding: 20px 30px;
+      font-size: 18px;
+      background-color: #fff;
+      border: 2px solid #cc0000;
+      color: #cc0000;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 80%;
+      max-width: 400px;
+      text-align: center;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .menu-button:hover {
+      background-color: #cc0000;
+      color: #fff;
+    }
+    footer {
+      text-align: center;
+      padding: 10px;
+      font-size: 12px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div style="display: flex; align-items: center;">
+      <img src="logo_mproincendie.png" alt="Logo Mproincendie" />
+      <h1>Mproincendie</h1>
+    </div>
+    <a href="parametres.html" class="settings" title="Paramètres">⚙️</a>
+  </header>
+
+  <main>
+    <button class="menu-button" onclick="location.href='saisie.html'">🔧 Saisir un compte rendu</button>
+    <button class="menu-button" onclick="location.href='clients.html'">📂 Accéder aux clients</button>
+  </main>
+
+  <footer>&copy; 2025 Mproincendie. Tous droits réservés.</footer>
+
+</body>
+</html>

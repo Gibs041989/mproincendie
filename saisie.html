@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compte rendu - Mproincendie</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f4f4f4; max-width: 900px; margin: auto; }
+    h1 { color: #cc0000; }
+    fieldset { margin-bottom: 20px; }
+    legend { font-weight: bold; }
+    label { display: block; margin-top: 10px; }
+    input, select, textarea { width: 100%; padding: 8px; margin-top: 4px; }
+    .extincteur { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; background: white; }
+    button { margin-top: 20px; padding: 10px 15px; font-size: 16px; }
+  </style>
+</head>
+<body>
+
+  <h1>🔧 Compte Rendu de Maintenance</h1>
+
+  <form onsubmit="event.preventDefault(); alert('Compte rendu enregistré (simulation)')">
+
+    <fieldset>
+      <legend>Client</legend>
+      <label>Nom du client : <input type="text" required></label>
+      <label>Adresse : <input type="text"></label>
+      <label>Ville / Code Postal : <input type="text"></label>
+      <label>Contact : <input type="text"></label>
+      <label>Téléphone : <input type="text"></label>
+      <label>Email : <input type="email"></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Intervention</legend>
+      <label>Date : <input type="date"></label>
+      <label>Technicien : <input type="text"></label>
+      <label>Type d'intervention :
+        <select>
+          <option>Vérification</option>
+          <option>Maintenance</option>
+          <option>Remplacement</option>
+        </select>
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Extincteurs</legend>
+      <div id="extincteurs"></div>
+      <button type="button" onclick="ajouterExtincteur()">+ Ajouter un extincteur</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Signatures</legend>
+      <label>Client :</label>
+      <input type="text" placeholder="Nom ou signature (manuel plus tard)">
+      <label>Technicien :</label>
+      <input type="text" placeholder="Nom ou signature (manuel plus tard)">
+    </fieldset>
+
+    <button type="submit">Valider le compte rendu</button>
+    <a href="index.html" style="display:block;margin-top:20px;">⬅ Retour à l’accueil</a>
+
+  </form>
+
+  <script>
+    function ajouterExtincteur() {
+      const container = document.getElementById('extincteurs');
+      const div = document.createElement('div');
+      div.className = 'extincteur';
+      div.innerHTML = `
+        <label>N° Extincteur : <input type="text" required></label>
+        <label>Type :
+          <select>
+            <option>Eau</option>
+            <option>Poudre</option>
+            <option>CO2</option>
+          </select>
+        </label>
+        <label>Pression Permanente (PP) : <input type="checkbox"></label>
+        <label>Millésime MES : <input type="text" placeholder="Ex: 2020"></label>
+        <label>Emplacement : <input type="text"></label>
+        <label>Opérations :</label>
+        <label><input type="checkbox"> Vérification</label>
+        <label><input type="checkbox"> Recharge</label>
+        <label><input type="checkbox"> Remplacement</label>
+        <label><input type="checkbox"> Réparation</label>
+        <label>Observations : <textarea rows="2"></textarea></label>
+      `;
+      container.appendChild(div);
+    }
+  </script>
+
+</body>
+</html>
