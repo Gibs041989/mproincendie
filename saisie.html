@@ -25,7 +25,37 @@ body {
     legend { font-weight: bold; font-size: 1.2rem; color: var(--red); padding: 0 10px; }
     label { display: block; margin-top: 10px; }
     input, select, textarea { border: 1px solid #bbb; border-radius: 4px; width: 100%; padding: 8px; margin-top: 4px; }
-    .extincteur { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; background: white; position: relative; }
+    
+.extincteur {
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-bottom: 15px;
+  background: #fff;
+  position: relative;
+  border-radius: 8px;
+}
+.extincteur label {
+  display: block;
+  font-weight: bold;
+  margin-top: 10px;
+}
+.extincteur input[type="text"],
+.extincteur select,
+.extincteur textarea {
+  width: 100%;
+  margin-top: 4px;
+  padding: 6px;
+  font-weight: normal;
+}
+.extincteur .checkbox-group label {
+  display: flex;
+  align-items: center;
+  font-weight: normal;
+}
+.extincteur .checkbox-group input[type="checkbox"] {
+  margin-right: 6px;
+}
+ padding: 10px; margin-bottom: 10px; background: white; position: relative; }
     .extincteur button { margin-right: 10px; }
     .signature-pad { border: 1px solid #999; width: 100%; height: 150px; }
     .extincteur-actions { margin-top: 10px; }
@@ -87,23 +117,23 @@ body {
   </div>
   <div style="display: flex; align-items: center; margin-bottom: 8px;">
     <div style="flex: 2;">Registre de sécurité présent et à jour ?</div>
-    <div style="flex: 1; text-align: center;"><input type="checkbox"></div>
-    <div style="flex: 1; text-align: center;"><input type="checkbox"></div>
+    <div style="flex: 1; text-align: center;"><input type="radio" name="registre" value="oui"></div>
+    <div style="flex: 1; text-align: center;"><input type="radio" name="registre" value="non"></div>
   </div>
   <div style="display: flex; align-items: center; margin-bottom: 8px;">
     <div style="flex: 2;">Signalétique en place ?</div>
-    <div style="flex: 1; text-align: center;"><input type="checkbox"></div>
-    <div style="flex: 1; text-align: center;"><input type="checkbox"></div>
+    <div style="flex: 1; text-align: center;"><input type="radio" name="signaletique" value="oui"></div>
+    <div style="flex: 1; text-align: center;"><input type="radio" name="signaletique" value="non"></div>
   </div>
   <div style="display: flex; align-items: center; margin-bottom: 8px;">
     <div style="flex: 2;">BAES présents ?</div>
-    <div style="flex: 1; text-align: center;"><input type="checkbox"></div>
-    <div style="flex: 1; text-align: center;"><input type="checkbox"></div>
+    <div style="flex: 1; text-align: center;"><input type="radio" name="baes" value="oui"></div>
+    <div style="flex: 1; text-align: center;"><input type="radio" name="baes" value="non"></div>
   </div>
   <div style="display: flex; align-items: center;">
     <div style="flex: 2;">Plans à jour ?</div>
-    <div style="flex: 1; text-align: center;"><input type="checkbox"></div>
-    <div style="flex: 1; text-align: center;"><input type="checkbox"></div>
+    <div style="flex: 1; text-align: center;"><input type="radio" name="plans" value="oui"></div>
+    <div style="flex: 1; text-align: center;"><input type="radio" name="plans" value="non"></div>
   </div>
 </div>
 
