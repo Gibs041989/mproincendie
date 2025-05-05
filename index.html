@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -8,9 +9,42 @@
   <title>Mproincendie</title>
   <link rel="manifest" href="/manifest.json" />
 </head>
-<body>
-  <h1>Appli Mproincendie</h1>
-  <p>L'application est prête à être installée.</p>
+<body style="font-family: sans-serif; padding: 20px;">
+
+  <h1>Mproincendie - Compte rendu extincteur</h1>
+
+  <form onsubmit="event.preventDefault(); alert('Compte rendu enregistré (simulation)')">
+    <label>N° Extincteur :</label><br>
+    <input type="text" name="numero" required><br><br>
+
+    <label>Type d'Extincteur :</label><br>
+    <select name="type" required>
+      <option value="">-- Choisir --</option>
+      <option value="Eau">Eau pulvérisée</option>
+      <option value="Poudre">Poudre</option>
+      <option value="CO2">CO2</option>
+    </select><br><br>
+
+    <label><input type="checkbox" name="pp"> Pression Permanente (PP)</label><br><br>
+
+    <label>Millésime MES :</label><br>
+    <input type="text" name="mes" placeholder="Ex: 2021"><br><br>
+
+    <label>Emplacement :</label><br>
+    <input type="text" name="emplacement"><br><br>
+
+    <label>Opérations réalisées :</label><br>
+    <label><input type="checkbox" name="operations" value="Vérification"> Vérification</label><br>
+    <label><input type="checkbox" name="operations" value="Recharge"> Recharge</label><br>
+    <label><input type="checkbox" name="operations" value="Remplacement"> Remplacement</label><br>
+    <label><input type="checkbox" name="operations" value="Réparation"> Réparation</label><br><br>
+
+    <label>Observations diverses :</label><br>
+    <textarea name="observations" rows="4" cols="40"></textarea><br><br>
+
+    <button type="submit">Valider le compte rendu</button>
+  </form>
+
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/service-worker.js')
