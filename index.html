@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -263,13 +265,7 @@
 <datalist id="years-list"></datalist>
 
 
-<!-- Prévisualisation PDF -->
-<section class="mt-8">
-  <h2 class="text-lg font-semibold mb-2">Aperçu PDF</h2>
-  <iframe id="pdf-preview" class="w-full h-[600px] border rounded"></iframe>
-</section>
-
-<!-- Script PDF Preview avec Blob -->
+<!-- Script PDF Preview dans nouvel onglet -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
   async function generatePDFProvisoire() {
@@ -286,20 +282,19 @@
     doc.text("Tél. : 06 58 70 80 47", 10, 32);
 
     doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
     doc.text("Résumé provisoire de maintenance :", 10, 45);
     doc.setFont("Helvetica", "normal");
     doc.text("- Ext. 1 - 6Kg Poudre ABC - Zone A1 - [VO, MS]", 10, 55);
 
-    // Création d’un blob et affichage dans l’iframe
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    document.getElementById("pdf-preview").src = url;
+    // Ouvrir dans un nouvel onglet sans téléchargement
+    const pdfBlob = doc.output("blob");
+    const pdfURL = URL.createObjectURL(pdfBlob);
+    window.open(pdfURL, "_blank");
   }
 </script>
-
 </body>
 </html>
+
 
 
 <template id="extincteur-template">
@@ -427,13 +422,7 @@
   });
 </script>
 
-<!-- Prévisualisation PDF -->
-<section class="mt-8">
-  <h2 class="text-lg font-semibold mb-2">Aperçu PDF</h2>
-  <iframe id="pdf-preview" class="w-full h-[600px] border rounded"></iframe>
-</section>
-
-<!-- Script PDF Preview avec Blob -->
+<!-- Script PDF Preview dans nouvel onglet -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
   async function generatePDFProvisoire() {
@@ -450,17 +439,16 @@
     doc.text("Tél. : 06 58 70 80 47", 10, 32);
 
     doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
     doc.text("Résumé provisoire de maintenance :", 10, 45);
     doc.setFont("Helvetica", "normal");
     doc.text("- Ext. 1 - 6Kg Poudre ABC - Zone A1 - [VO, MS]", 10, 55);
 
-    // Création d’un blob et affichage dans l’iframe
-    const blob = doc.output("blob");
-    const url = URL.createObjectURL(blob);
-    document.getElementById("pdf-preview").src = url;
+    // Ouvrir dans un nouvel onglet sans téléchargement
+    const pdfBlob = doc.output("blob");
+    const pdfURL = URL.createObjectURL(pdfBlob);
+    window.open(pdfURL, "_blank");
   }
 </script>
-
 </body>
 </html>
+
