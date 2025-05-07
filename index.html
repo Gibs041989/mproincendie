@@ -2,144 +2,465 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Maintenance Extincteurs - Formulaire</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Formulaire Maintenance Extincteurs - Mendes PI</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    function addExtincteur() {
-      const container = document.getElementById('extincteurs-container');
-      const template = document.getElementById('extincteur-template');
-      const clone = template.content.cloneNode(true);
-      container.appendChild(clone);
-      populateMisesEnService(clone.querySelector('.mise-en-service'));
-    }
-
-    function populateMisesEnService(selectElement = null) {
-      const currentYear = new Date().getFullYear();
-      const options = [];
-      for (let i = currentYear; i >= 2000; i--) {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = i;
-        options.push(option);
+    const baseClients = {
+      "Total Énergies": {
+        adresse: "1 rue des Pétroles, Paris",
+        tel: "0123456789",
+        email: "contact@total.com",
+        lieux: {
+          "Dépôt Nanterre": "5 quai des Graviers, Nanterre",
+          "Station Lyon": "88 avenue Lumière, Lyon"
+        }
+      },
+      "Ville de Paris": {
+        adresse: "Place de l'Hôtel de Ville, Paris",
+        tel: "0142781234",
+        email: "mairie@paris.fr",
+        lieux: {
+          "Mairie annexe 12e": "4 rue Abel, Paris 12",
+          "Gymnase Diderot": "16 bd Diderot, Paris"
+        }
       }
-      if (selectElement) {
-        options.forEach(opt => selectElement.appendChild(opt));
-      } else {
-        document.querySelectorAll('.mise-en-service').forEach(select => {
-          if (select.children.length < 2) {
-            options.forEach(opt => select.appendChild(opt.cloneNode(true)));
-          }
+    };
+
+    function onClientChange() {
+      const nom = document.getElementById('client').value;
+      const client = baseClients[nom];
+      if (client) {
+        document.getElementById('adresse').value = client.adresse;
+        document.getElementById('tel').value = client.tel;
+        document.getElementById('email').value = client.email;
+        const lieux = client.lieux || {};
+        const lieuxList = document.getElementById('lieu-intervention-list');
+        lieuxList.innerHTML = '';
+        Object.keys(lieux).forEach(nom => {
+          const opt = document.createElement('option');
+          opt.value = nom;
+          lieuxList.appendChild(opt);
         });
       }
     }
 
+    function onLieuChange() {
+      const nomClient = document.getElementById('client').value;
+      const nomLieu = document.getElementById('nom-lieu').value;
+      const client = baseClients[nomClient];
+      if (client && client.lieux && client.lieux[nomLieu]) {
+        document.getElementById('adresse-lieu').value = client.lieux[nomLieu];
+      }
+    }
+
+    function toggleLieuIntervention() {
+      const isChecked = document.getElementById('diffLieu').checked;
+      document.querySelectorAll('.lieu-intervention input').forEach(el => {
+        el.disabled = !isChecked;
+        el.classList.toggle('bg-gray-100', !isChecked);
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-      populateMisesEnService();
+      toggleLieuIntervention();
     });
   </script>
 </head>
 <body class="bg-gray-100 p-4 text-gray-800">
+  <div class="max-w-5xl mx-auto bg-white p-6 rounded-xl shadow space-y-6">
+    <h1 class="text-xl font-bold text-red-600 mb-4">Compte Rendu de Maintenance</h1>
 
-  <div class="max-w-5xl mx-auto bg-white p-6 rounded-xl shadow-lg space-y-6">
-    <div class="flex justify-between items-center">
-      <h1 class="text-2xl font-bold text-red-600">Compte Rendu de Maintenance</h1>
-      <a href="/" class="text-blue-600 underline hover:text-blue-800">← Retour à l'accueil</a>
+    <!-- Informations client -->
+    <section>
+      <h2 class="text-lg font-semibold mb-2">Informations Client</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Nom du client</label>
+          <input type="text" id="client" list="liste-clients" oninput="onClientChange()" class="border p-2 rounded w-full" />
+          <datalist id="liste-clients">
+            <option value="Total Énergies">
+            <option value="Ville de Paris">
+          </datalist>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Adresse du siège</label>
+          <input type="text" id="adresse" class="border p-2 rounded w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Téléphone</label>
+          <input type="text" id="tel" class="border p-2 rounded w-full" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Email</label>
+          <input type="email" id="email" class="border p-2 rounded w-full" />
+        </div>
+      </div>
+      <div class="mt-4">
+        <label class="inline-flex items-center">
+          <input type="checkbox" id="diffLieu" onchange="toggleLieuIntervention()" class="mr-2">
+          Lieu d’intervention différent
+        </label>
+      </div>
+      <div class="lieu-intervention mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Nom du site d’intervention</label>
+          <input type="text" id="nom-lieu" list="lieu-intervention-list" oninput="onLieuChange()" class="border p-2 rounded w-full bg-gray-100" disabled />
+          <datalist id="lieu-intervention-list"></datalist>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Adresse du site</label>
+          <input type="text" id="adresse-lieu" class="border p-2 rounded w-full bg-gray-100" disabled />
+        </div>
+      </div>
+    </section>
+  
+<!-- Détails Intervention -->
+<section>
+  <h2 class="text-lg font-semibold mt-6 mb-2">Détails de l'Intervention</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label class="block text-sm font-medium mb-1">Date d'intervention</label>
+      <input type="date" class="border p-2 rounded w-full" />
     </div>
-
-    <!-- Infos client -->
-    <section>
-      <h2 class="text-xl font-semibold mb-2">Informations Client</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input type="text" placeholder="Nom du client" class="border p-2 rounded w-full" />
-        <input type="text" placeholder="Adresse" class="border p-2 rounded w-full" />
-        <input type="text" placeholder="Téléphone" class="border p-2 rounded w-full" />
-        <input type="email" placeholder="Email" class="border p-2 rounded w-full" />
-      </div>
-    </section>
-
-    <!-- Intervention -->
-    <section>
-      <h2 class="text-xl font-semibold mb-2">Détails de l'Intervention</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input type="date" class="border p-2 rounded w-full" />
-        <input type="text" placeholder="Nom du technicien" class="border p-2 rounded w-full" />
-      </div>
-    </section>
-
-    <!-- Extincteurs -->
-    <section>
-      <h2 class="text-xl font-semibold mb-4">Extincteurs</h2>
-      <div id="extincteurs-container" class="space-y-6"></div>
-      <button onclick="addExtincteur()" type="button" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-        ➕ Ajouter un extincteur
-      </button>
-    </section>
-
-    <!-- Observations générales -->
-    <section>
-      <h2 class="text-xl font-semibold mb-2">Observations Générales</h2>
-      <textarea class="border p-2 rounded w-full" rows="4" placeholder="Remarques générales…"></textarea>
-    </section>
-
-    <!-- Valider -->
-    <div class="text-center">
-      <button class="bg-red-600 text-white px-6 py-2 rounded-xl hover:bg-red-700">
-        Générer le PDF
-      </button>
+    <div>
+      <label class="block text-sm font-medium mb-1">Nom du technicien</label>
+      <input type="text" class="border p-2 rounded w-full" />
     </div>
   </div>
+</section>
 
-  <!-- Template d'un extincteur -->
-  <template id="extincteur-template">
-    <div class="p-4 border rounded-lg bg-gray-50 space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium mb-1">Extincteur N°</label>
-          <input type="text" class="border p-2 rounded w-full" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-1">Type d'extincteur</label>
-          <select class="border p-2 rounded w-full">
-            <option selected disabled>Choisir</option>
-            <option>Eau pulvérisée</option>
-            <option>Poudre ABC</option>
-            <option>CO₂</option>
-            <option>Autre</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-1">Mise en service</label>
-          <select class="border p-2 rounded w-full mise-en-service text-sm">
-            <option selected disabled>Choisir</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-1">Fabricant</label>
-          <input type="text" class="border p-2 rounded w-full" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-1">Emplacement</label>
-          <input type="text" class="border p-2 rounded w-full" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium mb-1">Opérations effectuées</label>
-          <div class="space-y-1">
-            <label class="flex items-center"><input type="checkbox" class="mr-2"> Vérification</label>
-            <label class="flex items-center"><input type="checkbox" class="mr-2"> Recharge</label>
-            <label class="flex items-center"><input type="checkbox" class="mr-2"> Révision quinquennale</label>
-            <label class="flex items-center"><input type="checkbox" class="mr-2"> Mise en service ce-jour</label>
-            <label class="flex items-center"><input type="checkbox" class="mr-2"> Remplacement standard</label>
-            <label class="flex items-center"><input type="checkbox" class="mr-2"> Autre</label>
-          </div>
+<!-- Extincteurs -->
+<section>
+  <h2 class="text-lg font-semibold mt-6 mb-4">Extincteurs</h2>
+  <div id="extincteurs-container" class="space-y-6 mt-4"></div>
+  <button onclick="addExtincteur()" type="button" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full">
+    ➕ Ajouter un extincteur
+  </button>
+</section>
+
+<!-- Template extincteur -->
+
+<template
+  <details open class="p-4 border rounded-lg bg-gray-50 space-y-4">
+    <summary class="text-md font-semibold cursor-pointer mb-2">Nouvel extincteur</summary>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <input placeholder="N° extincteur" class="border p-2 rounded" />
+      <input list="types-extincteurs" placeholder="Type d'extincteur" class="border p-2 rounded" />
+      <input list="capacites-extincteurs" placeholder="Capacité" class="border p-2 rounded" />
+      <select class="border p-2 rounded"><option>PP</option><option>PA</option></select>
+      <input list="years-list" placeholder="MES" class="border p-2 rounded" />
+      <input list="fabricants" placeholder="Fabricant" class="border p-2 rounded" />
+      <input placeholder="Niv" class="border p-2 rounded" />
+      <input placeholder="Emplacement" class="border p-2 rounded" />
+      <div class="md:col-span-2">
+        <label class="block text-sm mb-1">Opérations effectuées</label>
+        <div class="flex flex-wrap gap-3 text-sm">
+          <label><input type="checkbox" class="mr-1"> Vérification OK</label>
+          <label><input type="checkbox" class="mr-1"> Révision quinquennale</label>
+          <label><input type="checkbox" class="mr-1"> Rechargé</label>
+          <label><input type="checkbox" class="mr-1"> Mise en service ce jour</label>
+          <label><input type="checkbox" class="mr-1"> Échange standard</label>
         </div>
       </div>
+      <div class="md:col-span-2">
+        <textarea class="border p-2 rounded w-full" placeholder="Observation"></textarea>
+      </div>
+    </div>
+    <div class="text-right">
+      <button onclick="validerExtincteur(this)" type="button"
+              class="mt-3 bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700">
+        ✅ Valider extincteur
+      </button>
+    </div>
+  </details>
+</template>
+
+<!-- Conformité -->
+<section>
+  <h2 class="text-lg font-semibold mt-6 mb-2">Vérifications de conformité</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+    <label><input type="checkbox" class="mr-2"> Registre de sécurité à jour ?</label>
+    <label><input type="checkbox" class="mr-2"> Signalétique à jour ?</label>
+    <label><input type="checkbox" class="mr-2"> BAES présents ?</label>
+    <label><input type="checkbox" class="mr-2"> Plans de sécurité présents et à jour ?</label>
+  </div>
+</section>
+
+<!-- Observations générales -->
+<section>
+  <h2 class="text-lg font-semibold mt-6 mb-2">Observations Générales</h2>
+  <textarea class="border p-2 rounded w-full" rows="4" placeholder="Remarques générales…"></textarea>
+</section>
+
+<!-- Validation -->
+<div class="text-center">
+  <button onclick="generatePDFProvisoire()" class="bg-red-600 text-white px-6 py-2 rounded-xl hover:bg-red-700 w-full md:w-auto mt-6">
+    Générer le PDF provisoire
+  </button>
+</div>
+
+</div>
+
+<script>
+  function addExtincteur() {
+    const container = document.getElementById('extincteurs-container');
+    const template = document.getElementById('extincteur-template');
+    const clone = template.content.cloneNode(true);
+    container.appendChild(clone);
+  }
+
+  function validerExtincteur(button) {
+    const section = button.closest("details");
+    const inputs = section.querySelectorAll("input, select, textarea");
+    const summary = section.querySelector("summary");
+
+    const numero = inputs[0]?.value || "";
+    const type = inputs[1]?.value || "";
+    const capacite = inputs[2]?.value || "";
+    const emplacement = inputs[7]?.value || "";
+    const operations = Array.from(section.querySelectorAll("input[type=checkbox]"))
+      .filter(cb => cb.checked)
+      .map(cb => {
+        const label = cb.parentElement.textContent.trim();
+        return label.split(" ").map(w => w[0]).join("").toUpperCase();
+      }).join(", ");
+
+    const resume = `Ext. ${numero} - ${type} ${capacite} - ${emplacement.slice(0, 12)} - [${operations}]`;
+    summary.textContent = resume;
+    section.open = false;
+  }
+
+  function generateYearOptions() {
+    const datalist = document.getElementById('years-list');
+    if (!datalist) return;
+    const currentYear = new Date().getFullYear();
+    for (let y = currentYear; y >= 2000; y--) {
+      const opt = document.createElement('option');
+      opt.value = y;
+      datalist.appendChild(opt);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    toggleLieuIntervention();
+    generateYearOptions();
+  });
+</script>
+
+<!-- Datalists -->
+<datalist id="types-extincteurs">
+  <option value="Poudre ABC">
+  <option value="Eau pulvérisée">
+  <option value="CO₂">
+</datalist>
+<datalist id="capacites-extincteurs">
+  <option value="2 kg"><option value="6 kg"><option value="9 kg"><option value="50 kg">
+</datalist>
+<datalist id="fabricants">
+  <option value="Desautel"><option value="Andrieu"><option value="Eurofeu">
+</datalist>
+<datalist id="years-list"></datalist>
+
+
+<!-- Prévisualisation PDF -->
+<section class="mt-8">
+  <h2 class="text-lg font-semibold mb-2">Aperçu PDF</h2>
+  <iframe id="pdf-preview" class="w-full h-[600px] border rounded"></iframe>
+</section>
+
+<!-- Script PDF Preview avec Blob -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  async function generatePDFProvisoire() {
+    const {{ jsPDF }} = window.jspdf;
+    const doc = new jsPDF({ orientation: "landscape" });
+
+    doc.setFontSize(16);
+    doc.setTextColor(230, 0, 0);
+    doc.text("MENDES PROTECTION INCENDIE", 10, 20);
+
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text("321 Avenue des Glières, 74300 Cluses", 10, 26);
+    doc.text("Tél. : 06 58 70 80 47", 10, 32);
+
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Résumé provisoire de maintenance :", 10, 45);
+    doc.setFont("Helvetica", "normal");
+    doc.text("- Ext. 1 - 6Kg Poudre ABC - Zone A1 - [VO, MS]", 10, 55);
+
+    // Création d’un blob et affichage dans l’iframe
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    document.getElementById("pdf-preview").src = url;
+  }
+</script>
+
+</body>
+</html>
+
+
+<template id="extincteur-template">
+  <details open class="p-4 border rounded-lg bg-gray-50 space-y-4">
+    <summary class="text-md font-semibold cursor-pointer mb-2">Nouvel extincteur</summary>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium mb-1">Observation pour cet extincteur</label>
+        <label class="block text-sm font-medium mb-1">Extincteur N°</label>
+        <input class="border p-2 rounded w-full" data-auto-num />
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Type d'extincteur (ex : 6Kg Poudre ABC)</label>
+        <input list="types-extincteurs" class="border p-2 rounded w-full" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Ext. PP ?</label>
+        <input type="checkbox" class="mt-2" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Mise en service</label>
+        <input list="years-list" class="border p-2 rounded w-full" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Fabricant</label>
+        <input list="fabricants" class="border p-2 rounded w-full" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Niveau</label>
+        <input class="border p-2 rounded w-full" />
+      </div>
+      <div>
+        <label class="block text-sm font-medium mb-1">Emplacement</label>
+        <input class="border p-2 rounded w-full" />
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-sm mb-1">Opérations effectuées</label>
+        <div class="flex flex-wrap gap-3 text-sm">
+          <label><input type="checkbox" class="mr-1"> Vérification OK</label>
+          <label><input type="checkbox" class="mr-1"> Révision quinquennale</label>
+          <label><input type="checkbox" class="mr-1"> Rechargé</label>
+          <label><input type="checkbox" class="mr-1"> Mise en service ce jour</label>
+          <label><input type="checkbox" class="mr-1"> Échange standard</label>
+        </div>
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-sm font-medium mb-1">Observation</label>
         <textarea class="border p-2 rounded w-full" rows="2"></textarea>
       </div>
     </div>
-  </template>
+    <div class="text-right">
+      <button onclick="validerExtincteur(this)" type="button"
+              class="mt-3 bg-green-600 text-white px-4 py-1 rounded hover:bg-green-700">
+        ✅ Valider extincteur
+      </button>
+    </div>
+  </details>
+</template>
+
+<datalist id="types-extincteurs">
+  <option value="6Kg Poudre ABC">
+  <option value="2Kg CO₂">
+  <option value="9L Eau pulvérisée">
+</datalist>
+<datalist id="fabricants">
+  <option value="Desautel"><option value="Andrieu"><option value="Eurofeu">
+</datalist>
+<datalist id="years-list"></datalist>
+
+<script>
+  let extincteurCounter = 1;
+
+  function addExtincteur() {
+    const container = document.getElementById('extincteurs-container');
+    const template = document.getElementById('extincteur-template');
+    const clone = template.content.cloneNode(true);
+    const numInput = clone.querySelector('[data-auto-num]');
+    if (numInput) numInput.value = extincteurCounter++;
+    container.appendChild(clone);
+  }
+
+  function validerExtincteur(button) {
+    const section = button.closest("details");
+    const inputs = section.querySelectorAll("input, select, textarea");
+    const summary = section.querySelector("summary");
+
+    const numero = inputs[0]?.value || "";
+    const type = inputs[1]?.value || "";
+    const emplacement = inputs[6]?.value || "";
+    const operations = Array.from(section.querySelectorAll("input[type=checkbox]"))
+      .filter(cb => cb.checked)
+      .map(cb => {
+        const label = cb.parentElement.textContent.trim();
+        return label.split(" ").map(w => w[0]).join("").toUpperCase();
+      }).join(", ");
+
+    const resume = `Ext. ${numero} - ${type} - ${emplacement.slice(0, 12)} - [${operations}]`;
+    summary.textContent = resume;
+    section.open = false;
+  }
+
+  function generateYearOptions() {
+    const datalist = document.getElementById('years-list');
+    if (!datalist) return;
+    const currentYear = new Date().getFullYear();
+    for (let y = currentYear; y >= 2000; y--) {
+      const opt = document.createElement('option');
+      opt.value = y;
+      datalist.appendChild(opt);
+    }
+  }
+
+  function toggleLieuIntervention() {
+    const isChecked = document.getElementById('diffLieu');
+    if (!isChecked) return;
+    const enabled = isChecked.checked;
+    document.querySelectorAll('.lieu-intervention input').forEach(el => {
+      el.disabled = !enabled;
+      el.classList.toggle('bg-gray-100', !enabled);
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    generateYearOptions();
+    toggleLieuIntervention();
+  });
+</script>
+
+<!-- Prévisualisation PDF -->
+<section class="mt-8">
+  <h2 class="text-lg font-semibold mb-2">Aperçu PDF</h2>
+  <iframe id="pdf-preview" class="w-full h-[600px] border rounded"></iframe>
+</section>
+
+<!-- Script PDF Preview avec Blob -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  async function generatePDFProvisoire() {
+    const {{ jsPDF }} = window.jspdf;
+    const doc = new jsPDF({ orientation: "landscape" });
+
+    doc.setFontSize(16);
+    doc.setTextColor(230, 0, 0);
+    doc.text("MENDES PROTECTION INCENDIE", 10, 20);
+
+    doc.setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    doc.text("321 Avenue des Glières, 74300 Cluses", 10, 26);
+    doc.text("Tél. : 06 58 70 80 47", 10, 32);
+
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Résumé provisoire de maintenance :", 10, 45);
+    doc.setFont("Helvetica", "normal");
+    doc.text("- Ext. 1 - 6Kg Poudre ABC - Zone A1 - [VO, MS]", 10, 55);
+
+    // Création d’un blob et affichage dans l’iframe
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    document.getElementById("pdf-preview").src = url;
+  }
+</script>
 
 </body>
 </html>
