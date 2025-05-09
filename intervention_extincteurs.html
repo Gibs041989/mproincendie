@@ -4,18 +4,149 @@
     <meta charset="UTF-8">
     <title>Maintenance Extincteurs - MproIntervention</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f5f5f5; }
+        header { background: #b30000; color: white; padding: 1rem; display: flex; align-items: center; }
+        header img { height: 50px; margin-right: 15px; }
+        .container { padding: 20px; max-width: 900px; margin: auto; }
+        .extincteur-bloc {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .extincteur-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .extincteur-body { margin-top: 15px; }
+        label { display: block; margin-top: 10px; }
+        input, select, textarea {
+            padding: 8px;
+            width: 100%;
+            max-width: 100%;
+            margin-top: 5px;
+        }
+        .checkboxes label {
+            display: inline-block;
+            margin-right: 15px;
+        }
+        .actions {
+            margin-top: 10px;
+            text-align: right;
+        }
+        .actions button {
+            padding: 8px 16px;
+            background: #e60000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .actions button:hover {
+            background: #cc0000;
+        }
+        .nav-shortcuts {
+            position: fixed;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            background: white;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            font-size: 1.5rem;
+            z-index: 999;
+        }
+        .nav-shortcuts a {
+            color: #b30000;
+            text-decoration: none;
+        }
+        .nav-shortcuts a:hover {
+            transform: scale(1.2);
+        }
+    </style>
 </head>
 <body>
     <header>
-        <img src="assets/logo.png" alt="Logo" height="50">
+        <img src="assets/logo.png" alt="Logo Mendes PI">
         <h1>Maintenance Extincteurs</h1>
-        <nav>
-            <button onclick="navigate('index.html')">Accueil</button>
-        </nav>
     </header>
-    <main>
-        <h2>Maintenance Extincteurs</h2>
-    </main>
+
+    <div class="container" id="extincteursContainer">
+        <!-- Blocs d’extincteurs ajoutés dynamiquement ici -->
+    </div>
+
+    <div class="container actions">
+        <button onclick="ajouterExtincteur()">➕ Ajouter un extincteur</button>
+    </div>
+
+    <!-- Barre de raccourcis -->
+    <div class="nav-shortcuts">
+        <a href="index.html" title="Accueil">🏠</a>
+        <a href="client.html" title="Clients">👤</a>
+        <a href="nouvelle_intervention.html" title="Nouvelle intervention">➕</a>
+        <a href="agenda.html" title="Agenda">📅</a>
+    </div>
+
     <script src="js/main.js"></script>
+    <script>
+        let compteur = 1;
+
+        function ajouterExtincteur() {
+            const container = document.getElementById("extincteursContainer");
+            const bloc = document.createElement("div");
+            bloc.className = "extincteur-bloc";
+            bloc.innerHTML = `
+                <div class="extincteur-header" onclick="this.nextElementSibling.classList.toggle('hidden')">
+                    <strong>Extincteur n°${compteur}</strong>
+                    <span>📝</span>
+                </div>
+                <div class="extincteur-body">
+                    <label>Type d'extincteur :</label>
+                    <input type="text" placeholder="Ex : 6Kg Poudre ABC">
+
+                    <label><input type="checkbox"> Ext. PP ?</label>
+
+                    <label>Millésime de mise en service :</label>
+                    <select>${[...Array(26)].map((_, i) => `<option>${2000 + i}</option>`).join('')}</select>
+
+                    <label>Fabricant :</label>
+                    <input type="text">
+
+                    <label>Niveau / Zone :</label>
+                    <input type="text">
+
+                    <label>Emplacement :</label>
+                    <input type="text">
+
+                    <label>Opérations effectuées :</label>
+                    <div class="checkboxes">
+                        <label><input type="checkbox"> Vérification OK</label>
+                        <label><input type="checkbox"> Révision quinquennale</label>
+                        <label><input type="checkbox"> Rechargé</label>
+                        <label><input type="checkbox"> Mise en service</label>
+                        <label><input type="checkbox"> Échange standard</label>
+                    </div>
+
+                    <label>Observation :</label>
+                    <textarea rows="3"></textarea>
+                </div>
+            `;
+            container.appendChild(bloc);
+            compteur++;
+        }
+
+        // Ajouter un extincteur dès le chargement
+        window.onload = ajouterExtincteur;
+    </script>
 </body>
 </html>
