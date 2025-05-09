@@ -1,8 +1,8 @@
 
 body {
     font-family: Arial, sans-serif;
-    padding: 20px;
     margin: 0;
+    padding: 20px;
     background: #f4f4f4;
 }
 header {
@@ -20,7 +20,22 @@ nav button {
     padding: 10px;
 }
 main {
-    padding: 20px;
     background: white;
+    padding: 20px;
+    margin-top: 20px;
     border-radius: 8px;
+}
+.login-container {
+    max-width: 300px;
+    margin: 100px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+input, select {
+    display: block;
+    margin: 10px auto;
+    padding: 8px;
+    width: 90%;
 }
