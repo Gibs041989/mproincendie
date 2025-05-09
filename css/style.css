@@ -1,0 +1,26 @@
+
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    margin: 0;
+    background: #f4f4f4;
+}
+header {
+    background: #c00;
+    color: white;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+}
+header img {
+    margin-right: 15px;
+}
+nav button {
+    margin: 5px;
+    padding: 10px;
+}
+main {
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+}
