@@ -1,152 +1,290 @@
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Maintenance Extincteurs - MproIntervention</title>
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f5f5f5; }
-        header { background: #b30000; color: white; padding: 1rem; display: flex; align-items: center; }
-        header img { height: 50px; margin-right: 15px; }
-        .container { padding: 20px; max-width: 900px; margin: auto; }
-        .extincteur-bloc {
-            background: white;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .extincteur-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #f0f0f0;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .extincteur-body { margin-top: 15px; }
-        label { display: block; margin-top: 10px; }
-        input, select, textarea {
-            padding: 8px;
-            width: 100%;
-            max-width: 100%;
-            margin-top: 5px;
-        }
-        .checkboxes label {
-            display: inline-block;
-            margin-right: 15px;
-        }
-        .actions {
-            margin-top: 10px;
-            text-align: right;
-        }
-        .actions button {
-            padding: 8px 16px;
-            background: #e60000;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .actions button:hover {
-            background: #cc0000;
-        }
-        .nav-shortcuts {
-            position: fixed;
-            bottom: 10px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            background: white;
-            padding: 10px;
-            border-top: 1px solid #ddd;
-            font-size: 1.5rem;
-            z-index: 999;
-        }
-        .nav-shortcuts a {
-            color: #b30000;
-            text-decoration: none;
-        }
-        .nav-shortcuts a:hover {
-            transform: scale(1.2);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Compte-rendu Extincteurs - MproIntervention</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    h2 { color: #b30000; }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    .flex {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #005fa3;
+    }
+    .extincteur-bloc {
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    summary {
+      font-weight: bold;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .checkbox-group {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <img src="assets/logo.png" alt="Logo Mendes PI">
-        <h1>Maintenance Extincteurs</h1>
-    </header>
+  <div style="margin-bottom: 15px;">
+    <h2>Compte-rendu Extincteurs</h2>
+    <div><strong>Client :</strong> Dupont Entreprise</div>
+    <div><strong>Lieu d’intervention :</strong> Site Annexe - Zone industrielle</div>
+  </div>
+  <datalist id="types-extincteurs">
+    <option value="6Kg Poudre ABC" />
+    <option value="2Kg CO2" />
+    <option value="9L Eau + Additif" />
+  </datalist>
+  <datalist id="years-list">
+    <option value="2025" /><option value="2024" /><option value="2023" />
+  </datalist>
+  <datalist id="fabricants">
+    <option value="Desautel" />
+    <option value="Eurofeu" />
+    <option value="Andrieu" />
+  </datalist>
 
-    <div class="container" id="extincteursContainer">
-        <!-- Blocs d’extincteurs ajoutés dynamiquement ici -->
-    </div>
+  <h2>Compte-rendu Extincteurs</h2>
 
-    <div class="container actions">
-        <button onclick="ajouterExtincteur()">➕ Ajouter un extincteur</button>
-    </div>
+  <section id="extincteurs-container"></section>
 
-    <!-- Barre de raccourcis -->
-    <div class="nav-shortcuts">
-        <a href="index.html" title="Accueil">🏠</a>
-        <a href="client.html" title="Clients">👤</a>
-        <a href="nouvelle_intervention.html" title="Nouvelle intervention">➕</a>
-        <a href="agenda.html" title="Agenda">📅</a>
-    </div>
+  <div style="text-align: left; margin: 20px 0;">
+    <button onclick="addExtincteur()" type="button" class="btn">➕ Ajouter un extincteur</button>
+  </div>
 
-    <script src="js/main.js"></script>
-    <script>
-        let compteur = 1;
+  <div class="checkbox-group">
+    <h3>✅ Devoir de conseil</h3>
+    <label><input type="checkbox" class="check-dc" /> Registre présent et à jour</label>
+    <label><input type="checkbox" class="check-dc" /> Signalétique à jour</label>
+    <label><input type="checkbox" class="check-dc" /> BAES présents</label>
+    <label><input type="checkbox" class="check-dc" /> Plans de sécurité présents et à jour</label>
+  </div>
 
-        function ajouterExtincteur() {
-            const container = document.getElementById("extincteursContainer");
-            const bloc = document.createElement("div");
-            bloc.className = "extincteur-bloc";
-            bloc.innerHTML = `
-                <div class="extincteur-header" onclick="this.nextElementSibling.classList.toggle('hidden')">
-                    <strong>Extincteur n°${compteur}</strong>
-                    <span>📝</span>
-                </div>
-                <div class="extincteur-body">
-                    <label>Type d'extincteur :</label>
-                    <input type="text" placeholder="Ex : 6Kg Poudre ABC">
+  <div style="margin-top: 20px;">
+    <button class="btn" onclick="validerCompteRendu()">✅ Valider le compte rendu</button>
+    <button class="btn" style="background:#28a745;margin-left:10px;" onclick="window.location.href='bon.html'">➡️ Passer au bon d’intervention</button>
+  </div>
 
-                    <label><input type="checkbox"> Ext. PP ?</label>
+  <template id="extincteur-template">
+    <details open class="extincteur-bloc">
+      <summary>Nouvel extincteur</summary>
+      <div class="grid">
+        <div><label>N° extincteur</label><input class="ext-num" /></div>
+        <div><label>Type d'extincteur</label><input class="ext-type" list="types-extincteurs" /></div>
+        <div><label>Ext. PP ?</label><input type="checkbox" /></div>
+        <div><label>Millésime</label><input class="ext-year" list="years-list" /></div>
+        <div><label>Fabricant</label><input class="ext-fab" list="fabricants" /></div>
+        <div><label>Niveau</label><input class="ext-niv" /></div>
+        <div><label>Emplacement</label><input class="ext-emplacement" /></div>
+        <div style="grid-column: span 2;">
+          <label>Opérations effectuées</label>
+          <div class="flex">
+            <label><input type="checkbox" data-code="VF" /> Vérification OK</label>
+            <label><input type="checkbox" data-code="RQ" /> Révision quinquennale</label>
+            <label><input type="checkbox" data-code="RE" /> Rechargé</label>
+            <label><input type="checkbox" data-code="MS" /> Mise en service</label>
+            <label><input type="checkbox" data-code="ES" /> Échange standard</label>
+          </div>
+        </div>
+        <div style="grid-column: span 2;"><label>Observation</label><textarea rows="3"></textarea></div>
+      </div>
+      <button class="btn" type="button" onclick="validerExtincteur(this)">✅ Valider extincteur</button>
+    </details>
+  </template>
 
-                    <label>Millésime de mise en service :</label>
-                    <select>${[...Array(26)].map((_, i) => `<option>${2000 + i}</option>`).join('')}</select>
+  
+<script>
+  window.onload = () => {
+    const saved = localStorage.getItem("crm_extincteurs");
+    if (saved) {
+      if (confirm("Un brouillon a été trouvé. Souhaitez-vous le recharger ?")) {
+        document.getElementById("extincteurs-container").innerHTML = saved;
+        document.querySelectorAll("details").forEach(x => x.open = false);
+      }
+    } else {
+      addExtincteur();
+    }
+  };
 
-                    <label>Fabricant :</label>
-                    <input type="text">
+  function sauvegarderBrouillon() {
+    const contenu = document.getElementById("extincteurs-container").innerHTML;
+    localStorage.setItem("crm_extincteurs", contenu);
+  }
 
-                    <label>Niveau / Zone :</label>
-                    <input type="text">
+  //
+    // brouillon effacé à la validation automatiquement
+  }
 
-                    <label>Emplacement :</label>
-                    <input type="text">
+  setInterval(sauvegarderBrouillon, 10000);
 
-                    <label>Opérations effectuées :</label>
-                    <div class="checkboxes">
-                        <label><input type="checkbox"> Vérification OK</label>
-                        <label><input type="checkbox"> Révision quinquennale</label>
-                        <label><input type="checkbox"> Rechargé</label>
-                        <label><input type="checkbox"> Mise en service</label>
-                        <label><input type="checkbox"> Échange standard</label>
-                    </div>
+    let compteur = 1;
 
-                    <label>Observation :</label>
-                    <textarea rows="3"></textarea>
-                </div>
-            `;
-            container.appendChild(bloc);
-            compteur++;
-        }
+    function addExtincteur() {
+      const container = document.getElementById("extincteurs-container");
+      const template = document.getElementById("extincteur-template");
+      const clone = template.content.cloneNode(true);
+      clone.querySelector(".ext-num").value = compteur++;
+      container.appendChild(clone);
+    }
 
-        // Ajouter un extincteur dès le chargement
-        window.onload = ajouterExtincteur;
-    </script>
+    function validerExtincteur(btn) {
+      const bloc = btn.closest("details");
+      const num = bloc.querySelector(".ext-num").value.trim();
+      const type = bloc.querySelector(".ext-type").value.trim();
+      const fab = bloc.querySelector(".ext-fab").value.trim();
+      const niv = bloc.querySelector(".ext-niv").value.trim();
+      const empl = bloc.querySelector(".ext-emplacement").value.trim();
+      const ops = [...bloc.querySelectorAll("input[data-code]:checked")];
+
+      if (!num || !type || !fab || !niv || !empl || ops.length === 0) {
+        alert("Merci de remplir les champs obligatoires et cocher au moins une opération.");
+        return;
+      }
+
+      const codeOps = ops.map(x => x.dataset.code).join(", ");
+      bloc.querySelector("summary").textContent = `🧯 N°${num} – ${type} – ${empl.slice(0, 12)} – ${codeOps}`;
+      [...bloc.querySelectorAll("input, textarea")].forEach(el => el.disabled = true);
+      btn.style.display = "none";
+
+      const bar = document.createElement("div");
+      bar.innerHTML = `
+        <button class="btn" onclick="toggleEdit(this)">✏️ Modifier</button>
+        <button class="btn" style="background:#d9534f;" onclick="supprimerExtincteur(this)">🗑️ Supprimer</button>
+      `;
+      bloc.appendChild(bar);
+      bloc.open = false;
+    }
+
+    function toggleEdit(btn) {
+      const bloc = btn.closest("details");
+      [...bloc.querySelectorAll("input, textarea")].forEach(el => el.disabled = false);
+      bloc.querySelector("button").style.display = "inline-block";
+      bloc.open = true;
+    }
+
+    function supprimerExtincteur(btn) {
+      if (confirm("Confirmer la suppression de cet extincteur ?")) {
+        btn.closest("details").remove();
+      }
+    }
+
+    function validerCompteRendu() {
+      const checkboxes = document.querySelectorAll(".check-dc");
+      const tousCoches = [...checkboxes].every(c => c.checked);
+      // vérification désactivée
+      if (false) {
+        alert("Merci de valider tous les points du devoir de conseil.");
+        return;
+      }
+      localStorage.removeItem("crm_extincteurs"); alert("Compte rendu validé !");
+    }
+
+    window.onload = addExtincteur;
+  </script>
+  
+  
+
+  
+
+  <div class="nav-shortcuts" style="
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    border-top: 1px solid #ccc;
+    padding: 12px 0;
+    font-size: 1.8rem;
+    z-index: 999;
+  ">
+    <a href="index.html" title="Accueil">🏠</a>
+    <a href="intervention_extincteurs.html" title="Extincteurs">🧯</a>
+    <a href="intervention_ria.html" title="RIA">🚿</a>
+    <a href="intervention_baes.html" title="BAES">💡</a>
+    <a href="intervention_desenfumage.html" title="Désenfumage">💨</a>
+  </div>
+</body> style="position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: center; gap: 20px; border-top: 1px solid #ccc; padding: 10px 0; font-size: 1.5rem;">
+    <a href="index.html" title="Accueil">🏠</a>
+    <a href="intervention_extincteurs.html" title="Extincteurs">🧯</a>
+    <a href="intervention_ria.html" title="RIA">🚿</a>
+    <a href="intervention_baes.html" title="BAES">💡</a>
+    <a href="intervention_desenfumage.html" title="Désenfumage">💨</a>
+</div><!-- fin nav-shortcuts -->
+ style="position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: center; gap: 20px; border-top: 1px solid #ccc; padding: 10px 0; font-size: 1.5rem;">
+    <a href="intervention_extincteurs.html" title="Extincteurs">🧯</a>
+    <a href="intervention_ria.html" title="RIA">🚿</a>
+    <a href="intervention_baes.html" title="BAES">💡</a>
+    <a href="intervention_desenfumage.html" title="Désenfumage">💨</a>
+  </div>
+
+  
+
+  <div class="nav-shortcuts" style="
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    border-top: 1px solid #ccc;
+    padding: 12px 0;
+    font-size: 1.8rem;
+    z-index: 999;
+  ">
+    <a href="index.html" title="Accueil">🏠</a>
+    <a href="intervention_extincteurs.html" title="Extincteurs">🧯</a>
+    <a href="intervention_ria.html" title="RIA">🚿</a>
+    <a href="intervention_baes.html" title="BAES">💡</a>
+    <a href="intervention_desenfumage.html" title="Désenfumage">💨</a>
+  </div>
 </body>
 </html>
