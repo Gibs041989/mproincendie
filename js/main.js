@@ -1,2 +1,10 @@
-function navigate(page) { window.location.href = page; }
-function login() { const user = document.getElementById('username').value; const role = document.getElementById('role').value; localStorage.setItem('role', role); localStorage.setItem('user', user); window.location.href = 'index.html'; }
+function navigate(page) {
+    window.location.href = page;
+}
+function login() {
+    const user = document.getElementById('username').value;
+    const role = document.getElementById('role').value;
+    localStorage.setItem('role', role);
+    localStorage.setItem('user', user);
+    window.location.href = 'index.html';
+}
