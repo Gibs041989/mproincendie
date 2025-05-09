@@ -6,92 +6,38 @@
   <meta charset="UTF-8" />
   <title>Compte-rendu Extincteurs - MproIntervention</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f5f5f5;
-      padding: 20px;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; padding: 20px; margin-bottom: 100px; }
     h2 { color: #b30000; }
-    label {
-      display: block;
-      font-weight: 600;
-      margin-top: 10px;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-    }
-    .flex {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 8px;
-    }
-    .btn {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: #0077cc;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .btn:hover {
-      background: #005fa3;
-    }
-    .extincteur-bloc {
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 20px;
-    }
-    summary {
-      font-weight: bold;
-      margin-bottom: 10px;
-      cursor: pointer;
-    }
-    .checkbox-group {
-      background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      margin-top: 20px;
-    }
+    label { display: block; font-weight: 600; margin-top: 10px; }
+    input, select, textarea { width: 100%; padding: 8px; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .flex { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+    .btn { margin-top: 20px; padding: 10px 20px; background: #0077cc; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    .btn:hover { background: #005fa3; }
+    .extincteur-bloc { background: white; border: 1px solid #ccc; border-radius: 10px; padding: 15px; margin-bottom: 20px; }
+    summary { font-weight: bold; margin-bottom: 10px; cursor: pointer; }
+    .checkbox-group { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ccc; margin-top: 20px; }
+    .nav-shortcuts { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: center; gap: 30px; border-top: 1px solid #ccc; padding: 12px 0; font-size: 1.8rem; z-index: 999; }
   </style>
 </head>
 <body>
-  <div style="margin-bottom: 15px;">
-    <h2>Compte-rendu Extincteurs</h2>
-    <div><strong>Client :</strong> Dupont Entreprise</div>
-    <div><strong>Lieu d’intervention :</strong> Site Annexe - Zone industrielle</div>
-  </div>
-  <datalist id="types-extincteurs">
-    <option value="6Kg Poudre ABC" />
-    <option value="2Kg CO2" />
-    <option value="9L Eau + Additif" />
-  </datalist>
-  <datalist id="years-list">
-    <option value="2025" /><option value="2024" /><option value="2023" />
-  </datalist>
-  <datalist id="fabricants">
-    <option value="Desautel" />
-    <option value="Eurofeu" />
-    <option value="Andrieu" />
-  </datalist>
-
   <h2>Compte-rendu Extincteurs</h2>
+  <div><strong>Client :</strong> Dupont Entreprise</div>
+  <div><strong>Lieu d’intervention :</strong> Site Annexe - Zone industrielle</div>
+  <div style="margin-top: 30px; margin-bottom: 10px;">
+    <div style="display: flex; flex-wrap: wrap; gap: 30px;">
+      <div style="flex: 1; min-width: 220px;">
+        <label for="date_intervention">📅 Date d’intervention</label>
+        <input type="date" name="date_intervention" id="date_intervention" />
+      </div>
+      <div style="flex: 2; min-width: 220px;">
+        <label for="technicien">👨‍🔧 Technicien intervenant</label>
+        <input type="text" name="technicien" id="technicien" placeholder="Nom et prénom du technicien" />
+      </div>
+    </div>
+  </div>
 
   <section id="extincteurs-container"></section>
-
   <div style="text-align: left; margin: 20px 0;">
     <button onclick="addExtincteur()" type="button" class="btn">➕ Ajouter un extincteur</button>
   </div>
@@ -136,33 +82,30 @@
     </details>
   </template>
 
-  
-<script>
-  window.onload = () => {
-    const saved = localStorage.getItem("crm_extincteurs");
-    if (saved) {
-      if (confirm("Un brouillon a été trouvé. Souhaitez-vous le recharger ?")) {
-        document.getElementById("extincteurs-container").innerHTML = saved;
-        document.querySelectorAll("details").forEach(x => x.open = false);
-      }
-    } else {
-      addExtincteur();
-    }
-  };
+  <datalist id="types-extincteurs">
+    <option value="6Kg Poudre ABC" />
+    <option value="2Kg CO2" />
+    <option value="9L Eau + Additif" />
+  </datalist>
+  <datalist id="years-list">
+    <option value="2025" /><option value="2024" /><option value="2023" />
+  </datalist>
+  <datalist id="fabricants">
+    <option value="Desautel" />
+    <option value="Eurofeu" />
+    <option value="Andrieu" />
+  </datalist>
 
-  function sauvegarderBrouillon() {
-    const contenu = document.getElementById("extincteurs-container").innerHTML;
-    localStorage.setItem("crm_extincteurs", contenu);
-  }
+  <div class="nav-shortcuts">
+    <a href="index.html" title="Accueil">🏠</a>
+    <a href="intervention_extincteurs.html" title="Extincteurs">🧯</a>
+    <a href="intervention_ria.html" title="RIA">🚿</a>
+    <a href="intervention_baes.html" title="BAES">💡</a>
+    <a href="intervention_desenfumage.html" title="Désenfumage">💨</a>
+  </div>
 
-  //
-    // brouillon effacé à la validation automatiquement
-  }
-
-  setInterval(sauvegarderBrouillon, 10000);
-
+  <script>
     let compteur = 1;
-
     function addExtincteur() {
       const container = document.getElementById("extincteurs-container");
       const template = document.getElementById("extincteur-template");
@@ -213,78 +156,18 @@
     }
 
     function validerCompteRendu() {
-      const checkboxes = document.querySelectorAll(".check-dc");
-      const tousCoches = [...checkboxes].every(c => c.checked);
-      // vérification désactivée
-      if (false) {
-        alert("Merci de valider tous les points du devoir de conseil.");
-        return;
-      }
-      localStorage.removeItem("crm_extincteurs"); alert("Compte rendu validé !");
+      localStorage.removeItem("crm_extincteurs_CLIENT123");
+      alert("Compte rendu validé !");
     }
 
-    window.onload = addExtincteur;
+    // Sauvegarde automatique liée à l’ID client
+    setInterval(() => {
+      localStorage.setItem("crm_extincteurs_CLIENT123", document.getElementById("extincteurs-container").innerHTML);
+    }, 10000);
+
+    window.onload = () => {
+      addExtincteur();
+    };
   </script>
-  
-  
-
-  
-
-  <div class="nav-shortcuts" style="
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: white;
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    border-top: 1px solid #ccc;
-    padding: 12px 0;
-    font-size: 1.8rem;
-    z-index: 999;
-  ">
-    <a href="index.html" title="Accueil">🏠</a>
-    <a href="intervention_extincteurs.html" title="Extincteurs">🧯</a>
-    <a href="intervention_ria.html" title="RIA">🚿</a>
-    <a href="intervention_baes.html" title="BAES">💡</a>
-    <a href="intervention_desenfumage.html" title="Désenfumage">💨</a>
-  </div>
-</body> style="position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: center; gap: 20px; border-top: 1px solid #ccc; padding: 10px 0; font-size: 1.5rem;">
-    <a href="index.html" title="Accueil">🏠</a>
-    <a href="intervention_extincteurs.html" title="Extincteurs">🧯</a>
-    <a href="intervention_ria.html" title="RIA">🚿</a>
-    <a href="intervention_baes.html" title="BAES">💡</a>
-    <a href="intervention_desenfumage.html" title="Désenfumage">💨</a>
-</div><!-- fin nav-shortcuts -->
- style="position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: center; gap: 20px; border-top: 1px solid #ccc; padding: 10px 0; font-size: 1.5rem;">
-    <a href="intervention_extincteurs.html" title="Extincteurs">🧯</a>
-    <a href="intervention_ria.html" title="RIA">🚿</a>
-    <a href="intervention_baes.html" title="BAES">💡</a>
-    <a href="intervention_desenfumage.html" title="Désenfumage">💨</a>
-  </div>
-
-  
-
-  <div class="nav-shortcuts" style="
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: white;
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    border-top: 1px solid #ccc;
-    padding: 12px 0;
-    font-size: 1.8rem;
-    z-index: 999;
-  ">
-    <a href="index.html" title="Accueil">🏠</a>
-    <a href="intervention_extincteurs.html" title="Extincteurs">🧯</a>
-    <a href="intervention_ria.html" title="RIA">🚿</a>
-    <a href="intervention_baes.html" title="BAES">💡</a>
-    <a href="intervention_desenfumage.html" title="Désenfumage">💨</a>
-  </div>
 </body>
 </html>
