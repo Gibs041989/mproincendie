@@ -180,13 +180,46 @@ textarea {
 .grid > div {
   width: 100%;
 }
+
+/* Compact summaries */
+summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 1rem !important;
+}
+summary::before {
+  font-size: 1.2rem;
+}
+.extincteur-bloc summary img,
+.extincteur-bloc summary svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Button styling */
+button.btn {
+  width: 100%;
+  max-width: 300px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  margin-top: 12px;
+}
+
+/* Devoir de conseil refinement */
+.checkbox-group {
+  background: #ffffff !important;
+  border-radius: 6px !important;
+  border: 1px solid #ccc;
+  box-shadow: none;
+  padding: 15px;
+}
 </style>
 </head>
 <body>
-<h2><span style="font-size: 1.4rem; font-weight: 700;">Compte-rendu Extincteurs</span></h2>
-<div><strong>Client :</strong> Dupont Entreprise</div>
-<div><strong>Lieu d’intervention :</strong> Site Annexe - Zone industrielle</div>
-<div style="margin-top: 30px; margin-bottom: 10px;">
+<h2><span style="font-size: 1.4rem; font-weight: 700;">Compte-rendu Extincteurs</span></h2><div><div><strong>Client :</strong> Dupont Entreprise</div><div><strong>Lieu d’intervention :</strong> Site Annexe - Zone industrielle</div></div><section style="margin-top: 30px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background: #fff;"><h3 style="font-size: 1.2rem; font-weight: 600;">📅 Détails de l’intervention</h3><div style="margin-top: 30px; margin-bottom: 10px;">
 <div style="display: flex; flex-wrap: wrap; gap: 30px;">
 <div style="flex: 1; min-width: 220px;">
 <label for="date_intervention">📅 Date d’intervention</label>
@@ -197,12 +230,15 @@ textarea {
 <input id="technicien" name="technicien" placeholder="Nom et prénom du technicien" type="text"/>
 </div>
 </div>
-</div>
+</div></section>
 <section id="extincteurs-container"></section>
 <div style="text-align: left; margin: 20px 0;">
 <button class="btn" onclick="addExtincteur()" type="button">➕ Ajouter un extincteur</button>
 </div>
-<div class="checkbox-group" style="margin-top: 20px;">
+<div style="margin-top: 30px;">
+<h3 style="font-size: 1.2rem; font-weight: 600;">📝 Observations générales</h3>
+<textarea id="observation_generale" placeholder="Ajouter une remarque générale sur l’intervention..." rows="4" style="width: 100%; font-size: 1rem;"></textarea>
+</div><div class="checkbox-group" style="margin-top: 20px; margin-bottom: 80px;">
 <h3><span style="font-size: 1.2rem; font-weight: 600;">✅ Devoir de conseil</span></h3>
 <div style="display: flex; flex-direction: column; gap: 12px;">
 <label class="dc-item">Registre présent et à jour<input class="check-dc" id="dc-registre" type="checkbox"/></label>
@@ -211,10 +247,7 @@ textarea {
 <label class="dc-item">Plans de sécurité présents et à jour<input class="check-dc" id="dc-plans" type="checkbox"/></label>
 </div>
 </div>
-<div style="margin-top: 20px;">
-<button class="btn" onclick="validerCompteRendu()">✅ Valider le compte rendu</button>
-<button class="btn" onclick="window.location.href='bon.html'" style="background:#28a745;margin-left:10px;">➡️ Passer au bon d’intervention</button>
-</div>
+
 <template id="extincteur-template">
 <details class="extincteur-bloc" open="">
 <summary style="font-weight: bold; font-size: 1.15rem;">🧯 Nouvel extincteur</summary>
@@ -257,7 +290,10 @@ textarea {
 <option value="Eurofeu"></option>
 <option value="Andrieu"></option>
 </datalist>
-<div class="nav-shortcuts">
+<section style="margin-top: 40px; margin-bottom: 120px; text-align: center;">
+<button class="btn" onclick="validerCompteRendu()" style="background:#0077cc; color:white; margin-bottom: 10px;">✅ Valider le compte rendu</button><br/>
+<button class="btn" onclick="window.location.href='bon.html'" style="background:#28a745; color:white;">➡️ Passer au bon d’intervention</button>
+</section><div class="nav-shortcuts">
 <a href="index.html" title="Accueil">🏠</a>
 <a href="intervention_extincteurs.html" title="Extincteurs">🧯</a>
 <a href="intervention_ria.html" title="RIA">🚿</a>
@@ -354,6 +390,20 @@ function validerCompteRendu() {
 
       addExtincteur();
     };
-  </script>
+  
+function validerCompteRendu() {
+  const extincteurs = document.querySelectorAll('.extincteur-bloc');
+  const valides = Array.from(extincteurs).filter(e => e.querySelector("summary").textContent.includes("–"));
+  if (valides.length === 0) {
+    alert("Vous devez valider au moins un extincteur pour pouvoir finaliser le compte rendu.");
+    return;
+  }
+  if (!confirm("Confirmer la validation pour " + valides.length + " extincteur(s) validé(s) ?")) {
+    return;
+  }
+  localStorage.removeItem("crm_extincteurs_CLIENT123");
+  alert("Compte rendu validé !");
+}
+</script>
 </body>
 </html>
