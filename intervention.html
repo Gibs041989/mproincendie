@@ -64,15 +64,15 @@
 <select id="select-client">
 <option value="">-- Sélectionner --</option>
 </select>
-<button onclick="ajouterClient()">➕ Nouveau client</button>
+<button onclick="window.location.href='nouveau_client.html'">➕ Nouveau client</button>
 <label style="margin-top: 20px;">
 <input id="check-lieu-diff" onchange="toggleLieu()" type="checkbox"/> Lieu d’intervention différent
     </label>
 <div id="lieu-diff" style="display: none;">
 <label>Adresse du lieu d’intervention</label>
-<input placeholder="Saisir adresse ou nom du site" type="text">
-</input></div>
-</section>
+<input placeholder="Saisir adresse ou nom du site" type="text"/>
+</div>
+<label style="margin-top: 20px;">Lieu d’intervention (si différent ou multiple)</label><select id="select-lieu" style="margin-top: 5px; display: none;"><option value="">-- Choisir un lieu --</option></select></section>
 <section>
 <h2>🛠️ Type d’intervention</h2>
 <div class="type-btns">
@@ -168,6 +168,57 @@
     window.onload = () => {
       chargerBrouillons();
     };
-  </script>
+  
+function chargerClients() {
+  const select = document.getElementById("select-client");
+  const clients = JSON.parse(localStorage.getItem("clients") || "[]");
+  clients.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c.nom;
+    opt.textContent = c.nom + " – " + c.adresse;
+    select.appendChild(opt);
+  });
+}
+window.onload = () => {
+  chargerBrouillons();
+  chargerClients();
+};
+
+    function chargerClients() {
+      const select = document.getElementById("select-client");
+      const clients = JSON.parse(localStorage.getItem("clients") || "[]");
+      const client_recent = localStorage.getItem("client_recent");
+      clients.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c.nom;
+        opt.textContent = c.nom + " – " + c.ville;
+        if (client_recent && c.nom === client_recent) {
+          opt.selected = true;
+          localStorage.removeItem("client_recent");
+        }
+        select.appendChild(opt);
+      });
+    }
+    
+document.getElementById("select-client").addEventListener("change", () => {
+  const nomClient = document.getElementById("select-client").value;
+  const clients = JSON.parse(localStorage.getItem("clients") || "[]");
+  const client = clients.find(c => c.nom === nomClient);
+  const lieuSelect = document.getElementById("select-lieu");
+  lieuSelect.innerHTML = "<option value=''>-- Choisir un lieu --</option>";
+
+  if (client && client.adresses_intervention && client.adresses_intervention.length) {
+    client.adresses_intervention.forEach(ad => {
+      const opt = document.createElement("option");
+      opt.value = ad.rue + ' - ' + ad.ville;
+      opt.textContent = (ad.nom || '') + ' - ' + ad.rue + ', ' + ad.ville;
+      lieuSelect.appendChild(opt);
+    });
+    lieuSelect.style.display = "block";
+  } else {
+    lieuSelect.style.display = "none";
+  }
+});
+</script>
 </body>
 </html>
