@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Nouveau client - Optimisé</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f5f5f5; }
+    form { background: white; padding: 20px; border-radius: 10px; max-width: 700px; margin: auto; }
+    h1 { color: #b30000; font-size: 1.5rem; }
+    label { display: block; margin-top: 15px; font-weight: 600; }
+    input, select, button {
+      width: 100%; padding: 10px; font-size: 1rem; margin-top: 5px;
+      border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box;
+    }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .row > div { flex: 1; min-width: 120px; }
+    .adresse-intervention {
+      border: 1px dashed #ccc;
+      padding: 10px;
+      margin-top: 15px;
+      border-radius: 6px;
+    }
+    .small-btn {
+      background: #0077cc; color: white; margin-top: 5px;
+      font-size: 0.9rem; width: auto; padding: 6px 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>➕ Nouveau client</h1>
+  <form onsubmit="enregistrerClient(); return false;">
+    <label>Nom / Raison sociale</label>
+    <input type="text" id="nom" required />
+
+    <div class="row">
+      <div><label>SIRET</label><input type="text" id="siret" /></div>
+      <div><label>Dirigeant</label><input type="text" id="dirigeant" /></div>
+    </div>
+
+    <label>Adresse principale</label>
+    <div class="row">
+      <div><input type="text" id="rue" placeholder="N° et rue" /></div>
+      <div><input type="text" id="cp" placeholder="Code postal" oninput="suggestVille(this.value, 'ville')" /></div>
+      <div><input list="villes" id="ville" placeholder="Ville" /></div>
+    </div>
+    <button type="button" class="small-btn" onclick="geolocaliser('rue','cp','ville')">📍 Utiliser ma position</button>
+
+    <div class="row">
+      <div><label>Téléphone</label><input type="tel" id="telephone" /></div>
+      <div><label>Email comptabilité</label><input type="email" id="email_compta" /></div>
+      <div><label>Email direction</label><input type="email" id="email_direction" /></div>
+    </div>
+
+    <label>Nom du contact référent</label>
+    <input type="text" id="contact" />
+
+    <label>Adresses d’intervention</label>
+    <div id="adresses-intervention">
+      <div class="adresse-intervention">
+        <input type="text" placeholder="Nom du lieu" class="lieu-nom" />
+        <input type="text" placeholder="N° et rue" class="lieu-rue" />
+        <input type="text" placeholder="Code postal" class="lieu-cp" oninput="suggestVille(this.value, this.nextElementSibling.id)" />
+        <input list="villes" placeholder="Ville" class="lieu-ville" id="lieu-ville-0" />
+        <input type="text" placeholder="Contact sur place" class="lieu-contact" />
+        <button type="button" class="small-btn" onclick="geolocaliserBloc(this)">📍 Utiliser ma position</button>
+      </div>
+    </div>
+    <button type="button" onclick="ajouterAdresse()">➕ Ajouter une adresse</button>
+    <button type="submit">✅ Enregistrer client</button>
+  </form>
+
+  <datalist id="villes"></datalist>
+
+  <script>
+    function ajouterAdresse() {
+      const container = document.getElementById("adresses-intervention");
+      const index = container.children.length;
+      const div = document.createElement("div");
+      div.className = "adresse-intervention";
+      div.innerHTML = `
+        <input type="text" placeholder="Nom du lieu" class="lieu-nom" />
+        <input type="text" placeholder="N° et rue" class="lieu-rue" />
+        <input type="text" placeholder="Code postal" class="lieu-cp" oninput="suggestVille(this.value, 'lieu-ville-${index}')" />
+        <input list="villes" placeholder="Ville" class="lieu-ville" id="lieu-ville-${index}" />
+        <input type="text" placeholder="Contact sur place" class="lieu-contact" />
+        <button type="button" class="small-btn" onclick="geolocaliserBloc(this)">📍 Utiliser ma position</button>
+      `;
+      container.appendChild(div);
+    }
+
+    function enregistrerClient() {
+      const client = {
+        nom: document.getElementById("nom").value,
+        siret: document.getElementById("siret").value,
+        dirigeant: document.getElementById("dirigeant").value,
+        rue: document.getElementById("rue").value,
+        cp: document.getElementById("cp").value,
+        ville: document.getElementById("ville").value,
+        telephone: document.getElementById("telephone").value,
+        email_compta: document.getElementById("email_compta").value,
+        email_direction: document.getElementById("email_direction").value,
+        contact: document.getElementById("contact").value,
+        adresses_intervention: Array.from(document.querySelectorAll(".adresse-intervention")).map(div => ({
+          nom: div.querySelector(".lieu-nom").value,
+          rue: div.querySelector(".lieu-rue").value,
+          cp: div.querySelector(".lieu-cp").value,
+          ville: div.querySelector(".lieu-ville").value,
+          contact: div.querySelector(".lieu-contact").value
+        }))
+      };
+      let clients = JSON.parse(localStorage.getItem("clients") || "[]");
+      clients.push(client);
+      localStorage.setItem("clients", JSON.stringify(clients));
+      alert("Client '" + client.nom + "' enregistré !");
+      window.location.href = "intervention.html";
+    }
+
+    async function geolocaliser(idRue, idCp, idVille) {
+      navigator.geolocation.getCurrentPosition(async pos => {
+        const { latitude, longitude } = pos.coords;
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+        const data = await res.json();
+        document.getElementById(idRue).value = data.address.road || "";
+        document.getElementById(idCp).value = data.address.postcode || "";
+        document.getElementById(idVille).value = data.address.city || data.address.town || data.address.village || "";
+      });
+    }
+
+    async function geolocaliserBloc(button) {
+      const bloc = button.parentElement;
+      navigator.geolocation.getCurrentPosition(async pos => {
+        const { latitude, longitude } = pos.coords;
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+        const data = await res.json();
+        bloc.querySelector(".lieu-rue").value = data.address.road || "";
+        bloc.querySelector(".lieu-cp").value = data.address.postcode || "";
+        bloc.querySelector(".lieu-ville").value = data.address.city || data.address.town || data.address.village || "";
+      });
+    }
+
+    async function suggestVille(cp, targetId) {
+      if (cp.length < 4) return;
+      const res = await fetch(`https://geo.api.gouv.fr/communes?codePostal=${cp}&fields=nom`);
+      const villes = await res.json();
+      const datalist = document.getElementById("villes");
+      datalist.innerHTML = "";
+      villes.forEach(v => {
+        const opt = document.createElement("option");
+        opt.value = v.nom;
+        datalist.appendChild(opt);
+      });
+    }
+  </script>
+</body>
+</html>
