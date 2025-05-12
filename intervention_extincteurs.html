@@ -158,7 +158,7 @@
 
   <template id="extincteur-template">
     <details open class="extincteur-bloc">
-      <summary>Nouvel extincteur</summary>
+      <summary style="font-weight: bold; font-size: 1.15rem;">🧯 Nouvel extincteur</summary>
       <div class="grid">
         <div><label>N° extincteur</label><input class="ext-num" /></div>
         <div><label>Type d'extincteur</label><input class="ext-type" list="types-extincteurs" /></div>
@@ -168,7 +168,7 @@
         <div><label>Niveau</label>
 <input class="ext-niv" /></div>
         <div><label>Emplacement</label><input class="ext-emplacement" /></div>
-        <div style="grid-column: span 2;"><label>Opérations effectuées</label>
+        <div style="grid-column: span 2;"><h4 style="font-size: 1.1rem; color: #b30000; font-weight: 600; margin-top: 20px;">Opérations effectuées</h4>
           
 
 <div class="operations-column" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
@@ -181,7 +181,7 @@
 
 
         </div>
-        <div style="grid-column: span 2;"><label>Observation</label><textarea rows="3"></textarea></div>
+        <div style="grid-column: span 2;"><h4 style="font-size: 1.1rem; color: #b30000; font-weight: 600; margin-top: 20px;">Observation</h4><textarea rows="3"></textarea></div>
       </div>
       <button class="btn" type="button" onclick="validerExtincteur(this)">✅ Valider extincteur</button>
     </details>
