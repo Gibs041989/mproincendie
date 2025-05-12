@@ -7,25 +7,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compte-rendu Extincteurs - MproIntervention</title>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; padding: 20px; margin-bottom: 100px; }
-    h2 { color: #b30000; }
-    label { display: block; font-weight: 600; margin-top: 10px; }
-    input, select, textarea {
-      font-size: 16px; width: 100%; padding: 8px; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    .flex { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
-    .btn { margin-top: 20px; padding: 10px 20px; background: #0077cc; color: white; border: none; border-radius: 6px; cursor: pointer; }
-    .btn:hover { background: #005fa3; }
-    .extincteur-bloc { background: white; border: 1px solid #ccc; border-radius: 10px; padding: 15px; margin-bottom: 20px; }
-    summary { font-weight: bold; margin-bottom: 10px; cursor: pointer; }
-    .checkbox-group { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ccc; margin-top: 20px; }
-    .nav-shortcuts { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: center; gap: 30px; border-top: 1px solid #ccc; padding: 12px 0; font-size: 1.8rem; z-index: 999; }
-    @media (max-width: 600px) {
-      .grid {
-        grid-template-columns: 1fr !important;
-      }
-    }
-  </style>
+
+.op-item, .dc-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.op-item input,
+.dc-item input {
+  margin: 0;
+}
+
+</style>
 </head>
 <body>
   <h2>Compte-rendu Extincteurs</h2>
@@ -51,21 +49,20 @@
 
   
 
+
+
 <div class="checkbox-group" style="margin-top: 20px;">
   <h3>✅ Devoir de conseil</h3>
-  <div style="display: grid; grid-template-columns: auto 1fr; row-gap: 12px; align-items: center; column-gap: 20px;">
-    <input type="checkbox" class="check-dc" id="dc-registre" />
-    <label for="dc-registre" style="margin-left: 0;">Registre présent et à jour</label>
-
-    <input type="checkbox" class="check-dc" id="dc-signaletique" />
-    <label for="dc-signaletique" style="margin-left: 0;">Signalétique à jour</label>
-
-    <input type="checkbox" class="check-dc" id="dc-baes" />
-    <label for="dc-baes" style="margin-left: 0;">BAES présents</label>
-
-    <input type="checkbox" class="check-dc" id="dc-plans" />
-    <label for="dc-plans" style="margin-left: 0;">Plans de sécurité présents et à jour</label>
+  <div style="display: flex; flex-direction: column; gap: 12px;">
+    <label class="dc-item"><input type="checkbox" class="check-dc" id="dc-registre" /> Registre présent et à jour</label>
+    <label class="dc-item"><input type="checkbox" class="check-dc" id="dc-signaletique" /> Signalétique à jour</label>
+    <label class="dc-item"><input type="checkbox" class="check-dc" id="dc-baes" /> BAES présents</label>
+    <label class="dc-item"><input type="checkbox" class="check-dc" id="dc-plans" /> Plans de sécurité présents et à jour</label>
   </div>
+</div>
+
+</div>
+
 </div>
 
 </div>
@@ -92,22 +89,17 @@
 
 
 
-<div class="operations-column" style="display: grid; grid-template-columns: auto 1fr; row-gap: 10px; align-items: center; margin-top: 10px; column-gap: 20px;">
-  <input type="checkbox" data-code="VF" id="op-vf" />
-  <label for="op-vf" style="margin-left: 0;">Vérification OK</label>
 
-  <input type="checkbox" data-code="RQ" id="op-rq" />
-  <label for="op-rq" style="margin-left: 0;">Révision quinquennale</label>
 
-  <input type="checkbox" data-code="RE" id="op-re" />
-  <label for="op-re" style="margin-left: 0;">Rechargé</label>
-
-  <input type="checkbox" data-code="MS" id="op-ms" />
-  <label for="op-ms" style="margin-left: 0;">Mise en service</label>
-
-  <input type="checkbox" data-code="ES" id="op-es" />
-  <label for="op-es" style="margin-left: 0;">Échange standard</label>
+<div class="operations-column" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+  <label class="op-item"><input type="checkbox" data-code="VF" id="op-vf" /> Vérification OK</label>
+  <label class="op-item"><input type="checkbox" data-code="RQ" id="op-rq" /> Révision quinquennale</label>
+  <label class="op-item"><input type="checkbox" data-code="RE" id="op-re" /> Rechargé</label>
+  <label class="op-item"><input type="checkbox" data-code="MS" id="op-ms" /> Mise en service</label>
+  <label class="op-item"><input type="checkbox" data-code="ES" id="op-es" /> Échange standard</label>
 </div>
+
+
 
 
 
