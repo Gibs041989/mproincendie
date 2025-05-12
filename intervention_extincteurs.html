@@ -1,12 +1,13 @@
 
 
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Compte-rendu Extincteurs - MproIntervention</title>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Compte-rendu Extincteurs - MproIntervention</title>
+<style>
 
 
 
@@ -130,108 +131,140 @@ label {
   font-weight: 600;
 }
 
+
+/* GLOBAL */
+:root {
+  --main-color: #b30000;
+  --bg-light: #f5f5f5;
+  --btn-color: #0077cc;
+  --btn-hover: #005fa3;
+}
+body {
+  max-width: 960px;
+  margin: 0 auto;
+}
+h2 span {
+  font-size: 1.6rem;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 15px;
+}
+textarea {
+  resize: vertical;
+}
+button.btn {
+  width: 100%;
+  max-width: 260px;
+}
+@media (max-width: 768px) {
+  h2 span {
+    font-size: 1.4rem;
+  }
+  .nav-shortcuts {
+    font-size: 1.5rem;
+    gap: 20px;
+    padding: 10px 0;
+  }
+}
+
+input, select, textarea {
+  width: 100% !important;
+  box-sizing: border-box;
+  display: block;
+}
+textarea {
+  min-height: 100px;
+}
+.grid > div {
+  width: 100%;
+}
 </style>
 </head>
 <body>
-  <h2><span style="font-size: 1.4rem; font-weight: 700;">Compte-rendu Extincteurs</span></h2>
-  <div><strong>Client :</strong> Dupont Entreprise</div>
-  <div><strong>Lieu d’intervention :</strong> Site Annexe - Zone industrielle</div>
-  <div style="margin-top: 30px; margin-bottom: 10px;">
-    <div style="display: flex; flex-wrap: wrap; gap: 30px;">
-      <div style="flex: 1; min-width: 220px;">
-        <label for="date_intervention">📅 Date d’intervention</label>
-        <input type="date" name="date_intervention" id="date_intervention" />
-      </div>
-      <div style="flex: 2; min-width: 220px;">
-        <label for="technicien">👨‍🔧 Technicien intervenant</label>
-        <input type="text" name="technicien" id="technicien" placeholder="Nom et prénom du technicien" />
-      </div>
-    </div>
-  </div>
-
-  <section id="extincteurs-container"></section>
-  <div style="text-align: left; margin: 20px 0;">
-    <button onclick="addExtincteur()" type="button" class="btn">➕ Ajouter un extincteur</button>
-  </div>
-
-  
-
+<h2><span style="font-size: 1.4rem; font-weight: 700;">Compte-rendu Extincteurs</span></h2>
+<div><strong>Client :</strong> Dupont Entreprise</div>
+<div><strong>Lieu d’intervention :</strong> Site Annexe - Zone industrielle</div>
+<div style="margin-top: 30px; margin-bottom: 10px;">
+<div style="display: flex; flex-wrap: wrap; gap: 30px;">
+<div style="flex: 1; min-width: 220px;">
+<label for="date_intervention">📅 Date d’intervention</label>
+<input id="date_intervention" name="date_intervention" type="date"/>
+</div>
+<div style="flex: 2; min-width: 220px;">
+<label for="technicien">👨‍🔧 Technicien intervenant</label>
+<input id="technicien" name="technicien" placeholder="Nom et prénom du technicien" type="text"/>
+</div>
+</div>
+</div>
+<section id="extincteurs-container"></section>
+<div style="text-align: left; margin: 20px 0;">
+<button class="btn" onclick="addExtincteur()" type="button">➕ Ajouter un extincteur</button>
+</div>
 <div class="checkbox-group" style="margin-top: 20px;">
-  <h3><span style="font-size: 1.2rem; font-weight: 600;">✅ Devoir de conseil</span></h3>
-  <div style="display: flex; flex-direction: column; gap: 12px;">
-    <label class="dc-item">Registre présent et à jour<input type="checkbox" class="check-dc" id="dc-registre" /></label>
-    <label class="dc-item">Signalétique à jour<input type="checkbox" class="check-dc" id="dc-signaletique" /></label>
-    <label class="dc-item">BAES présents<input type="checkbox" class="check-dc" id="dc-baes" /></label>
-    <label class="dc-item">Plans de sécurité présents et à jour<input type="checkbox" class="check-dc" id="dc-plans" /></label>
-  </div>
+<h3><span style="font-size: 1.2rem; font-weight: 600;">✅ Devoir de conseil</span></h3>
+<div style="display: flex; flex-direction: column; gap: 12px;">
+<label class="dc-item">Registre présent et à jour<input class="check-dc" id="dc-registre" type="checkbox"/></label>
+<label class="dc-item">Signalétique à jour<input class="check-dc" id="dc-signaletique" type="checkbox"/></label>
+<label class="dc-item">BAES présents<input class="check-dc" id="dc-baes" type="checkbox"/></label>
+<label class="dc-item">Plans de sécurité présents et à jour<input class="check-dc" id="dc-plans" type="checkbox"/></label>
 </div>
-
 </div>
-
-
-  <div style="margin-top: 20px;">
-    <button class="btn" onclick="validerCompteRendu()">✅ Valider le compte rendu</button>
-    <button class="btn" style="background:#28a745;margin-left:10px;" onclick="window.location.href='bon.html'">➡️ Passer au bon d’intervention</button>
-  </div>
-
-  
+<div style="margin-top: 20px;">
+<button class="btn" onclick="validerCompteRendu()">✅ Valider le compte rendu</button>
+<button class="btn" onclick="window.location.href='bon.html'" style="background:#28a745;margin-left:10px;">➡️ Passer au bon d’intervention</button>
+</div>
 <template id="extincteur-template">
-  <details open class="extincteur-bloc">
-    <summary style="font-weight: bold; font-size: 1.15rem;">🧯 Nouvel extincteur</summary>
-    <div class="grid" style="display: flex; flex-direction: column; gap: 15px;">
-      <div><label>N° extincteur</label><input class="ext-num" /></div>
-      <div><label>Type d'extincteur</label><input list="types-extincteurs" class="ext-type" /></div>
-      <div><label class="op-item" style="width: 100%; justify-content: space-between;">Ext. PP ?<input type="checkbox" class="ext-pp" /></label></div>
-      <div><label>Fabricant</label><input list="fabricants" class="ext-fab" /></div>
-      <div><label>Millésime</label><input list="years-list" class="ext-year" /></div>
-      <div><label>Niveau</label><input class="ext-niv" /></div>
-      <div><label>Emplacement</label><input class="ext-emplacement" /></div>
-    </div>
-
-    <div style="grid-column: span 2;">
-      <h4 style="font-size: 1.1rem; color: #b30000; font-weight: 600; margin-top: 20px;">Opérations effectuées</h4>
-      <div class="operations-column" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
-        <label class="op-item">Vérification OK<input type="checkbox" data-code="VF" id="op-vf" /></label>
-        <label class="op-item">Révision quinquennale<input type="checkbox" data-code="RQ" id="op-rq" /></label>
-        <label class="op-item">Rechargé<input type="checkbox" data-code="RE" id="op-re" /></label>
-        <label class="op-item">Mise en service<input type="checkbox" data-code="MS" id="op-ms" /></label>
-        <label class="op-item">Échange standard<input type="checkbox" data-code="ES" id="op-es" /></label>
-      </div>
-    </div>
-
-    <div style="grid-column: span 2;">
-      <h4 style="font-size: 1.1rem; color: #b30000; font-weight: 600; margin-top: 20px;">Observation</h4>
-      <textarea rows="3"></textarea>
-    </div>
-
-    <button class="btn" type="button" onclick="validerExtincteur(this)">✅ Valider extincteur</button>
-  </details>
+<details class="extincteur-bloc" open="">
+<summary style="font-weight: bold; font-size: 1.15rem;">🧯 Nouvel extincteur</summary>
+<div class="grid" style="display: flex; flex-direction: column; gap: 15px;">
+<div><label>N° extincteur</label><input class="ext-num"/></div>
+<div><label>Type d'extincteur</label><input class="ext-type" list="types-extincteurs"/></div>
+<div><label class="op-item" style="width: 100%; justify-content: space-between;">Ext. PP ?<input class="ext-pp" type="checkbox"/></label></div>
+<div><label>Fabricant</label><input class="ext-fab" list="fabricants"/></div>
+<div><label>Millésime</label><input class="ext-year" list="years-list"/></div>
+<div><label>Niveau</label><input class="ext-niv"/></div>
+<div><label>Emplacement</label><input class="ext-emplacement"/></div>
+</div>
+<div style="grid-column: span 2;">
+<h4 style="font-size: 1.1rem; color: #b30000; font-weight: 600; margin-top: 20px;">Opérations effectuées</h4>
+<div class="operations-column" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+<label class="op-item">Vérification OK<input data-code="VF" id="op-vf" type="checkbox"/></label>
+<label class="op-item">Révision quinquennale<input data-code="RQ" id="op-rq" type="checkbox"/></label>
+<label class="op-item">Rechargé<input data-code="RE" id="op-re" type="checkbox"/></label>
+<label class="op-item">Mise en service<input data-code="MS" id="op-ms" type="checkbox"/></label>
+<label class="op-item">Échange standard<input data-code="ES" id="op-es" type="checkbox"/></label>
+</div>
+</div>
+<div style="grid-column: span 2;">
+<h4 style="font-size: 1.1rem; color: #b30000; font-weight: 600; margin-top: 20px;">Observation</h4>
+<textarea rows="3"></textarea>
+</div>
+<button class="btn" onclick="validerExtincteur(this)" type="button">✅ Valider extincteur</button>
+</details>
 </template>
-
-
-  <datalist id="types-extincteurs">
-    <option value="6Kg Poudre ABC" />
-    <option value="2Kg CO2" />
-    <option value="9L Eau + Additif" />
-  </datalist>
-  <datalist id="years-list">
-    <option value="2025" /><option value="2024" /><option value="2023" />
-  </datalist>
-  <datalist id="fabricants">
-    <option value="Desautel" />
-    <option value="Eurofeu" />
-    <option value="Andrieu" />
-  </datalist>
-
-  <div class="nav-shortcuts">
-    <a href="index.html" title="Accueil">🏠</a>
-    <a href="intervention_extincteurs.html" title="Extincteurs">🧯</a>
-    <a href="intervention_ria.html" title="RIA">🚿</a>
-    <a href="intervention_baes.html" title="BAES">💡</a>
-    <a href="intervention_desenfumage.html" title="Désenfumage">💨</a>
-  </div>
-
-  <script>
+<datalist id="types-extincteurs">
+<option value="6Kg Poudre ABC"></option>
+<option value="2Kg CO2"></option>
+<option value="9L Eau + Additif"></option>
+</datalist>
+<datalist id="years-list">
+<option value="2025"></option><option value="2024"></option><option value="2023"></option>
+</datalist>
+<datalist id="fabricants">
+<option value="Desautel"></option>
+<option value="Eurofeu"></option>
+<option value="Andrieu"></option>
+</datalist>
+<div class="nav-shortcuts">
+<a href="index.html" title="Accueil">🏠</a>
+<a href="intervention_extincteurs.html" title="Extincteurs">🧯</a>
+<a href="intervention_ria.html" title="RIA">🚿</a>
+<a href="intervention_baes.html" title="BAES">💡</a>
+<a href="intervention_desenfumage.html" title="Désenfumage">💨</a>
+</div>
+<script>
     let compteur = 1;
     function addExtincteur() {
       const container = document.getElementById("extincteurs-container");
