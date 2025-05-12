@@ -49,13 +49,27 @@
     <button onclick="addExtincteur()" type="button" class="btn">➕ Ajouter un extincteur</button>
   </div>
 
-  <div class="checkbox-group">
-    <h3>✅ Devoir de conseil</h3>
-    <label><input type="checkbox" class="check-dc" /> Registre présent et à jour</label>
-    <label><input type="checkbox" class="check-dc" /> Signalétique à jour</label>
-    <label><input type="checkbox" class="check-dc" /> BAES présents</label>
-    <label><input type="checkbox" class="check-dc" /> Plans de sécurité présents et à jour</label>
+  
+
+<div class="checkbox-group" style="margin-top: 20px;">
+  <h3>✅ Devoir de conseil</h3>
+  <div style="display: grid; grid-template-columns: auto 1fr; row-gap: 12px; align-items: center; column-gap: 20px;">
+    <input type="checkbox" class="check-dc" id="dc-registre" />
+    <label for="dc-registre" style="margin-left: 0;">Registre présent et à jour</label>
+
+    <input type="checkbox" class="check-dc" id="dc-signaletique" />
+    <label for="dc-signaletique" style="margin-left: 0;">Signalétique à jour</label>
+
+    <input type="checkbox" class="check-dc" id="dc-baes" />
+    <label for="dc-baes" style="margin-left: 0;">BAES présents</label>
+
+    <input type="checkbox" class="check-dc" id="dc-plans" />
+    <label for="dc-plans" style="margin-left: 0;">Plans de sécurité présents et à jour</label>
   </div>
+</div>
+
+</div>
+
 
   <div style="margin-top: 20px;">
     <button class="btn" onclick="validerCompteRendu()">✅ Valider le compte rendu</button>
@@ -76,22 +90,26 @@
         <div style="grid-column: span 2;"><label>Opérations effectuées</label>
           
 
-<div class="operations-column" style="display: grid; grid-template-columns: auto 1fr; row-gap: 10px; align-items: center; margin-top: 10px;">
+
+
+<div class="operations-column" style="display: grid; grid-template-columns: auto 1fr; row-gap: 10px; align-items: center; margin-top: 10px; column-gap: 20px;">
   <input type="checkbox" data-code="VF" id="op-vf" />
-  <label for="op-vf">Vérification OK</label>
+  <label for="op-vf" style="margin-left: 0;">Vérification OK</label>
 
   <input type="checkbox" data-code="RQ" id="op-rq" />
-  <label for="op-rq">Révision quinquennale</label>
+  <label for="op-rq" style="margin-left: 0;">Révision quinquennale</label>
 
   <input type="checkbox" data-code="RE" id="op-re" />
-  <label for="op-re">Rechargé</label>
+  <label for="op-re" style="margin-left: 0;">Rechargé</label>
 
   <input type="checkbox" data-code="MS" id="op-ms" />
-  <label for="op-ms">Mise en service</label>
+  <label for="op-ms" style="margin-left: 0;">Mise en service</label>
 
   <input type="checkbox" data-code="ES" id="op-es" />
-  <label for="op-es">Échange standard</label>
+  <label for="op-es" style="margin-left: 0;">Échange standard</label>
 </div>
+
+
 
 
         </div>
