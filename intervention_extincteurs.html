@@ -4,6 +4,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compte-rendu Extincteurs - MproIntervention</title>
   <style>
     body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; padding: 20px; margin-bottom: 100px; }
@@ -18,6 +19,11 @@
     summary { font-weight: bold; margin-bottom: 10px; cursor: pointer; }
     .checkbox-group { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ccc; margin-top: 20px; }
     .nav-shortcuts { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: center; gap: 30px; border-top: 1px solid #ccc; padding: 12px 0; font-size: 1.8rem; z-index: 999; }
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -66,8 +72,7 @@
         <div><label>Fabricant</label><input class="ext-fab" list="fabricants" /></div>
         <div><label>Niveau</label><input class="ext-niv" /></div>
         <div><label>Emplacement</label><input class="ext-emplacement" /></div>
-        <div style="grid-column: span 2;">
-          <label>Opérations effectuées</label>
+        <div style="grid-column: span 2;"><label>Opérations effectuées</label>
           <div class="flex">
             <label><input type="checkbox" data-code="VF" /> Vérification OK</label>
             <label><input type="checkbox" data-code="RQ" /> Révision quinquennale</label>
@@ -160,7 +165,7 @@
       alert("Compte rendu validé !");
     }
 
-    // Sauvegarde automatique liée à l’ID client
+    // Sauvegarde automatique
     setInterval(() => {
       localStorage.setItem("crm_extincteurs_CLIENT123", document.getElementById("extincteurs-container").innerHTML);
     }, 10000);
