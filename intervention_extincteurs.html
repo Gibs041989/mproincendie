@@ -74,13 +74,25 @@
         <div><label>Niveau</label><input class="ext-niv" /></div>
         <div><label>Emplacement</label><input class="ext-emplacement" /></div>
         <div style="grid-column: span 2;"><label>Opérations effectuées</label>
-          <div class="operations-column" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
-            <label><input type="checkbox" data-code="VF" /> Vérification OK</label>
-            <label><input type="checkbox" data-code="RQ" /> Révision quinquennale</label>
-            <label><input type="checkbox" data-code="RE" /> Rechargé</label>
-            <label><input type="checkbox" data-code="MS" /> Mise en service</label>
-            <label><input type="checkbox" data-code="ES" /> Échange standard</label>
-          </div>
+          
+<div class="operations-column" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+  <label style="display: flex; align-items: center; gap: 10px;">
+    <input type="checkbox" data-code="VF" /> Vérification OK
+  </label>
+  <label style="display: flex; align-items: center; gap: 10px;">
+    <input type="checkbox" data-code="RQ" /> Révision quinquennale
+  </label>
+  <label style="display: flex; align-items: center; gap: 10px;">
+    <input type="checkbox" data-code="RE" /> Rechargé
+  </label>
+  <label style="display: flex; align-items: center; gap: 10px;">
+    <input type="checkbox" data-code="MS" /> Mise en service
+  </label>
+  <label style="display: flex; align-items: center; gap: 10px;">
+    <input type="checkbox" data-code="ES" /> Échange standard
+  </label>
+</div>
+
         </div>
         <div style="grid-column: span 2;"><label>Observation</label><textarea rows="3"></textarea></div>
       </div>
