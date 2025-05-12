@@ -11,6 +11,7 @@
 
 
 
+
     body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; padding: 20px; margin-bottom: 100px; }
     h2 { color: #b30000; }
     label { display: block; font-weight: 600; margin-top: 10px; }
@@ -112,6 +113,23 @@
   margin: 0;
 }
 
+
+
+body {
+  font-size: 16px;
+}
+input, select, textarea {
+  font-size: 1rem;
+  padding: 10px;
+}
+button {
+  font-size: 1rem;
+  padding: 10px 16px;
+}
+label {
+  font-weight: 600;
+}
+
 </style>
 </head>
 <body>
@@ -156,65 +174,40 @@
     <button class="btn" style="background:#28a745;margin-left:10px;" onclick="window.location.href='bon.html'">➡️ Passer au bon d’intervention</button>
   </div>
 
-  <template id="extincteur-template">
-    <details open class="extincteur-bloc">
-      <summary style="font-weight: bold; font-size: 1.15rem;">🧯 Nouvel extincteur</summary>
-      
-<div class="grid" style="display: flex; flex-direction: column; gap: 15px;">
-  <div>
-    <label>N° extincteur</label>
-    <input class="ext-num" />
-  </div>
-  <div>
-    <label>Type d'extincteur</label>
-    <input list="types-extincteurs" class="ext-type" />
-  </div>
-  <div>
-    <label class="op-item" style="width: 100%; justify-content: space-between;">Ext. PP ?<input type="checkbox" class="ext-pp" /></label>
-  </div>
-  <div>
-    <label>Fabricant</label>
-    <input list="fabricants" class="ext-fab" />
-  </div>
-  <div>
-    <label>Millésime</label>
-    <input list="years-list" class="ext-year" />
-  </div>
-  <div>
-    <label>Niveau</label>
-    <input class="ext-niv" />
-  </div>
-  <div>
-    <label>Emplacement</label>
-    <input class="ext-emplacement" />
-  </div>
-</div>
+  
+<template id="extincteur-template">
+  <details open class="extincteur-bloc">
+    <summary style="font-weight: bold; font-size: 1.15rem;">🧯 Nouvel extincteur</summary>
+    <div class="grid" style="display: flex; flex-direction: column; gap: 15px;">
+      <div><label>N° extincteur</label><input class="ext-num" /></div>
+      <div><label>Type d'extincteur</label><input list="types-extincteurs" class="ext-type" /></div>
+      <div><label class="op-item" style="width: 100%; justify-content: space-between;">Ext. PP ?<input type="checkbox" class="ext-pp" /></label></div>
+      <div><label>Fabricant</label><input list="fabricants" class="ext-fab" /></div>
+      <div><label>Millésime</label><input list="years-list" class="ext-year" /></div>
+      <div><label>Niveau</label><input class="ext-niv" /></div>
+      <div><label>Emplacement</label><input class="ext-emplacement" /></div>
+    </div>
 
-        <div><label>Type d'extincteur</label><input class="ext-type" list="types-extincteurs" /></div>
-        <div><label class="op-item" style="width: 100%;">Ext. PP ?<input type="checkbox" class="ext-pp" /></label></div>
-        <div><label>Millésime</label><input class="ext-year" list="years-list" /></div>
-        <div><label>Fabricant</label><input class="ext-fab" list="fabricants" /></div>
-        <div><label>Niveau</label>
-<input class="ext-niv" /></div>
-        <div><label>Emplacement</label><input class="ext-emplacement" /></div>
-        <div style="grid-column: span 2;"><h4 style="font-size: 1.1rem; color: #b30000; font-weight: 600; margin-top: 20px;">Opérations effectuées</h4>
-          
-
-<div class="operations-column" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
-  <label class="op-item">Vérification OK<input type="checkbox" data-code="VF" id="op-vf" /></label>
-  <label class="op-item">Révision quinquennale<input type="checkbox" data-code="RQ" id="op-rq" /></label>
-  <label class="op-item">Rechargé<input type="checkbox" data-code="RE" id="op-re" /></label>
-  <label class="op-item">Mise en service<input type="checkbox" data-code="MS" id="op-ms" /></label>
-  <label class="op-item">Échange standard<input type="checkbox" data-code="ES" id="op-es" /></label>
-</div>
-
-
-        </div>
-        <div style="grid-column: span 2;"><h4 style="font-size: 1.1rem; color: #b30000; font-weight: 600; margin-top: 20px;">Observation</h4><textarea rows="3"></textarea></div>
+    <div style="grid-column: span 2;">
+      <h4 style="font-size: 1.1rem; color: #b30000; font-weight: 600; margin-top: 20px;">Opérations effectuées</h4>
+      <div class="operations-column" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+        <label class="op-item">Vérification OK<input type="checkbox" data-code="VF" id="op-vf" /></label>
+        <label class="op-item">Révision quinquennale<input type="checkbox" data-code="RQ" id="op-rq" /></label>
+        <label class="op-item">Rechargé<input type="checkbox" data-code="RE" id="op-re" /></label>
+        <label class="op-item">Mise en service<input type="checkbox" data-code="MS" id="op-ms" /></label>
+        <label class="op-item">Échange standard<input type="checkbox" data-code="ES" id="op-es" /></label>
       </div>
-      <button class="btn" type="button" onclick="validerExtincteur(this)">✅ Valider extincteur</button>
-    </details>
-  </template>
+    </div>
+
+    <div style="grid-column: span 2;">
+      <h4 style="font-size: 1.1rem; color: #b30000; font-weight: 600; margin-top: 20px;">Observation</h4>
+      <textarea rows="3"></textarea>
+    </div>
+
+    <button class="btn" type="button" onclick="validerExtincteur(this)">✅ Valider extincteur</button>
+  </details>
+</template>
+
 
   <datalist id="types-extincteurs">
     <option value="6Kg Poudre ABC" />
@@ -289,10 +282,23 @@
       }
     }
 
-    function validerCompteRendu() {
-      localStorage.removeItem("crm_extincteurs_CLIENT123");
-      alert("Compte rendu validé !");
-    }
+    
+function validerCompteRendu() {
+  const extincteurs = document.querySelectorAll('.extincteur-bloc');
+  if (extincteurs.length === 0) {
+    alert("Vous devez renseigner au moins un extincteur pour valider le compte rendu.");
+    return;
+  }
+
+  const nb = extincteurs.length;
+  if (!confirm("Confirmer la validation pour " + nb + " extincteur(s) renseigné(s) ?")) {
+    return;
+  }
+
+  localStorage.removeItem("crm_extincteurs_CLIENT123");
+  alert("Compte rendu validé !");
+}
+
 
     // Sauvegarde automatique
     setInterval(() => {
