@@ -235,10 +235,7 @@ button.btn {
 <div style="text-align: left; margin: 20px 0;">
 <button class="btn" onclick="addExtincteur()" type="button">➕ Ajouter un extincteur</button>
 </div>
-<div style="margin-top: 30px;">
-<h3 style="font-size: 1.2rem; font-weight: 600;">📝 Observations générales</h3>
-<textarea id="observation_generale" placeholder="Ajouter une remarque générale sur l’intervention..." rows="4" style="width: 100%; font-size: 1rem;"></textarea>
-</div><div class="checkbox-group" style="margin-top: 20px; margin-bottom: 80px;">
+<div class="checkbox-group" style="margin-top: 20px; margin-bottom: 80px;">
 <h3><span style="font-size: 1.2rem; font-weight: 600;">✅ Devoir de conseil</span></h3>
 <div style="display: flex; flex-direction: column; gap: 12px;">
 <label class="dc-item">Registre présent et à jour<input class="check-dc" id="dc-registre" type="checkbox"/></label>
@@ -246,8 +243,10 @@ button.btn {
 <label class="dc-item">BAES présents<input class="check-dc" id="dc-baes" type="checkbox"/></label>
 <label class="dc-item">Plans de sécurité présents et à jour<input class="check-dc" id="dc-plans" type="checkbox"/></label>
 </div>
+</div><div style="margin-top: 30px;">
+<h3 style="font-size: 1.2rem; font-weight: 600;">📝 Points à améliorer / autres observations</h3>
+<textarea id="observation_generale" placeholder="Ajouter une remarque générale sur l’intervention..." rows="4" style="width: 100%; font-size: 1rem;"></textarea>
 </div>
-
 <template id="extincteur-template">
 <details class="extincteur-bloc" open="">
 <summary style="font-weight: bold; font-size: 1.15rem;">🧯 Nouvel extincteur</summary>
