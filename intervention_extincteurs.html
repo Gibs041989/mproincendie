@@ -159,8 +159,37 @@
   <template id="extincteur-template">
     <details open class="extincteur-bloc">
       <summary style="font-weight: bold; font-size: 1.15rem;">🧯 Nouvel extincteur</summary>
-      <div class="grid">
-        <div><label>N° extincteur</label><input class="ext-num" /></div>
+      
+<div class="grid" style="display: flex; flex-direction: column; gap: 15px;">
+  <div>
+    <label>N° extincteur</label>
+    <input class="ext-num" />
+  </div>
+  <div>
+    <label>Type d'extincteur</label>
+    <input list="types-extincteurs" class="ext-type" />
+  </div>
+  <div>
+    <label class="op-item" style="width: 100%; justify-content: space-between;">Ext. PP ?<input type="checkbox" class="ext-pp" /></label>
+  </div>
+  <div>
+    <label>Fabricant</label>
+    <input list="fabricants" class="ext-fab" />
+  </div>
+  <div>
+    <label>Millésime</label>
+    <input list="years-list" class="ext-year" />
+  </div>
+  <div>
+    <label>Niveau</label>
+    <input class="ext-niv" />
+  </div>
+  <div>
+    <label>Emplacement</label>
+    <input class="ext-emplacement" />
+  </div>
+</div>
+
         <div><label>Type d'extincteur</label><input class="ext-type" list="types-extincteurs" /></div>
         <div><label class="op-item" style="width: 100%;">Ext. PP ?<input type="checkbox" class="ext-pp" /></label></div>
         <div><label>Millésime</label><input class="ext-year" list="years-list" /></div>
@@ -228,7 +257,7 @@
       const empl = bloc.querySelector(".ext-emplacement").value.trim();
       const ops = [...bloc.querySelectorAll("input[data-code]:checked")];
 
-      if (!num || !type || !fab || !niv || !empl || ops.length === 0) {
+      if (!num || !type || !niv || !empl || ops.length === 0) {
         alert("Merci de remplir les champs obligatoires et cocher au moins une opération.");
         return;
       }
