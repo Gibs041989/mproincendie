@@ -8,6 +8,29 @@
   <title>Compte-rendu Extincteurs - MproIntervention</title>
   <style>
 
+
+
+
+    body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; padding: 20px; margin-bottom: 100px; }
+    h2 { color: #b30000; }
+    label { display: block; font-weight: 600; margin-top: 10px; }
+    input, select, textarea {
+      font-size: 16px; width: 100%; padding: 8px; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .flex { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+    .btn { margin-top: 20px; padding: 10px 20px; background: #0077cc; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    .btn:hover { background: #005fa3; }
+    .extincteur-bloc { background: white; border: 1px solid #ccc; border-radius: 10px; padding: 15px; margin-bottom: 20px; }
+    summary { font-weight: bold; margin-bottom: 10px; cursor: pointer; }
+    .checkbox-group { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ccc; margin-top: 20px; }
+    .nav-shortcuts { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: center; gap: 30px; border-top: 1px solid #ccc; padding: 12px 0; font-size: 1.8rem; z-index: 999; }
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  
+
 .op-item, .dc-item {
   display: flex;
   align-items: center;
@@ -17,9 +40,75 @@
   border: 1px solid #ccc;
   border-radius: 8px;
   cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
 }
-.op-item input,
-.dc-item input {
+.op-item input, .dc-item input {
+  margin: 0;
+}
+
+
+
+.op-item, .dc-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  gap: 12px;
+  padding: 12px;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  width: fit-content;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.op-item input, .dc-item input {
+  margin: 0;
+}
+
+
+
+.op-item, .dc-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  gap: 12px;
+  padding: 12px;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  min-width: 320px;
+  max-width: 100%;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+.op-item input, .dc-item input {
+  margin: 0;
+}
+
+
+
+.op-item, .dc-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  gap: 12px;
+  padding: 12px;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  min-width: 320px;
+  max-width: 100%;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+.op-item input, .dc-item input {
   margin: 0;
 }
 
@@ -49,20 +138,14 @@
 
   
 
-
-
 <div class="checkbox-group" style="margin-top: 20px;">
   <h3>✅ Devoir de conseil</h3>
   <div style="display: flex; flex-direction: column; gap: 12px;">
-    <label class="dc-item"><input type="checkbox" class="check-dc" id="dc-registre" /> Registre présent et à jour</label>
-    <label class="dc-item"><input type="checkbox" class="check-dc" id="dc-signaletique" /> Signalétique à jour</label>
-    <label class="dc-item"><input type="checkbox" class="check-dc" id="dc-baes" /> BAES présents</label>
-    <label class="dc-item"><input type="checkbox" class="check-dc" id="dc-plans" /> Plans de sécurité présents et à jour</label>
+    <label class="dc-item">Registre présent et à jour<input type="checkbox" class="check-dc" id="dc-registre" /></label>
+    <label class="dc-item">Signalétique à jour<input type="checkbox" class="check-dc" id="dc-signaletique" /></label>
+    <label class="dc-item">BAES présents<input type="checkbox" class="check-dc" id="dc-baes" /></label>
+    <label class="dc-item">Plans de sécurité présents et à jour<input type="checkbox" class="check-dc" id="dc-plans" /></label>
   </div>
-</div>
-
-</div>
-
 </div>
 
 </div>
@@ -79,29 +162,22 @@
       <div class="grid">
         <div><label>N° extincteur</label><input class="ext-num" /></div>
         <div><label>Type d'extincteur</label><input class="ext-type" list="types-extincteurs" /></div>
-        <div><label>Ext. PP ?</label><input type="checkbox" /></div>
+        <div><label class="op-item">Ext. PP ?<input type="checkbox" class="ext-pp" /></label></div>
         <div><label>Millésime</label><input class="ext-year" list="years-list" /></div>
         <div><label>Fabricant</label><input class="ext-fab" list="fabricants" /></div>
-        <div><label>Niveau</label><input class="ext-niv" /></div>
+        <div><label>Niveau</label>
+<input class="ext-niv" inputmode="numeric" pattern="[0-9]*" /></div>
         <div><label>Emplacement</label><input class="ext-emplacement" /></div>
         <div style="grid-column: span 2;"><label>Opérations effectuées</label>
           
 
-
-
-
-
 <div class="operations-column" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
-  <label class="op-item"><input type="checkbox" data-code="VF" id="op-vf" /> Vérification OK</label>
-  <label class="op-item"><input type="checkbox" data-code="RQ" id="op-rq" /> Révision quinquennale</label>
-  <label class="op-item"><input type="checkbox" data-code="RE" id="op-re" /> Rechargé</label>
-  <label class="op-item"><input type="checkbox" data-code="MS" id="op-ms" /> Mise en service</label>
-  <label class="op-item"><input type="checkbox" data-code="ES" id="op-es" /> Échange standard</label>
+  <label class="op-item">Vérification OK<input type="checkbox" data-code="VF" id="op-vf" /></label>
+  <label class="op-item">Révision quinquennale<input type="checkbox" data-code="RQ" id="op-rq" /></label>
+  <label class="op-item">Rechargé<input type="checkbox" data-code="RE" id="op-re" /></label>
+  <label class="op-item">Mise en service<input type="checkbox" data-code="MS" id="op-ms" /></label>
+  <label class="op-item">Échange standard<input type="checkbox" data-code="ES" id="op-es" /></label>
 </div>
-
-
-
-
 
 
         </div>
