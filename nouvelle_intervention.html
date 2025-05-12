@@ -1,113 +1,173 @@
+
+
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Nouvelle intervention - MproIntervention</title>
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f5f5f5; }
-        header { background: #b30000; color: white; padding: 1rem; display: flex; align-items: center; }
-        header img { height: 50px; margin-right: 15px; }
-        .container { padding: 20px; }
-        .bloc { background: white; padding: 20px; margin-bottom: 20px; border-radius: 10px; }
-        label { display: block; margin-top: 10px; }
-        input, select { padding: 8px; width: 100%; max-width: 400px; }
-        .checkbox { margin-top: 10px; }
-        .lieu-diff { display: none; margin-top: 10px; }
-        .actions button {
-            margin: 10px 10px 0 0;
-            padding: 10px 20px;
-            background-color: #e60000;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .actions button:hover {
-            background-color: #cc0000;
-        }
-        .nav-shortcuts {
-            position: fixed;
-            bottom: 10px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            background: white;
-            padding: 10px;
-            border-top: 1px solid #ddd;
-            font-size: 1.5rem;
-            z-index: 999;
-        }
-        .nav-shortcuts a {
-            color: #b30000;
-            text-decoration: none;
-        }
-        .nav-shortcuts a:hover {
-            transform: scale(1.2);
-        }
-    </style>
+<meta charset="utf-8"/>
+<title>Intervention - MproIntervention</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    h1 { color: #b30000; font-size: 1.5rem; }
+    section { background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+    label { font-weight: 600; display: block; margin-top: 10px; }
+    input, select {
+      width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px;
+    }
+    button {
+      background: #0077cc; color: white; border: none; padding: 10px 20px;
+      border-radius: 6px; margin-top: 15px; cursor: pointer;
+    }
+    .type-btns {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px;
+    }
+    .type-btns button {
+      flex: 1 1 calc(50% - 10px);
+      background: #e60000;
+    }
+    .brouillon {
+      border: 1px solid #ccc; border-radius: 6px; padding: 10px; margin-bottom: 10px;
+      background: #fff;
+    }
+    .brouillon-actions {
+      margin-top: 10px;
+    }
+    .brouillon-actions button {
+      margin-right: 10px;
+      padding: 6px 12px;
+    }
+    .nav-shortcuts {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: white;
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      border-top: 1px solid #ccc;
+      padding: 12px 0;
+      font-size: 1.8rem;
+      z-index: 999;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <img src="assets/logo.png" alt="Logo Mendes PI">
-        <h1>Nouvelle intervention</h1>
-    </header>
+<h1>➕ Nouvelle intervention</h1>
+<section>
+<h2>🧑 Client</h2>
+<label>Choisir un client existant</label>
+<select id="select-client">
+<option value="">-- Sélectionner --</option>
+</select>
+<button onclick="ajouterClient()">➕ Nouveau client</button>
+<label style="margin-top: 20px;">
+<input id="check-lieu-diff" onchange="toggleLieu()" type="checkbox"/> Lieu d’intervention différent
+    </label>
+<div id="lieu-diff" style="display: none;">
+<label>Adresse du lieu d’intervention</label>
+<input placeholder="Saisir adresse ou nom du site" type="text">
+</input></div>
+</section>
+<section>
+<h2>🛠️ Type d’intervention</h2>
+<div class="type-btns">
+<button onclick="window.location.href='intervention_extincteurs.html'">🧯 Extincteurs</button>
+<button onclick="window.location.href='intervention_baes.html'">💡 BAES</button>
+<button onclick="window.location.href='intervention_ria.html'">🚿 RIA</button>
+<button onclick="window.location.href='intervention_desenfumage.html'">💨 Désenfumage</button>
+<button onclick="window.location.href='bon_intervention.html'">🔧 Bon d’intervention</button>
+</div>
+</section>
+<section>
+<h2>📝 Brouillons en cours</h2>
+<div id="brouillons-container">Chargement des brouillons...</div>
+</section>
+<div class="nav-shortcuts">
+<a href="index.html" title="Accueil">🏠</a>
+<a href="intervention_extincteurs.html" title="Extincteurs">🧯</a>
+<a href="intervention_ria.html" title="RIA">🚿</a>
+<a href="intervention_baes.html" title="BAES">💡</a>
+<a href="intervention_desenfumage.html" title="Désenfumage">💨</a>
+</div>
+<script>
+    function toggleLieu() {
+      document.getElementById("lieu-diff").style.display =
+        document.getElementById("check-lieu-diff").checked ? "block" : "none";
+    }
 
-    <div class="container">
-        <div class="bloc">
-            <h3>Client concerné</h3>
-            <label for="clientSelect">Sélectionner un client :</label>
-            <select id="clientSelect">
-                <option value="">-- Choisir un client --</option>
-                <option>Dupont SARL</option>
-                <option>Mendes Incendie</option>
-                <option>SecuriTech</option>
-            </select>
+    function ajouterClient() {
+      alert("Redirection vers la création d’un nouveau client.");
+    }
 
-            <div class="checkbox">
-                <input type="checkbox" id="lieuDiff" onchange="toggleLieu()"> Lieu d'intervention différent
-            </div>
-
-            <div class="lieu-diff" id="lieuDiffForm">
-                <label for="adresse">Adresse du lieu :</label>
-                <input type="text" id="adresse" placeholder="Adresse complète">
-
-                <label for="ville">Ville :</label>
-                <input type="text" id="ville" placeholder="Ville">
-
-                <label for="contact">Nom du contact sur place :</label>
-                <input type="text" id="contact" placeholder="Nom prénom">
-            </div>
+    function chargerBrouillons() {
+  const container = document.getElementById("brouillons-container");
+  container.innerHTML = "";
+  for (let key in localStorage) {
+    if (key.startsWith("crm_extincteurs_") || key.startsWith("crm_ria_") || key.startsWith("crm_baes_") || key.startsWith("crm_desenfumage_") || key.startsWith("bon_intervention_")) {
+      const type = key.includes("extincteurs") ? "Extincteurs" :
+                   key.includes("ria") ? "RIA" :
+                   key.includes("baes") ? "BAES" :
+                   key.includes("desenfumage") ? "Désenfumage" :
+                   "Bon d’intervention";
+      const label = key.split("_").slice(-1)[0];
+      const div = document.createElement("div");
+      div.className = "brouillon";
+      div.innerHTML = `
+        <strong>${label}</strong><br/>
+        <small>Type : ${type}</small>
+        <div class="brouillon-actions">
+          <button onclick="reprendreBrouillon('${key}')">Reprendre</button>
+          <button onclick="supprimerBrouillon('${key}')">Supprimer</button>
         </div>
-
-        <div class="bloc">
-            <h3>Type d'intervention</h3>
-            <div class="actions">
-                <button onclick="navigate('intervention_extincteurs.html')">🧯 Extincteurs</button>
-                <button onclick="navigate('intervention_baes.html')">💡 BAES</button>
-                <button onclick="navigate('intervention_ria.html')">🚿 RIA</button>
-                <button onclick="navigate('intervention_desenfumage.html')">🌬️ Désenfumage</button>
-                <button onclick="navigate('bon.html')">📄 Bon d'intervention</button>
+      `;
+      container.appendChild(div);
+    }
+  }
+  if (container.innerHTML === "") {
+    container.innerHTML = "<em>Aucun brouillon en cours.</em>";
+  }
+}
+      const container = document.getElementById("brouillons-container");
+      container.innerHTML = "";
+      for (let key in localStorage) {
+        if (key.startsWith("crm_extincteurs_")) {
+          const div = document.createElement("div");
+          div.className = "brouillon";
+          div.innerHTML = `
+            <strong>${key.replace("crm_extincteurs_", "")}</strong>
+            <div class="brouillon-actions">
+              <button onclick="reprendreBrouillon('${key}')">Reprendre</button>
+              <button onclick="supprimerBrouillon('${key}')">Supprimer</button>
             </div>
-        </div>
-    </div>
-
-    <!-- Barre de raccourcis -->
-    <div class="nav-shortcuts">
-      <a href="index.html" title="Accueil">🏠</a>
-      <a href="client.html" title="Clients">👤</a>
-      <a href="nouvelle_intervention.html" title="Nouvelle intervention">➕</a>
-      <a href="agenda.html" title="Agenda">📅</a>
-    </div>
-
-    <script src="js/main.js"></script>
-    <script>
-        function toggleLieu() {
-            const check = document.getElementById("lieuDiff").checked;
-            document.getElementById("lieuDiffForm").style.display = check ? "block" : "none";
+          `;
+          container.appendChild(div);
         }
-    </script>
+      }
+      if (container.innerHTML === "") {
+        container.innerHTML = "<em>Aucun brouillon en cours.</em>";
+      }
+    }
+
+    function reprendreBrouillon(key) {
+      localStorage.setItem("current_brouillon", key);
+      window.location.href = "intervention_extincteurs.html";
+    }
+
+    function supprimerBrouillon(key) {
+      if (confirm("Supprimer ce brouillon ?")) {
+        localStorage.removeItem(key);
+        chargerBrouillons();
+      }
+    }
+
+    window.onload = () => {
+      chargerBrouillons();
+    };
+  </script>
 </body>
 </html>
