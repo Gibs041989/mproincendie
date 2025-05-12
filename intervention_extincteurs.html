@@ -235,7 +235,7 @@ button.btn {
 <div style="text-align: left; margin: 20px 0;">
 <button class="btn" onclick="addExtincteur()" type="button">➕ Ajouter un extincteur</button>
 </div>
-<div class="checkbox-group" style="margin-top: 20px; margin-bottom: 80px;">
+<div class="checkbox-group" style="background: #ffffff; padding: 10px 12px; border-radius: 6px; border: 1px solid #ccc; margin-top: 20px;">
 <h3><span style="font-size: 1.2rem; font-weight: 600;">✅ Devoir de conseil</span></h3>
 <div style="display: flex; flex-direction: column; gap: 12px;">
 <label class="dc-item">Registre présent et à jour<input class="check-dc" id="dc-registre" type="checkbox"/></label>
@@ -403,6 +403,14 @@ function validerCompteRendu() {
   localStorage.removeItem("crm_extincteurs_CLIENT123");
   alert("Compte rendu validé !");
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+  const dateField = document.getElementById("date_intervention");
+  if (dateField && !dateField.value) {
+    const today = new Date().toISOString().split('T')[0];
+    dateField.value = today;
+  }
+});
 </script>
 </body>
 </html>
