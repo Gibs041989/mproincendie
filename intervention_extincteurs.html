@@ -10,7 +10,8 @@
     body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; padding: 20px; margin-bottom: 100px; }
     h2 { color: #b30000; }
     label { display: block; font-weight: 600; margin-top: 10px; }
-    input, select, textarea { width: 100%; padding: 8px; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; }
+    input, select, textarea {
+      font-size: 16px; width: 100%; padding: 8px; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
     .flex { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
     .btn { margin-top: 20px; padding: 10px 20px; background: #0077cc; color: white; border: none; border-radius: 6px; cursor: pointer; }
@@ -73,7 +74,7 @@
         <div><label>Niveau</label><input class="ext-niv" /></div>
         <div><label>Emplacement</label><input class="ext-emplacement" /></div>
         <div style="grid-column: span 2;"><label>Opérations effectuées</label>
-          <div class="flex">
+          <div class="operations-column" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
             <label><input type="checkbox" data-code="VF" /> Vérification OK</label>
             <label><input type="checkbox" data-code="RQ" /> Révision quinquennale</label>
             <label><input type="checkbox" data-code="RE" /> Rechargé</label>
@@ -171,6 +172,19 @@
     }, 10000);
 
     window.onload = () => {
+
+    document.querySelectorAll('input[list]').forEach(input => {
+      input.addEventListener('focus', () => {
+        const listId = input.getAttribute('list');
+        if (listId) {
+          const datalist = document.getElementById(listId);
+          if (datalist && datalist.options.length) {
+            input.setAttribute('autocomplete', 'on');
+          }
+        }
+      });
+    });
+
       addExtincteur();
     };
   </script>
