@@ -118,6 +118,51 @@
 function chargerCoordonnees() {
   const nomClient = new URLSearchParams(window.location.search).get("client") || localStorage.getItem("client_recent");
   const clients = JSON.parse(localStorage.getItem("clients") || "[]");
+  const client = clients.find(c => c.nom === nomClient || c.nom.replace(/\s+/g, '_').toUpperCase() === nomClient);
+  if (!client) return;
+
+  const normaliseNom = client.nom.replace(/\s+/g, '_').toUpperCase();
+  const lieu = client.adresses_intervention?.[0];
+  document.getElementById("client-coordonnees").innerHTML = `
+    <div><strong>Client :</strong> ${client.nom}</div>
+    <div><strong>Adresse :</strong> ${client.rue || ''}, ${client.cp || ''} ${client.ville || ''}</div>
+    <div><strong>Lieu d’intervention :</strong> ${lieu?.nom || ''} - ${lieu?.rue || ''}, ${lieu?.ville || ''}</div>
+  `;
+  document.getElementById("lieu-signature").textContent = client.ville || '';
+
+  const crmTypes = ["extincteurs", "baes", "ria", "desenfumage"];
+  let resumeHTML = "<h3 class='font-semibold text-sm mb-2'>📋 Résumé des CRM liés</h3>";
+  let trouvé = false;
+
+  crmTypes.forEach(type => {
+    const key = `crm_${type}_${normaliseNom}`;
+    if (localStorage.getItem(key)) {
+      trouvé = true;
+      const data = JSON.parse(localStorage.getItem(key));
+      const emoji = type === "extincteurs" ? "🧯" :
+                    type === "baes" ? "💡" :
+                    type === "ria" ? "🚿" :
+                    type === "desenfumage" ? "💨" : "❓";
+      resumeHTML += `<div class="mb-1"><strong>${emoji} ${type.toUpperCase()}</strong><br><span class="ml-2">${data.resume || "—"}</span></div>`;
+      if (Array.isArray(data.articles)) {
+        data.articles.forEach(item => {
+          const ligne = document.createElement("tr");
+          ligne.innerHTML = `
+            <td class="p-2"><input class="w-full p-1 border rounded" value="${item.code || ''}"></td>
+            <td class="p-2"><input class="w-full p-1 border rounded" value="${item.designation || ''}"></td>
+            <td class="p-2 text-right"><input type="number" min="0" class="w-full p-1 border rounded text-right" value="${item.qte || 1}" onchange="calculerTotal()"></td>
+            <td class="p-2 text-right"><input type="number" step="0.01" class="w-full p-1 border rounded text-right" value="${item.pu || 0}" onchange="calculerTotal()"></td>
+            <td class="p-2 text-right total-ligne">0.00</td>
+          `;
+          document.getElementById("tableau-lignes").appendChild(ligne);
+        });
+      }
+    }
+  });
+
+  document.getElementById("crm-resume").innerHTML = trouvé ? resumeHTML : "<em>Aucun CRM validé pour ce client.</em>";
+  calculerTotal();
+  const clients = JSON.parse(localStorage.getItem("clients") || "[]");
   const client = clients.find(c => c.nom === nomClient);
   if (!client) return;
 
@@ -250,6 +295,51 @@ function genererPDF() {
 
 window.onload = () => {
 const nomClient = new URLSearchParams(window.location.search).get("client") || localStorage.getItem("client_recent");
+  const clients = JSON.parse(localStorage.getItem("clients") || "[]");
+  const client = clients.find(c => c.nom === nomClient || c.nom.replace(/\s+/g, '_').toUpperCase() === nomClient);
+  if (!client) return;
+
+  const normaliseNom = client.nom.replace(/\s+/g, '_').toUpperCase();
+  const lieu = client.adresses_intervention?.[0];
+  document.getElementById("client-coordonnees").innerHTML = `
+    <div><strong>Client :</strong> ${client.nom}</div>
+    <div><strong>Adresse :</strong> ${client.rue || ''}, ${client.cp || ''} ${client.ville || ''}</div>
+    <div><strong>Lieu d’intervention :</strong> ${lieu?.nom || ''} - ${lieu?.rue || ''}, ${lieu?.ville || ''}</div>
+  `;
+  document.getElementById("lieu-signature").textContent = client.ville || '';
+
+  const crmTypes = ["extincteurs", "baes", "ria", "desenfumage"];
+  let resumeHTML = "<h3 class='font-semibold text-sm mb-2'>📋 Résumé des CRM liés</h3>";
+  let trouvé = false;
+
+  crmTypes.forEach(type => {
+    const key = `crm_${type}_${normaliseNom}`;
+    if (localStorage.getItem(key)) {
+      trouvé = true;
+      const data = JSON.parse(localStorage.getItem(key));
+      const emoji = type === "extincteurs" ? "🧯" :
+                    type === "baes" ? "💡" :
+                    type === "ria" ? "🚿" :
+                    type === "desenfumage" ? "💨" : "❓";
+      resumeHTML += `<div class="mb-1"><strong>${emoji} ${type.toUpperCase()}</strong><br><span class="ml-2">${data.resume || "—"}</span></div>`;
+      if (Array.isArray(data.articles)) {
+        data.articles.forEach(item => {
+          const ligne = document.createElement("tr");
+          ligne.innerHTML = `
+            <td class="p-2"><input class="w-full p-1 border rounded" value="${item.code || ''}"></td>
+            <td class="p-2"><input class="w-full p-1 border rounded" value="${item.designation || ''}"></td>
+            <td class="p-2 text-right"><input type="number" min="0" class="w-full p-1 border rounded text-right" value="${item.qte || 1}" onchange="calculerTotal()"></td>
+            <td class="p-2 text-right"><input type="number" step="0.01" class="w-full p-1 border rounded text-right" value="${item.pu || 0}" onchange="calculerTotal()"></td>
+            <td class="p-2 text-right total-ligne">0.00</td>
+          `;
+          document.getElementById("tableau-lignes").appendChild(ligne);
+        });
+      }
+    }
+  });
+
+  document.getElementById("crm-resume").innerHTML = trouvé ? resumeHTML : "<em>Aucun CRM validé pour ce client.</em>";
+  calculerTotal();
   const clients = JSON.parse(localStorage.getItem("clients") || "[]");
   const client = clients.find(c => c.nom === nomClient);
   if (!client) return;
