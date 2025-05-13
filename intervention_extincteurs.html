@@ -219,7 +219,7 @@ button.btn {
 </style>
 </head>
 <body>
-<h2><span style="font-size: 1.4rem; font-weight: 700;">Compte-rendu Extincteurs</span></h2><div><div><strong>Client :</strong> Dupont Entreprise</div><div><strong>Lieu d’intervention :</strong> Site Annexe - Zone industrielle</div></div><section style="margin-top: 30px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background: #fff;"><h3 style="font-size: 1.2rem; font-weight: 600;">📅 Détails de l’intervention</h3><div style="margin-top: 30px; margin-bottom: 10px;">
+<h2><span style="font-size: 1.4rem; font-weight: 700;">Compte-rendu Extincteurs</span></h2><div class="mb-4 text-sm text-gray-800" id="coordonnees-client"></div><section style="margin-top: 30px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background: #fff;"><h3 style="font-size: 1.2rem; font-weight: 600;">📅 Détails de l’intervention</h3><div style="margin-top: 30px; margin-bottom: 10px;">
 <div style="display: flex; flex-wrap: wrap; gap: 30px;">
 <div style="flex: 1; min-width: 220px;">
 <label for="date_intervention">📅 Date d’intervention</label>
@@ -235,10 +235,7 @@ button.btn {
 <div style="text-align: left; margin: 20px 0;">
 <button class="btn" onclick="addExtincteur()" type="button">➕ Ajouter un extincteur</button>
 </div>
-<div style="margin-top: 30px;">
-<h3 style="font-size: 1.2rem; font-weight: 600;">📝 Observations générales</h3>
-<textarea id="observation_generale" placeholder="Ajouter une remarque générale sur l’intervention..." rows="4" style="width: 100%; font-size: 1rem;"></textarea>
-</div><div class="checkbox-group" style="margin-top: 20px; margin-bottom: 80px;">
+<div class="checkbox-group" style="margin-top: 20px; margin-bottom: 80px;">
 <h3><span style="font-size: 1.2rem; font-weight: 600;">✅ Devoir de conseil</span></h3>
 <div style="display: flex; flex-direction: column; gap: 12px;">
 <label class="dc-item">Registre présent et à jour<input class="check-dc" id="dc-registre" type="checkbox"/></label>
@@ -246,6 +243,9 @@ button.btn {
 <label class="dc-item">BAES présents<input class="check-dc" id="dc-baes" type="checkbox"/></label>
 <label class="dc-item">Plans de sécurité présents et à jour<input class="check-dc" id="dc-plans" type="checkbox"/></label>
 </div>
+</div><div style="margin-top: 30px;">
+<h3 style="font-size: 1.2rem; font-weight: 600;">📝 Points à améliorer / autres observations</h3>
+<textarea id="observation_generale" placeholder="Ajouter une remarque générale sur l’intervention..." rows="4" style="width: 100%; font-size: 1rem;"></textarea>
 </div>
 <template id="extincteur-template">
 <details class="extincteur-bloc" open="">
@@ -374,6 +374,23 @@ function validerCompteRendu() {
     }, 10000);
 
     window.onload = () => {
+const params = new URLSearchParams(window.location.search);
+    const nomClient = params.get('client') || localStorage.getItem('client_recent');
+    const clients = JSON.parse(localStorage.getItem('clients') || '[]');
+    const client = clients.find(c => c.nom === nomClient);
+    const bloc = document.getElementById("coordonnees-client");
+
+    if (client) {
+      const lieu = client.adresses_intervention?.[0];
+      bloc.innerHTML = `
+        <div><strong>Client :</strong> ${client.nom}</div>
+        <div><strong>Adresse :</strong> ${client.rue || ''}, ${client.cp || ''} ${client.ville || ''}</div>
+        <div><strong>Lieu d’intervention :</strong> ${lieu?.nom || ''} - ${lieu?.rue || ''}, ${lieu?.ville || ''}</div>
+      `;
+    } else {
+      bloc.innerHTML = "<div class='text-red-600'>Client introuvable.</div>";
+    }
+
 
     document.querySelectorAll('input[list]').forEach(input => {
       input.addEventListener('focus', () => {
