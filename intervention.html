@@ -187,7 +187,11 @@ window.onload = () => {
     function chargerClients() {
       const select = document.getElementById("select-client");
       const clients = JSON.parse(localStorage.getItem("clients") || "[]");
-      const client_recent = localStorage.getItem("client_recent");
+      
+      const urlClient = new URLSearchParams(window.location.search).get('client');
+      const urlClient = new URLSearchParams(window.location.search).get('client');
+      const client_recent = urlClient || localStorage.getItem("client_recent");
+    
       clients.forEach(c => {
         const opt = document.createElement("option");
         opt.value = c.nom;
