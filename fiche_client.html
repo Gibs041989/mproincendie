@@ -43,6 +43,18 @@
     <section class="bg-white shadow rounded-xl p-4">
       <h2 class="text-lg font-semibold mb-2">📍 Lieux d’intervention</h2>
       <ul id="lieux" class="list-disc ml-5 text-sm text-gray-700"></ul>
+<div class="mt-4">
+  <button onclick="document.getElementById('formAjoutLieu').classList.toggle('hidden')" class="text-blue-600 underline text-sm mb-2">➕ Ajouter un lieu d’intervention</button>
+  <form id="formAjoutLieu" class="space-y-2 hidden" onsubmit="ajouterLieu(); return false;">
+    <input id="lieu_nom" class="w-full p-2 border rounded" placeholder="Nom du lieu" required />
+    <input id="lieu_rue" class="w-full p-2 border rounded" placeholder="Rue" />
+    <input id="lieu_cp" class="w-full p-2 border rounded" placeholder="Code postal" />
+    <input id="lieu_ville" class="w-full p-2 border rounded" placeholder="Ville" />
+    <input id="lieu_contact" class="w-full p-2 border rounded" placeholder="Contact sur place" />
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">💾 Ajouter le lieu</button>
+  </form>
+</div>
+
     </section>
 
     <section class="bg-white shadow rounded-xl p-4">
@@ -170,7 +182,26 @@
       afficherClient();
     }
 
-    window.onload = () => { chargerClient(); setTimeout(() => const docList = document.getElementById('liste-documents');
+    
+function ajouterLieu() {
+  const nom = document.getElementById("lieu_nom").value.trim();
+  const rue = document.getElementById("lieu_rue").value.trim();
+  const cp = document.getElementById("lieu_cp").value.trim();
+  const ville = document.getElementById("lieu_ville").value.trim();
+  const contact = document.getElementById("lieu_contact").value.trim();
+  if (!client.adresses_intervention) client.adresses_intervention = [];
+  client.adresses_intervention.push({ nom, rue, cp, ville, contact });
+  const clients = JSON.parse(localStorage.getItem("clients") || "[]");
+  clients[index] = client;
+  localStorage.setItem("clients", JSON.stringify(clients));
+  alert("Lieu ajouté !");
+  document.getElementById("formAjoutLieu").reset();
+  document.getElementById("formAjoutLieu").classList.add("hidden");
+  afficherClient();
+}
+
+
+window.onload = () => { chargerClient(); setTimeout(() => const docList = document.getElementById('liste-documents');
       docList.innerHTML = '';
       const allDocs = (client.historique || []).flatMap(h => h.documents.map(d => ({
         label: `${d.label} (${h.mois}/${h.annee})`,
@@ -186,4 +217,3 @@
   </script>
 </body>
 </html>
-
