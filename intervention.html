@@ -174,6 +174,52 @@
     window.location.href = `bon_intervention_RESUME_CLAIR_OK.html?client=${encodeURIComponent(nomClean)}`;
   });
 
+function chargerBrouillons() {
+  const container = document.getElementById("brouillons-container");
+  container.innerHTML = "";
+  for (let key in localStorage) {
+    if (key.startsWith("crm_extincteurs_") || key.startsWith("crm_ria_") || key.startsWith("crm_baes_") || key.startsWith("crm_desenfumage_") || key.startsWith("bon_intervention_")) {
+      const type = key.includes("extincteurs") ? "Extincteurs" :
+                   key.includes("ria") ? "RIA" :
+                   key.includes("baes") ? "BAES" :
+                   key.includes("desenfumage") ? "Désenfumage" :
+                   "Bon d’intervention";
+      const label = key.split("_").slice(-1)[0];
+      const div = document.createElement("div");
+      div.className = "border rounded p-3 bg-gray-50";
+      div.innerHTML = `
+        <strong>${label}</strong><br/>
+        <small>Type : ${type}</small>
+        <div class="mt-2 flex gap-3">
+          <button onclick="reprendreBrouillon('${key}')" class="bg-blue-600 text-white px-3 py-1 rounded">Reprendre</button>
+          <button onclick="supprimerBrouillon('${key}')" class="bg-red-600 text-white px-3 py-1 rounded">Supprimer</button>
+        </div>
+      `;
+      container.appendChild(div);
+    }
+  }
+  if (container.innerHTML === "") {
+    container.innerHTML = "<em>Aucun brouillon en cours.</em>";
+  }
+}
+
+function reprendreBrouillon(key) {
+  localStorage.setItem("current_brouillon", key);
+  const redirect = key.includes("bon_intervention") ? "bon_intervention_RESUME_CLAIR_OK.html" :
+                   key.includes("extincteurs") ? "intervention_extincteurs.html" :
+                   key.includes("ria") ? "intervention_ria.html" :
+                   key.includes("baes") ? "intervention_baes.html" :
+                   key.includes("desenfumage") ? "intervention_desenfumage.html" : "#";
+  window.location.href = redirect + "?client=" + encodeURIComponent(key.split("_").slice(-1)[0]);
+}
+
+function supprimerBrouillon(key) {
+  if (confirm("Supprimer ce brouillon ?")) {
+    localStorage.removeItem(key);
+    chargerBrouillons();
+  }
+}
+
 window.onload = () => {
       chargerClients();
       chargerBrouillons();
