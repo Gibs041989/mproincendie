@@ -110,7 +110,11 @@
       localStorage.setItem("clients", JSON.stringify(clients));
       localStorage.setItem("client_recent", client.nom);
       alert("Client '" + client.nom + "' enregistré ! Redirection...");
-      setTimeout(() => { window.location.href = "intervention.html"; }, 300);
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirection = urlParams.get('from') === 'intervention' ? 'intervention.html' : 'clients.html';
+      setTimeout(() => { window.location.href = redirection; }, 300);
+    
     }
 
     async function geolocaliser(idRue, idCp, idVille) {
