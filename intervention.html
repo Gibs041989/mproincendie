@@ -43,7 +43,7 @@
       <a href="intervention_baes.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-center">💡 BAES</a>
       <a href="intervention_ria.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-center">🚿 RIA</a>
       <a href="intervention_desenfumage.html" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-center">💨 Désenfumage</a>
-      <a href="bon_intervention.html" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-center col-span-full">🧾 Bon d’intervention</a>
+      <a id="btn-bon" href="#" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-center col-span-full">🧾 Bon d’intervention</a>
     </div>
   </section>
 
@@ -162,7 +162,19 @@
       }
     });
 
-    window.onload = () => {
+    document.getElementById("btn-bon").addEventListener("click", function(e) {
+    e.preventDefault();
+    const select = document.getElementById("select-client");
+    const nom = select.value;
+    if (!nom) {
+      alert("Veuillez sélectionner un client avant de générer le bon d’intervention.");
+      return;
+    }
+    const nomClean = nom.replace(/\s+/g, '_').normalize("NFD").replace(/\p{Diacritic}/gu, "").toUpperCase();
+    window.location.href = `bon_intervention_RESUME_CLAIR_OK.html?client=${encodeURIComponent(nomClean)}`;
+  });
+
+window.onload = () => {
       chargerClients();
       chargerBrouillons();
     };
