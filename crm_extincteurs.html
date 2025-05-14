@@ -1,406 +1,247 @@
-
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Compte-rendu Extincteurs - MproIntervention</title>
-<style>
-
-
-
-
-
-    body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; padding: 20px; margin-bottom: 100px; }
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Compte-rendu Extincteurs - MPRO Intervention</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+      margin-bottom: 100px;
+      max-width: 960px;
+      margin-left: auto;
+      margin-right: auto;
+    }
     h2 { color: #b30000; }
-    label { display: block; font-weight: 600; margin-top: 10px; }
+    label { font-weight: 600; display: block; margin-top: 10px; }
     input, select, textarea {
-      font-size: 16px; width: 100%; padding: 8px; margin-top: 4px; border-radius: 4px; border: 1px solid #ccc; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    .flex { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
-    .btn { margin-top: 20px; padding: 10px 20px; background: #0077cc; color: white; border: none; border-radius: 6px; cursor: pointer; }
+      font-size: 16px;
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
     .btn:hover { background: #005fa3; }
-    .extincteur-bloc { background: white; border: 1px solid #ccc; border-radius: 10px; padding: 15px; margin-bottom: 20px; }
-    summary { font-weight: bold; margin-bottom: 10px; cursor: pointer; }
-    .checkbox-group { background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #ccc; margin-top: 20px; }
-    .nav-shortcuts { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: center; gap: 30px; border-top: 1px solid #ccc; padding: 12px 0; font-size: 1.8rem; z-index: 999; }
-    @media (max-width: 600px) {
-      .grid {
-        grid-template-columns: 1fr !important;
-      }
+    .extincteur-bloc {
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
     }
-  
-
-.op-item, .dc-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  cursor: pointer;
-  width: 100%;
-  box-sizing: border-box;
-}
-.op-item input, .dc-item input {
-  margin: 0;
-}
-
-
-
-.op-item, .dc-item {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  text-align: left;
-  gap: 12px;
-  padding: 12px;
-  background: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  cursor: pointer;
-  width: fit-content;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-.op-item input, .dc-item input {
-  margin: 0;
-}
-
-
-
-.op-item, .dc-item {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  text-align: left;
-  gap: 12px;
-  padding: 12px;
-  background: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  cursor: pointer;
-  min-width: 320px;
-  max-width: 100%;
-  white-space: nowrap;
-  box-sizing: border-box;
-}
-.op-item input, .dc-item input {
-  margin: 0;
-}
-
-
-
-.op-item, .dc-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  text-align: left;
-  gap: 12px;
-  padding: 12px;
-  background: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  cursor: pointer;
-  min-width: 320px;
-  max-width: 100%;
-  white-space: nowrap;
-  box-sizing: border-box;
-}
-.op-item input, .dc-item input {
-  margin: 0;
-}
-
-
-
-body {
-  font-size: 16px;
-}
-input, select, textarea {
-  font-size: 1rem;
-  padding: 10px;
-}
-button {
-  font-size: 1rem;
-  padding: 10px 16px;
-}
-label {
-  font-weight: 600;
-}
-
-
-/* GLOBAL */
-:root {
-  --main-color: #b30000;
-  --bg-light: #f5f5f5;
-  --btn-color: #0077cc;
-  --btn-hover: #005fa3;
-}
-body {
-  max-width: 960px;
-  margin: 0 auto;
-}
-h2 span {
-  font-size: 1.6rem;
-}
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 15px;
-}
-textarea {
-  resize: vertical;
-}
-button.btn {
-  width: 100%;
-  max-width: 260px;
-}
-@media (max-width: 768px) {
-  h2 span {
-    font-size: 1.4rem;
-  }
-  .nav-shortcuts {
-    font-size: 1.5rem;
-    gap: 20px;
-    padding: 10px 0;
-  }
-}
-
-input, select, textarea {
-  width: 100% !important;
-  box-sizing: border-box;
-  display: block;
-}
-textarea {
-  min-height: 100px;
-}
-.grid > div {
-  width: 100%;
-}
-
-/* Compact summaries */
-summary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px;
-  font-weight: bold;
-  font-size: 1rem !important;
-}
-summary::before {
-  font-size: 1.2rem;
-}
-.extincteur-bloc summary img,
-.extincteur-bloc summary svg {
-  width: 20px;
-  height: 20px;
-}
-
-/* Button styling */
-button.btn {
-  width: 100%;
-  max-width: 300px;
-  padding: 8px 12px;
-  font-size: 1rem;
-  margin-top: 12px;
-}
-
-/* Devoir de conseil refinement */
-.checkbox-group {
-  background: #ffffff !important;
-  border-radius: 6px !important;
-  border: 1px solid #ccc;
-  box-shadow: none;
-  padding: 15px;
-}
-</style>
+    summary {
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .nav-shortcuts {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid #ccc;
+      padding: 12px 0;
+      font-size: 1.5rem;
+      z-index: 999;
+    }
+    @media (max-width: 768px) {
+      .nav-shortcuts { font-size: 1.3rem; }
+    }
+  </style>
 </head>
-<body><div class="bg-white p-4 flex items-center justify-between shadow mb-4"><img class="h-12" src="logo-mendes.png"/></div>
-<div class="bg-white p-4 shadow rounded mb-4" id="bandeau-client">
-<p class="text-sm text-gray-700"><strong>🧾 Client :</strong> <span id="nom-client">[Nom client]</span></p>
-<p class="text-sm text-gray-700"><strong>📍 Lieu d’intervention :</strong> <span id="lieu-intervention">[Lieu d’intervention]</span></p>
+<body>
+  <div class="bg-white p-4 flex items-center justify-between shadow mb-4">
+    <img class="h-12" src="logo-mendes.png" alt="Logo MPRO"/>
+  </div>
+
+  <div class="bg-white p-4 shadow rounded mb-4" id="bandeau-client">
+    <p><strong>🧾 Client :</strong> <span id="nom-client">[Nom client]</span></p>
+    <p><strong>📍 Lieu d’intervention :</strong> <span id="lieu-intervention">[Lieu d’intervention]</span></p>
+  </div>
+
+  <h2>Compte-rendu Extincteurs</h2>
+
+  <section>
+    <label for="date_intervention">📅 Date d’intervention</label>
+    <input type="date" id="date_intervention" />
+
+    <label for="technicien">👨‍🔧 Technicien</label>
+    <input type="text" id="technicien" placeholder="Nom et prénom" />
+  </section>
+
+  <section id="extincteurs-container" style="margin-top: 30px;"></section>
+
+  <button class="btn" onclick="ajouterExtincteur()">➕ Ajouter un extincteur</button>
+
+  <div style="margin-top: 30px;">
+    <h3>✅ Devoir de conseil</h3>
+    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+      <label class="dc-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #ccc; border-radius: 8px; background: #f9f9f9; cursor: pointer;">
+        <span>Registre présent et à jour</span><input type="checkbox" id="dc-registre" />
+      </label>
+      <label class="dc-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #ccc; border-radius: 8px; background: #f9f9f9; cursor: pointer;">
+        <span>Signalétique à jour</span><input type="checkbox" id="dc-signaletique" />
+      </label>
+      <label class="dc-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #ccc; border-radius: 8px; background: #f9f9f9; cursor: pointer;">
+        <span>BAES présents</span><input type="checkbox" id="dc-baes" />
+      </label>
+      <label class="dc-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #ccc; border-radius: 8px; background: #f9f9f9; cursor: pointer;">
+        <span>Plans de sécurité présents et à jour</span><input type="checkbox" id="dc-plans" />
+      </label>
+    </div>
+  </div>
+
+  <div style="margin-top: 30px;">
+    <h3>📝 Observations générales</h3>
+    <textarea id="observation_generale" rows="4" placeholder="Remarques..."></textarea>
+  </div>
+
+  <div style="margin: 30px 0; text-align: center;">
+    <button class="btn" onclick="validerCompteRendu()">✅ Valider le compte rendu</button>
+    <button class="btn" onclick="window.location.href='bon.html'" style="background:#28a745;">➡️ Passer au bon d’intervention</button>
+  </div>
+
+  <div class="nav-shortcuts">
+    <a href="index.html" title="Accueil">🏠</a>
+    <a href="intervention.html" title="Intervention">📋</a>
+    <a href="clients.html" title="Clients">👥</a>
+    <a href="parametres.html" title="Paramètres">⚙️</a>
+  </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const nom = localStorage.getItem("nom_client");
-    const lieu = localStorage.getItem("lieu_intervention");
-    const elNom = document.getElementById("nom-client");
-    const elLieu = document.getElementById("lieu-intervention");
+  const ID_CLIENT = localStorage.getItem("id_client") || "CLIENT123";
 
-    if (nom) {
-      elNom.textContent = nom;
-    } else {
-      elNom.textContent = "❌ Aucune information client reçue";
-      elNom.classList.add("text-red-600", "font-semibold");
-    }
-
-    if (lieu) {
-      elLieu.textContent = lieu;
-    } else {
-      elLieu.textContent = "❌ Aucun lieu d’intervention précisé";
-      elLieu.classList.add("text-red-600", "font-semibold");
-    }
-  });
-</script>
-</div>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const nom = localStorage.getItem("nom_client") || "Client inconnu";
-    const lieu = localStorage.getItem("lieu_intervention") || "Lieu non précisé";
-    document.getElementById("nom-client").textContent = nom;
-    document.getElementById("lieu-intervention").textContent = lieu;
-  });
-</script>
-<div class="bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded mb-4" id="reprise-crm"></div>
-<h2><span style="font-size: 1.4rem; font-weight: 700;">Compte-rendu Extincteurs</span></h2><div class="mb-4 text-sm text-gray-800" id="coordonnees-client"></div><section style="margin-top: 30px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; background: #fff;"><h3 style="font-size: 1.2rem; font-weight: 600;">📅 Détails de l’intervention</h3><div style="margin-top: 30px; margin-bottom: 10px;">
-<div style="display: flex; flex-wrap: wrap; gap: 30px;">
-<div style="flex: 1; min-width: 220px;">
-<label for="date_intervention">📅 Date d’intervention</label>
-<input id="date_intervention" name="date_intervention" type="date"/>
-</div>
-<div style="flex: 2; min-width: 220px;">
-<label for="technicien">👨‍🔧 Technicien intervenant</label>
-<input id="technicien" name="technicien" placeholder="Nom et prénom du technicien" type="text"/>
-</div>
-</div>
-</div></section>
-<section id="extincteurs-container"></section>
-<div style="text-align: left; margin: 20px 0;">
-<button class="btn" onclick="addExtincteur()" type="button">➕ Ajouter un extincteur</button>
-</div>
-<div class="checkbox-group" style="margin-top: 20px; margin-bottom: 80px;">
-<h3><span style="font-size: 1.2rem; font-weight: 600;">✅ Devoir de conseil</span></h3>
-<div style="display: flex; flex-direction: column; gap: 12px;">
-<label class="dc-item">Registre présent et à jour<input class="check-dc" id="dc-registre" type="checkbox"/></label>
-<label class="dc-item">Signalétique à jour<input class="check-dc" id="dc-signaletique" type="checkbox"/></label>
-<label class="dc-item">BAES présents<input class="check-dc" id="dc-baes" type="checkbox"/></label>
-<label class="dc-item">Plans de sécurité présents et à jour<input class="check-dc" id="dc-plans" type="checkbox"/></label>
-</div>
-</div><div style="margin-top: 30px;">
-<h3 style="font-size: 1.2rem; font-weight: 600;">📝 Points à améliorer / autres observations</h3>
-<textarea id="observation_generale" placeholder="Ajouter une remarque générale sur l’intervention..." rows="4" style="width: 100%; font-size: 1rem;"></textarea>
-</div>
-<template id="extincteur-template">
-<details class="extincteur-bloc" open="">
-<summary style="font-weight: bold; font-size: 1.15rem;">🧯 Nouvel extincteur</summary>
-<div class="grid" style="display: flex; flex-direction: column; gap: 15px;">
-<div><label>N° extincteur</label><input class="ext-num"/></div>
-<div><label>Type d'extincteur</label><input class="ext-type" list="types-extincteurs"/></div>
-<div><label class="op-item" style="width: 100%; justify-content: space-between;">Ext. PP ?<input class="ext-pp" type="checkbox"/></label></div>
-<div><label>Fabricant</label><input class="ext-fab" list="fabricants"/></div>
-<div><label>Millésime</label><input class="ext-year" list="years-list"/></div>
-<div><label>Niveau</label><input class="ext-niv"/></div>
-<div><label>Emplacement</label><input class="ext-emplacement"/></div>
-</div>
-<div style="grid-column: span 2;">
-<h4 style="font-size: 1.1rem; color: #b30000; font-weight: 600; margin-top: 20px;">Opérations effectuées</h4>
-<div class="operations-column" style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
-<label class="op-item">Vérification OK<input data-code="VF" id="op-vf" type="checkbox"/></label>
-<label class="op-item">Révision quinquennale<input data-code="RQ" id="op-rq" type="checkbox"/></label>
-<label class="op-item">Rechargé<input data-code="RE" id="op-re" type="checkbox"/></label>
-<label class="op-item">Mise en service<input data-code="MS" id="op-ms" type="checkbox"/></label>
-<label class="op-item">Échange standard<input data-code="ES" id="op-es" type="checkbox"/></label>
-</div>
-</div>
-<div style="grid-column: span 2;">
-<h4 style="font-size: 1.1rem; color: #b30000; font-weight: 600; margin-top: 20px;">Observation</h4>
-<textarea rows="3"></textarea>
-</div>
-<button class="btn" onclick="validerExtincteur(this)" type="button">✅ Valider extincteur</button>
-</details>
-</template>
-<datalist id="types-extincteurs">
-<option value="6Kg Poudre ABC"></option>
-<option value="2Kg CO2"></option>
-<option value="9L Eau + Additif"></option>
-</datalist>
-<datalist id="years-list">
-<option value="2025"></option><option value="2024"></option><option value="2023"></option>
-</datalist>
-<datalist id="fabricants">
-<option value="Desautel"></option>
-<option value="Eurofeu"></option>
-<option value="Andrieu"></option>
-</datalist>
-<section style="margin-top: 40px; margin-bottom: 120px; text-align: center;">
-<button class="btn" onclick="validerCompteRendu()" style="background:#0077cc; color:white; margin-bottom: 10px;">✅ Valider le compte rendu</button><br/>
-<button class="btn" onclick="window.location.href='bon.html'" style="background:#28a745; color:white;">➡️ Passer au bon d’intervention</button>
-</section><div class="nav-shortcuts">
-<a href="index.html" title="Accueil">🏠</a>
-<a href="intervention_extincteurs.html" title="Extincteurs">🧯</a>
-<a href="intervention_ria.html" title="RIA">🚿</a>
-<a href="intervention_baes.html" title="BAES">💡</a>
-<a href="intervention_desenfumage.html" title="Désenfumage">💨</a>
-</div>
-
-<script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const ancienneDonnee = localStorage.getItem('crm_extincteurs_CLIENT123');
-  const blocReprise = document.getElementById("reprise-crm");
-
-  if (ancienneDonnee) {
-    const lastDate = localStorage.getItem('crm_extincteurs_DATE');
-    blocReprise.innerHTML = `
-      ⚠️ Ancien compte-rendu détecté (${lastDate || 'date inconnue'}).<br/>
-      <button onclick="reprendreCRM()" class='mt-2 px-4 py-2 bg-yellow-500 text-white rounded'>📥 Reprendre le compte-rendu précédent</button>
-    `;
-  } else {
-    blocReprise.style.display = "none";
+  function getExtincteursData() {
+    const blocs = document.querySelectorAll(".extincteur-bloc");
+    const extincteurs = [];
+    blocs.forEach((bloc) => {
+      extincteurs.push({
+        type: bloc.querySelector(".ext-type")?.value || "",
+        pp: bloc.querySelector(".ext-pp")?.checked || false,
+        fab: bloc.querySelector(".ext-fab")?.value || "",
+        year: bloc.querySelector(".ext-year")?.value || "",
+        niv: bloc.querySelector(".ext-niv")?.value || "",
+        emplacement: bloc.querySelector(".ext-emplacement")?.value || "",
+        obs: bloc.querySelector(".ext-obs")?.value || ""
+      });
+    });
+    return extincteurs;
   }
 
-  const btnAjouter = document.querySelector('[onclick*="ajouterExtincteur"]');
-  if (btnAjouter) {
-    btnAjouter.onclick = ajouterExtincteur;
-  }
-
-  window.reprendreCRM = function () {
-    const ancienneDonnee = localStorage.getItem('crm_extincteurs_CLIENT123');
-    if (ancienneDonnee) {
-      document.body.innerHTML = ancienneDonnee;
-      alert("Compte-rendu précédent restauré.");
-    }
-  };
-
-  function ajouterExtincteur() {
-    const bloc = document.createElement('details');
-    bloc.className = "extincteur-bloc";
-    bloc.innerHTML = `
-      <summary>Nouveau extincteur (non validé)</summary>
-      <label>Type d'extincteur</label><input type="text" class="w-full p-2 border rounded" placeholder="Ex: 6kg Poudre ABC" />
-      <label>Emplacement</label><input type="text" class="w-full p-2 border rounded" placeholder="Ex: Bureau RDC" />
-      <div class="checkbox-group">
-        <label><input type="checkbox" /> Vérification OK</label>
-        <label><input type="checkbox" /> Révision quinquennale</label>
-        <label><input type="checkbox" /> Recharge</label>
-        <label><input type="checkbox" /> Échange standard</label>
-      </div>
-      <button onclick="validerBloc(this)" class="btn">✅ Valider extincteur</button>
-    `;
-    document.body.appendChild(bloc);
-  }
-
-  window.validerBloc = function (btn) {
-    const bloc = btn.closest("details");
-    const type = bloc.querySelector('input[type="text"]').value;
-    const emplacement = bloc.querySelectorAll('input[type="text"]')[1].value;
-    const checks = bloc.querySelectorAll('input[type="checkbox"]:checked');
-    const operations = [...checks].map(c => c.parentElement.textContent.trim()).join(", ");
-    bloc.innerHTML = `<summary>${type} - ${emplacement} (${operations})</summary>`;
-    bloc.open = false;
-    sauvegarderCRM();
+  function getFormData() {
+    return {
+      date: document.getElementById("date_intervention").value,
+      technicien: document.getElementById("technicien").value,
+      extincteurs: getExtincteursData(),
+      devoir_conseil: {
+        registre: document.getElementById("dc-registre").checked,
+        signaletique: document.getElementById("dc-signaletique").checked,
+        baes: document.getElementById("dc-baes").checked,
+        plans: document.getElementById("dc-plans").checked
+      },
+      observation: document.getElementById("observation_generale").value,
+      nom_client: localStorage.getItem("nom_client") || "",
+      lieu_intervention: localStorage.getItem("lieu_intervention") || ""
+    };
   }
 
   function sauvegarderCRM() {
-    const donnees = document.body.innerHTML;
-    const date = new Date().toLocaleDateString("fr-FR");
-    localStorage.setItem('crm_extincteurs_CLIENT123', donnees);
-    localStorage.setItem('crm_extincteurs_DATE', date);
-    console.log("CRM sauvegardé le " + date);
+    const data = getFormData();
+    localStorage.setItem("crm_extincteurs_" + ID_CLIENT, JSON.stringify(data));
+    localStorage.setItem("crm_extincteurs_DATE", new Date().toLocaleDateString("fr-FR"));
   }
-});
+
+  function restaurerCRM() {
+    const data = JSON.parse(localStorage.getItem("crm_extincteurs_" + ID_CLIENT));
+    if (!data) return;
+    document.getElementById("date_intervention").value = data.date || "";
+    document.getElementById("technicien").value = data.technicien || "";
+    document.getElementById("observation_generale").value = data.observation || "";
+    document.getElementById("dc-registre").checked = data.devoir_conseil.registre;
+    document.getElementById("dc-signaletique").checked = data.devoir_conseil.signaletique;
+    document.getElementById("dc-baes").checked = data.devoir_conseil.baes;
+    document.getElementById("dc-plans").checked = data.devoir_conseil.plans;
+    data.extincteurs.forEach(ext => {
+      ajouterExtincteur();
+      const bloc = document.querySelectorAll(".extincteur-bloc").at(-1);
+      bloc.querySelector(".ext-type").value = ext.type;
+      bloc.querySelector(".ext-pp").checked = ext.pp;
+      bloc.querySelector(".ext-fab").value = ext.fab;
+      bloc.querySelector(".ext-year").value = ext.year;
+      bloc.querySelector(".ext-niv").value = ext.niv;
+      bloc.querySelector(".ext-emplacement").value = ext.emplacement;
+      bloc.querySelector(".ext-obs").value = ext.obs;
+    });
+  }
+
+  function ajouterExtincteur() {
+    const container = document.getElementById("extincteurs-container");
+    const bloc = document.createElement("details");
+    bloc.className = "extincteur-bloc";
+    bloc.open = true;
+
+    const summary = document.createElement("summary");
+    summary.textContent = `🧯 Extincteur`;
+    bloc.appendChild(summary);
+
+    const contenu = document.createElement("div");
+    contenu.innerHTML = `
+      <label>Type</label><input type="text" class="ext-type" />
+      <label>PP ? <input type="checkbox" class="ext-pp" /></label>
+      <label>Fabricant</label><input type="text" class="ext-fab" />
+      <label>Millésime</label><input type="text" class="ext-year" />
+      <label>Niveau</label><input type="text" class="ext-niv" />
+      <label>Emplacement</label><input type="text" class="ext-emplacement" />
+      <label>Observation</label><textarea rows="3" class="ext-obs"></textarea>
+    `;
+    bloc.appendChild(contenu);
+    container.appendChild(bloc);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const ancienne = localStorage.getItem("crm_extincteurs_" + ID_CLIENT);
+    if (ancienne) {
+      if (confirm("📥 Un brouillon existe. Voulez-vous le restaurer ?")) restaurerCRM();
+    }
+
+    setInterval(sauvegarderCRM, 15000);
+
+    document.querySelector("button[onclick*='bon.html']")
+      .addEventListener("click", () => {
+        const data = getFormData();
+        localStorage.setItem("crm_resume_" + ID_CLIENT, JSON.stringify(data));
+      });
+
+    document.querySelector("button[onclick*='validerCompteRendu']")
+      .addEventListener("click", () => {
+        const data = getFormData();
+        const historique = JSON.parse(localStorage.getItem("crm_historique_" + ID_CLIENT) || "[]");
+        historique.push({
+          date: data.date,
+          technicien: data.technicien,
+          extincteurs: data.extincteurs,
+          observation: data.observation
+        });
+        localStorage.setItem("crm_historique_" + ID_CLIENT, JSON.stringify(historique));
+        localStorage.removeItem("crm_extincteurs_" + ID_CLIENT);
+        alert("✅ Compte-rendu enregistré dans l'historique.");
+      });
+  });
 </script>
-</script></body>
+</body>
 </html>
