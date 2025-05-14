@@ -9,19 +9,18 @@
       font-family: 'Segoe UI', sans-serif;
       background: #f5f5f5;
       padding: 20px;
-      margin-bottom: 100px;
+      margin-bottom: 120px;
       max-width: 960px;
-      margin-left: auto;
-      margin-right: auto;
+      margin: auto;
     }
-    h2 { color: #b30000; }
+    h2 { color: #b30000; margin-bottom: 10px; }
     label { font-weight: 600; display: block; margin-top: 10px; }
     input, select, textarea {
       font-size: 16px;
       width: 100%;
       padding: 10px;
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 6px;
       box-sizing: border-box;
     }
     .btn {
@@ -45,6 +44,24 @@
     summary {
       font-weight: bold;
       cursor: pointer;
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+    .op-item, .dc-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+      gap: 12px;
+      padding: 12px;
+      background: #f9f9f9;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+      min-width: 320px;
+      max-width: 100%;
+      white-space: nowrap;
+      box-sizing: border-box;
     }
     .nav-shortcuts {
       position: fixed;
@@ -65,51 +82,33 @@
   </style>
 </head>
 <body>
-  <div class="bg-white p-4 flex items-center justify-between shadow mb-4">
-    <img class="h-12" src="logo-mendes.png" alt="Logo MPRO"/>
-  </div>
-
-  <div class="bg-white p-4 shadow rounded mb-4" id="bandeau-client">
-    <p><strong>🧾 Client :</strong> <span id="nom-client">[Nom client]</span></p>
-    <p><strong>📍 Lieu d’intervention :</strong> <span id="lieu-intervention">[Lieu d’intervention]</span></p>
+  <div class="bg-white p-4 shadow mb-4 flex justify-between">
+    <img src="logo-mendes.png" class="h-12" alt="Logo MPRO">
   </div>
 
   <h2>Compte-rendu Extincteurs</h2>
+  <p><strong>🧾 Client :</strong> <span id="nom-client">[Nom]</span></p>
+  <p><strong>📍 Lieu d’intervention :</strong> <span id="lieu-intervention">[Lieu]</span></p>
 
-  <section>
-    <label for="date_intervention">📅 Date d’intervention</label>
-    <input type="date" id="date_intervention" />
+  <label for="date_intervention">📅 Date d’intervention</label>
+  <input type="date" id="date_intervention"/>
 
-    <label for="technicien">👨‍🔧 Technicien</label>
-    <input type="text" id="technicien" placeholder="Nom et prénom" />
-  </section>
+  <label for="technicien">👨‍🔧 Technicien</label>
+  <input type="text" id="technicien" placeholder="Nom et prénom"/>
 
   <section id="extincteurs-container" style="margin-top: 30px;"></section>
-
   <button class="btn" onclick="ajouterExtincteur()">➕ Ajouter un extincteur</button>
 
-  <div style="margin-top: 30px;">
-    <h3>✅ Devoir de conseil</h3>
-    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
-      <label class="dc-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #ccc; border-radius: 8px; background: #f9f9f9; cursor: pointer;">
-        <span>Registre présent et à jour</span><input type="checkbox" id="dc-registre" />
-      </label>
-      <label class="dc-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #ccc; border-radius: 8px; background: #f9f9f9; cursor: pointer;">
-        <span>Signalétique à jour</span><input type="checkbox" id="dc-signaletique" />
-      </label>
-      <label class="dc-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #ccc; border-radius: 8px; background: #f9f9f9; cursor: pointer;">
-        <span>BAES présents</span><input type="checkbox" id="dc-baes" />
-      </label>
-      <label class="dc-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #ccc; border-radius: 8px; background: #f9f9f9; cursor: pointer;">
-        <span>Plans de sécurité présents et à jour</span><input type="checkbox" id="dc-plans" />
-      </label>
-    </div>
+  <h3 style="margin-top:30px;">✅ Devoir de conseil</h3>
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <label class="dc-item">Registre présent et à jour<input type="checkbox" id="dc-registre"/></label>
+    <label class="dc-item">Signalétique à jour<input type="checkbox" id="dc-signaletique"/></label>
+    <label class="dc-item">BAES présents<input type="checkbox" id="dc-baes"/></label>
+    <label class="dc-item">Plans de sécurité présents et à jour<input type="checkbox" id="dc-plans"/></label>
   </div>
 
-  <div style="margin-top: 30px;">
-    <h3>📝 Observations générales</h3>
-    <textarea id="observation_generale" rows="4" placeholder="Remarques..."></textarea>
-  </div>
+  <h3 style="margin-top:30px;">📝 Observations générales</h3>
+  <textarea id="observation_generale" rows="4" placeholder="Ajouter une remarque générale..."></textarea>
 
   <div style="margin: 30px 0; text-align: center;">
     <button class="btn" onclick="validerCompteRendu()">✅ Valider le compte rendu</button>
@@ -117,131 +116,107 @@
   </div>
 
   <div class="nav-shortcuts">
-    <a href="index.html" title="Accueil">🏠</a>
-    <a href="intervention.html" title="Intervention">📋</a>
-    <a href="clients.html" title="Clients">👥</a>
-    <a href="parametres.html" title="Paramètres">⚙️</a>
+    <a href="index.html">🏠</a>
+    <a href="intervention.html">📋</a>
+    <a href="clients.html">👥</a>
+    <a href="parametres.html">⚙️</a>
   </div>
 
 <script>
   const ID_CLIENT = localStorage.getItem("id_client") || "CLIENT123";
+  document.getElementById("nom-client").textContent = localStorage.getItem("nom_client") || "[Non précisé]";
+  document.getElementById("lieu-intervention").textContent = localStorage.getItem("lieu_intervention") || "[Non précisé]";
+  let compteur = 1;
 
-  function getExtincteursData() {
-    const blocs = document.querySelectorAll(".extincteur-bloc");
-    const extincteurs = [];
-    blocs.forEach((bloc) => {
-      extincteurs.push({
-        type: bloc.querySelector(".ext-type")?.value || "",
-        pp: bloc.querySelector(".ext-pp")?.checked || false,
-        fab: bloc.querySelector(".ext-fab")?.value || "",
-        year: bloc.querySelector(".ext-year")?.value || "",
-        niv: bloc.querySelector(".ext-niv")?.value || "",
-        emplacement: bloc.querySelector(".ext-emplacement")?.value || "",
-        obs: bloc.querySelector(".ext-obs")?.value || ""
-      });
-    });
-    return extincteurs;
+  function ajouterExtincteur() {
+    const bloc = document.createElement("details");
+    bloc.className = "extincteur-bloc";
+    bloc.innerHTML = `
+      <summary>🧯 Extincteur n°<input type="number" class="ext-num" value="${compteur++}" style="width: 60px; margin-left: 10px;" /></summary>
+      <label>Type d’extincteur</label><input class="ext-type" list="liste-types"/>
+      <label>Ext. PP ? <input type="checkbox" class="ext-pp"/></label>
+      <label>Fabricant</label><input class="ext-fab" list="liste-fab"/>
+      <label>Millésime</label><input class="ext-year" list="liste-year"/>
+      <label>Niveau</label><input class="ext-niv"/>
+      <label>Emplacement</label><input class="ext-emplacement"/>
+      <label>Opérations effectuées :</label>
+      <label class="op-item">Vérification OK<input type="checkbox" data-code="VF"/></label>
+      <label class="op-item">Révision quinquennale<input type="checkbox" data-code="RQ"/></label>
+      <label class="op-item">Rechargé<input type="checkbox" data-code="RE"/></label>
+      <label class="op-item">Mise en service<input type="checkbox" data-code="MS"/></label>
+      <label class="op-item">Échange standard<input type="checkbox" data-code="ES"/></label>
+      <label>Observation</label><textarea class="ext-obs" rows="3"></textarea>
+    `;
+    document.getElementById("extincteurs-container").appendChild(bloc);
   }
 
   function getFormData() {
+    const blocs = document.querySelectorAll(".extincteur-bloc");
+    const extincteurs = [...blocs].map(bloc => ({
+      numero: bloc.querySelector(".ext-num").value,
+      type: bloc.querySelector(".ext-type").value,
+      pp: bloc.querySelector(".ext-pp").checked,
+      fab: bloc.querySelector(".ext-fab").value,
+      year: bloc.querySelector(".ext-year").value,
+      niv: bloc.querySelector(".ext-niv").value,
+      emplacement: bloc.querySelector(".ext-emplacement").value,
+      ops: [...bloc.querySelectorAll(".op-item input:checked")].map(c => c.dataset.code),
+      obs: bloc.querySelector(".ext-obs").value
+    }));
     return {
       date: document.getElementById("date_intervention").value,
       technicien: document.getElementById("technicien").value,
-      extincteurs: getExtincteursData(),
-      devoir_conseil: {
+      extincteurs,
+      devoir: {
         registre: document.getElementById("dc-registre").checked,
         signaletique: document.getElementById("dc-signaletique").checked,
         baes: document.getElementById("dc-baes").checked,
         plans: document.getElementById("dc-plans").checked
       },
       observation: document.getElementById("observation_generale").value,
-      nom_client: localStorage.getItem("nom_client") || "",
-      lieu_intervention: localStorage.getItem("lieu_intervention") || ""
+      nom_client: localStorage.getItem("nom_client"),
+      lieu: localStorage.getItem("lieu_intervention")
     };
   }
 
-  function sauvegarderCRM() {
+  function sauvegarderBrouillon() {
     const data = getFormData();
     localStorage.setItem("crm_extincteurs_" + ID_CLIENT, JSON.stringify(data));
-    localStorage.setItem("crm_extincteurs_DATE", new Date().toLocaleDateString("fr-FR"));
   }
 
-  function restaurerCRM() {
-    const data = JSON.parse(localStorage.getItem("crm_extincteurs_" + ID_CLIENT));
-    if (!data) return;
-    document.getElementById("date_intervention").value = data.date || "";
-    document.getElementById("technicien").value = data.technicien || "";
-    document.getElementById("observation_generale").value = data.observation || "";
-    document.getElementById("dc-registre").checked = data.devoir_conseil.registre;
-    document.getElementById("dc-signaletique").checked = data.devoir_conseil.signaletique;
-    document.getElementById("dc-baes").checked = data.devoir_conseil.baes;
-    document.getElementById("dc-plans").checked = data.devoir_conseil.plans;
-    data.extincteurs.forEach(ext => {
-      ajouterExtincteur();
-      const bloc = document.querySelectorAll(".extincteur-bloc").at(-1);
-      bloc.querySelector(".ext-type").value = ext.type;
-      bloc.querySelector(".ext-pp").checked = ext.pp;
-      bloc.querySelector(".ext-fab").value = ext.fab;
-      bloc.querySelector(".ext-year").value = ext.year;
-      bloc.querySelector(".ext-niv").value = ext.niv;
-      bloc.querySelector(".ext-emplacement").value = ext.emplacement;
-      bloc.querySelector(".ext-obs").value = ext.obs;
+  function validerCompteRendu() {
+    const data = getFormData();
+    const historique = JSON.parse(localStorage.getItem("crm_historique_" + ID_CLIENT) || "[]");
+    historique.push(data);
+    localStorage.setItem("crm_historique_" + ID_CLIENT, JSON.stringify(historique));
+    localStorage.removeItem("crm_extincteurs_" + ID_CLIENT);
+    alert("✅ Compte-rendu enregistré.");
+  }
+
+  setInterval(sauvegarderBrouillon, 15000);
+
+  const boutonBon = document.querySelector("button[onclick*='bon.html']");
+  if (boutonBon) {
+    boutonBon.addEventListener("click", () => {
+      const data = getFormData();
+      localStorage.setItem("crm_resume_" + ID_CLIENT, JSON.stringify(data));
     });
   }
-
-  function ajouterExtincteur() {
-    const container = document.getElementById("extincteurs-container");
-    const bloc = document.createElement("details");
-    bloc.className = "extincteur-bloc";
-    bloc.open = true;
-
-    const summary = document.createElement("summary");
-    summary.textContent = `🧯 Extincteur`;
-    bloc.appendChild(summary);
-
-    const contenu = document.createElement("div");
-    contenu.innerHTML = `
-      <label>Type</label><input type="text" class="ext-type" />
-      <label>PP ? <input type="checkbox" class="ext-pp" /></label>
-      <label>Fabricant</label><input type="text" class="ext-fab" />
-      <label>Millésime</label><input type="text" class="ext-year" />
-      <label>Niveau</label><input type="text" class="ext-niv" />
-      <label>Emplacement</label><input type="text" class="ext-emplacement" />
-      <label>Observation</label><textarea rows="3" class="ext-obs"></textarea>
-    `;
-    bloc.appendChild(contenu);
-    container.appendChild(bloc);
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    const ancienne = localStorage.getItem("crm_extincteurs_" + ID_CLIENT);
-    if (ancienne) {
-      if (confirm("📥 Un brouillon existe. Voulez-vous le restaurer ?")) restaurerCRM();
-    }
-
-    setInterval(sauvegarderCRM, 15000);
-
-    document.querySelector("button[onclick*='bon.html']")
-      .addEventListener("click", () => {
-        const data = getFormData();
-        localStorage.setItem("crm_resume_" + ID_CLIENT, JSON.stringify(data));
-      });
-
-    document.querySelector("button[onclick*='validerCompteRendu']")
-      .addEventListener("click", () => {
-        const data = getFormData();
-        const historique = JSON.parse(localStorage.getItem("crm_historique_" + ID_CLIENT) || "[]");
-        historique.push({
-          date: data.date,
-          technicien: data.technicien,
-          extincteurs: data.extincteurs,
-          observation: data.observation
-        });
-        localStorage.setItem("crm_historique_" + ID_CLIENT, JSON.stringify(historique));
-        localStorage.removeItem("crm_extincteurs_" + ID_CLIENT);
-        alert("✅ Compte-rendu enregistré dans l'historique.");
-      });
-  });
 </script>
+
+<datalist id="liste-types">
+  <option value="6Kg Poudre ABC">
+  <option value="2Kg CO2">
+  <option value="9L Eau + Additif">
+</datalist>
+<datalist id="liste-fab">
+  <option value="Desautel">
+  <option value="Eurofeu">
+  <option value="Andrieu">
+</datalist>
+<datalist id="liste-year">
+  <option value="2025"><option value="2024"><option value="2023">
+</datalist>
+
 </body>
 </html>
