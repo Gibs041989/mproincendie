@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de bord - MPro Incendie</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Tableau de bord</h1>
+        <div class="section" id="welcome-message"></div>
+        <div class="section navigation" id="menu"></div>
+        <div class="section">
+            <button onclick="logout()">Déconnexion</button>
+        </div>
+    </div>
+    <script>
+        function loadDashboard() {
+            const userRole = localStorage.getItem('userRole');
+            const welcomeMessage = document.getElementById('welcome-message');
+            const menu = document.getElementById('menu');
+            if (!userRole) {
+                window.location.href = 'login.html';
+                return;
+            }
+            if (userRole === 'admin') {
+                welcomeMessage.innerHTML = '<h2>Bienvenue, Administrateur</h2>';
+                menu.innerHTML = `
+                    <a href="CRM_extincteurs.html">Gestion des extincteurs</a>
+                    <a href="nouveau_client.html">Ajouter un client</a>
+                    <a href="client.html">Liste des clients</a>
+                `;
+            } else if (userRole === 'technicien') {
+                welcomeMessage.innerHTML = '<h2>Bienvenue, Technicien</h2>';
+                menu.innerHTML = `
+                    <a href="intervention.html">Interventions</a>
+                    <a href="bon_intervention.html">Nouveau bon d'intervention</a>
+                `;
+            }
+        }
+        function logout() {
+            localStorage.removeItem('userRole');
+            window.location.href = 'login.html';
+        }
+        window.onload = loadDashboard;
+    </script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compte-rendu RIA</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Compte-rendu RIA</h1>
+
+        <section class="section">
+            <h2>🧾 Client</h2>
+            <label>Nom client: <input type="text" id="clientName" placeholder="Nom du client" required></label>
+            <label>Lieu d’intervention: <input type="text" id="lieu" placeholder="Lieu d’intervention"></label>
+        </section>
+
+        <section class="section">
+            <h2>📅 Détails de l’intervention</h2>
+            <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-15" required></label>
+            <label>Technicien intervenant: <input type="text" id="technician" placeholder="Nom du technicien"></label>
+        </section>
+
+        <section class="section">
+            <h2>🚿 RIA</h2>
+            <button onclick="addRIA()">➕ Ajouter un RIA</button>
+            <div id="riaList"></div>
+            <p id="riaError" class="error" style="display: none;">Veuillez ajouter au moins un RIA.</p>
+        </section>
+
+        <section class="section">
+            <h2>✅ Devoir de conseil</h2>
+            <label><input type="checkbox" id="registre"> Registre présent et à jour</label>
+            <label><input type="checkbox" id="signaletique"> Signalétique à jour</label>
+            <label><input type="checkbox" id="plans"> Plans de sécurité présents et à jour</label>
+        </section>
+
+        <section class="section">
+            <h2>📝 Observations</h2>
+            <textarea id="observations" rows="4" placeholder="Notes sur l'intervention..."></textarea>
+        </section>
+
+        <section class="section">
+            <button onclick="validateCRM()">✅ Valider le compte rendu</button>
+            <a href="bon_intervention.html"><button>➡️ Passer au bon d’intervention</button></a>
+            <a href="intervention.html"><button>⬅️ Retour à l’intervention</button></a>
+        </section>
+
+        <div class="navigation">
+            <a href="index.html">🏠 Accueil</a>
+            <a href="client.html">📁 Clients</a>
+            <a href="intervention.html">🛠️ Intervention</a>
+            <a href="CRM_extincteurs.html">🧯 Extincteurs</a>
+            <a href="CRM_baes.html">💡 BAES</a>
+            <a href="CRM_desenfumage.html">💨 Désenfumage</a>
+        </div>
+    </div>
+
+    <script>
+        let riaCount = 0;
+
+        window.onload = () => {
+            const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
+            if (interventionData.client) {
+                document.getElementById('clientName').value = interventionData.client;
+            }
+            if (interventionData.lieu) {
+                document.getElementById('lieu').value = interventionData.lieu;
+            }
+        };
+
+        function addRIA() {
+            riaCount++;
+            const div = document.createElement('div');
+            div.className = 'ria';
+            div.innerHTML = `
+                <h3>RIA #${riaCount}</h3>
+                <label>N° RIA: <input type="text" class="num" value="RIA-${riaCount}"></label>
+                <label>Type: <input type="text" class="type" placeholder="Ex. PIA, RIA pivotant"></label>
+                <label>Pression: <input type="text" class="pression" placeholder="Ex. 7 bars"></label>
+                <label>État: <input type="text" class="etat" placeholder="Bon, À réparer"></label>
+                <label>Emplacement: <input type="text" class="emplacement" placeholder="Ex. Hall principal"></label>
+                <h4>Opérations effectuées</h4>
+                <label><input type="checkbox" class="op-verif"> Vérification OK</label>
+                <label><input type="checkbox" class="op-maintenance"> Maintenance effectuée</label>
+                <label>Observation: <textarea class="observation" rows="2"></textarea></label>
+                <button onclick="this.parentElement.remove(); updateSummary()">Supprimer</button>
+            `;
+            document.getElementById('riaList').appendChild(div);
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const rias = document.querySelectorAll('.ria');
+            let summary = 'Résumé des RIA:\n';
+            rias.forEach((r, i) => {
+                const num = r.querySelector('.num').value;
+                const type = r.querySelector('.type').value;
+                const emplacement = r.querySelector('.emplacement').value;
+                const ops = Array.from(r.querySelectorAll('input[type="checkbox"]'))
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.className.split('-')[1].charAt(0).toUpperCase())
+                    .join('');
+                summary += `${num} - ${type} (${emplacement}) [${ops}]\n`;
+            });
+            return summary;
+        }
+
+        function validateCRM() {
+            const client = document.getElementById('clientName').value;
+            const date = document.getElementById('interventionDate').value;
+            const rias = document.querySelectorAll('.ria');
+
+            if (!client) {
+                alert('Le nom du client est obligatoire.');
+                return;
+            }
+            if (!date) {
+                alert('La date d’intervention est obligatoire.');
+                return;
+            }
+            if (rias.length === 0) {
+                document.getElementById('riaError').style.display = 'block';
+                return;
+            }
+
+            const summary = updateSummary();
+            const observations = document.getElementById('observations').value;
+            const devoirConseil = {
+                registre: document.getElementById('registre').checked,
+                signaletique: document.getElementById('signaletique').checked,
+                plans: document.getElementById('plans').checked
+            };
+            const crmData = {
+                client: client,
+                lieu: document.getElementById('lieu').value,
+                date: date,
+                technician: document.getElementById('technician').value,
+                summary: summary,
+                observations: observations,
+                devoirConseil: devoirConseil
+            };
+
+            let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
+            drafts['crm_ria'] = crmData;
+            localStorage.setItem('drafts', JSON.stringify(drafts));
+
+            let interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
+            interventionData.crm_ria = crmData;
+            localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
+
+            alert('Compte-rendu validé et sauvegardé !');
+        }
+    </script>
+</body>
+</html>

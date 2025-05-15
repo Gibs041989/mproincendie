@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compte-rendu Extincteurs</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Compte-rendu Extincteurs</h1>
+
+        <section class="section">
+            <h2>🧾 Client</h2>
+            <label>Nom client: <input type="text" id="clientName" placeholder="Nom du client" required></label>
+            <label>Lieu d’intervention: <input type="text" id="lieu" placeholder="Lieu d’intervention"></label>
+        </section>
+
+        <section class="section">
+            <h2>📅 Détails de l’intervention</h2>
+            <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-15" required></label>
+            <label>Technicien intervenant: <input type="text" id="technician" placeholder="Nom du technicien"></label>
+        </section>
+
+        <section class="section">
+            <h2>🧯 Extincteurs</h2>
+            <button onclick="addExtincteur()">➕ Ajouter un extincteur</button>
+            <div id="extincteursList"></div>
+            <p id="extincteurError" class="error" style="display: none;">Veuillez ajouter au moins un extincteur.</p>
+        </section>
+
+        <section class="section">
+            <h2>✅ Devoir de conseil</h2>
+            <label><input type="checkbox" id="registre"> Registre présent et à jour</label>
+            <label><input type="checkbox" id="signaletique"> Signalétique à jour</label>
+            <label><input type="checkbox" id="baes"> BAES présents</label>
+            <label><input type="checkbox" id="plans"> Plans de sécurité présents et à jour</label>
+        </section>
+
+        <section class="section">
+            <h2>📝 Points à améliorer / Observations</h2>
+            <textarea id="observations" rows="4" placeholder="Notes sur l'intervention..."></textarea>
+        </section>
+
+        <section class="section">
+            <button onclick="validateCRM()">✅ Valider le compte rendu</button>
+            <a href="bon_intervention.html"><button>➡️ Passer au bon d’intervention</button></a>
+            <a href="intervention.html"><button>⬅️ Retour à l’intervention</button></a>
+        </section>
+
+        <div class="navigation">
+            <a href="index.html">🏠 Accueil</a>
+            <a href="client.html">📁 Clients</a>
+            <a href="intervention.html">🛠️ Intervention</a>
+            <a href="CRM_ria.html">🚿 RIA</a>
+            <a href="CRM_baes.html">💡 BAES</a>
+            <a href="CRM_desenfumage.html">💨 Désenfumage</a>
+        </div>
+    </div>
+
+    <script>
+        let extincteurCount = 0;
+
+        // Pré-remplir client et lieu depuis localStorage
+        window.onload = () => {
+            const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
+            if (interventionData.client) {
+                document.getElementById('clientName').value = interventionData.client;
+            }
+            if (interventionData.lieu) {
+                document.getElementById('lieu').value = interventionData.lieu;
+            }
+        };
+
+        function addExtincteur() {
+            extincteurCount++;
+            const div = document.createElement('div');
+            div.className = 'extincteur';
+            div.innerHTML = `
+                <h3>Extincteur #${extincteurCount}</h3>
+                <label>N° extincteur: <input type="text" class="num" value="EXT-${extincteurCount}"></label>
+                <label>Type d'extincteur: <input type="text" class="type" placeholder="Eau, CO2, etc."></label>
+                <label>Ext. PP ? <input type="checkbox" class="pp"></label>
+                <label>Fabricant: <input type="text" class="fabricant" placeholder="Nom du fabricant"></label>
+                <label>Millésime: <input type="text" class="millesime" placeholder="Année"></label>
+                <label>Niveau: <input type="text" class="niveau" placeholder="Bon, Moyen, Mauvais"></label>
+                <label>Emplacement: <input type="text" class="emplacement" placeholder="Ex. Hall principal"></label>
+                <h4>Opérations effectuées</h4>
+                <label><input type="checkbox" class="op-verif"> Vérification OK</label>
+                <label><input type="checkbox" class="op-quinquennale"> Révision quinquennale</label>
+                <label><input type="checkbox" class="op-recharge"> Rechargé</label>
+                <label><input type="checkbox" class="op-mise-service"> Mise en service</label>
+                <label><input type="checkbox" class="op-echange"> Échange standard</label>
+                <label>Observation: <textarea class="observation" rows="2"></textarea></label>
+                <button onclick="this.parentElement.remove(); updateSummary()">Supprimer</button>
+            `;
+            document.getElementById('extincteursList').appendChild(div);
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const extincteurs = document.querySelectorAll('.extincteur');
+            let summary = 'Résumé des extincteurs:\n';
+            extincteurs.forEach((e, i) => {
+                const num = e.querySelector('.num').value;
+                const type = e.querySelector('.type').value;
+                const emplacement = e.querySelector('.emplacement').value;
+                const ops = Array.from(e.querySelectorAll('input[type="checkbox"]'))
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.className.split('-')[1].charAt(0).toUpperCase())
+                    .join('');
+                summary += `${num} - ${type} (${emplacement}) [${ops}]\n`;
+            });
+            return summary;
+        }
+
+        function validateCRM() {
+            // Validation des champs obligatoires
+            const client = document.getElementById('clientName').value;
+            const date = document.getElementById('interventionDate').value;
+            const extincteurs = document.querySelectorAll('.extincteur');
+
+            if (!client) {
+                alert('Le nom du client est obligatoire.');
+                return;
+            }
+            if (!date) {
+                alert('La date d’intervention est obligatoire.');
+                return;
+            }
+            if (extincteurs.length === 0) {
+                document.getElementById('extincteurError').style.display = 'block';
+                return;
+            }
+
+            const summary = updateSummary();
+            const observations = document.getElementById('observations').value;
+            const devoirConseil = {
+                registre: document.getElementById('registre').checked,
+                signaletique: document.getElementById('signaletique').checked,
+                baes: document.getElementById('baes').checked,
+                plans: document.getElementById('plans').checked
+            };
+            const crmData = {
+                client: client,
+                lieu: document.getElementById('lieu').value,
+                date: date,
+                technician: document.getElementById('technician').value,
+                summary: summary,
+                observations: observations,
+                devoirConseil: devoirConseil
+            };
+
+            // Sauvegarde comme brouillon
+            let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
+            drafts['crm_extincteurs'] = crmData;
+            localStorage.setItem('drafts', JSON.stringify(drafts));
+
+            // Mise à jour de l’intervention en cours
+            let interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
+            interventionData.crm_extincteurs = crmData;
+            localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
+
+            alert('Compte-rendu validé et sauvegardé !');
+        }
+    </script>
+</body>
+</html>

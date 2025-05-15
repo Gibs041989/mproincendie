@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouveau client</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>➕ Nouveau client</h1>
+        <a href="intervention.html">← Retour</a>
+
+        <section class="section">
+            <label>Nom / Raison sociale: <input type="text" id="name" required></label>
+            <label>SIRET: <input type="text" id="siret"></label>
+            <label>Dirigeant: <input type="text" id="dirigeant"></label>
+            <label>Adresse principale: <input type="text" id="adresse"></label>
+            <label>Ville: <input type="text" id="ville" required></label>
+            <label>Téléphone: <input type="tel" id="telephone"></label>
+            <label>Email comptabilité: <input type="email" id="emailCompta"></label>
+            <label>Email direction: <input type="email" id="emailDirection"></label>
+            <label>Nom du contact référent: <input type="text" id="contact"></label>
+        </section>
+
+        <section class="section">
+            <h2>📍 Adresses d’intervention</h2>
+            <div id="lieuxList"></div>
+            <button onclick="addLieu()">➕ Ajouter une adresse</button>
+        </section>
+
+        <section class="section">
+            <button onclick="saveClient()">✅ Enregistrer client</button>
+        </section>
+
+        <div class="navigation">
+            <a href="index.html">🏠 Accueil</a>
+            <a href="client.html">📁 Clients</a>
+            <a href="intervention.html">🛠️ Intervention</a>
+        </div>
+    </div>
+
+    <script>
+        let lieuCount = 0;
+
+        function addLieu() {
+            lieuCount++;
+            const div = document.createElement('div');
+            div.className = 'lieu';
+            div.innerHTML = `
+                <h3>Adresse #${lieuCount}</h3>
+                <label>Adresse: <input type="text" class="lieuAdresse"></label>
+                <label>Ville: <input type="text" class="lieuVille" required></label>
+                <button onclick="this.parentElement.remove()">Supprimer</button>
+            `;
+            document.getElementById('lieuxList').appendChild(div);
+        }
+
+        function saveClient() {
+            const name = document.getElementById('name').value;
+            const ville = document.getElementById('ville').value;
+
+            if (!name) {
+                alert('Le nom est obligatoire.');
+                return;
+            }
+            if (!ville) {
+                alert('La ville est obligatoire.');
+                return;
+            }
+
+            const client = {
+                name: name,
+                siret: document.getElementById('siret').value,
+                dirigeant: document.getElementById('dirigeant').value,
+                adresse: document.getElementById('adresse').value,
+                ville: ville,
+                telephone: document.getElementById('telephone').value,
+                emailCompta: document.getElementById('emailCompta').value,
+                emailDirection: document.getElementById('emailDirection').value,
+                contact: document.getElementById('contact').value,
+                lieux: Array.from(document.querySelectorAll('.lieu')).map(lieu => ({
+                    adresse: lieu.querySelector('.lieuAdresse').value,
+                    ville: lieu.querySelector('.lieuVille').value
+                }))
+            };
+
+            let clients = JSON.parse(localStorage.getItem('clients')) || [];
+            clients.push(client);
+            localStorage.setItem('clients', JSON.stringify(clients));
+
+            alert('Client enregistré !');
+            window.location.href = 'intervention.html';
+        }
+    </script>
+</body>
+</html>

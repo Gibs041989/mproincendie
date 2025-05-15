@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des clients</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📁 Liste des clients</h1>
+
+        <section class="section">
+            <h2>Filtres</h2>
+            <label>Nom: <input type="text" id="filterName" oninput="filterClients()"></label>
+            <label>Ville: <input type="text" id="filterVille" oninput="filterClients()"></label>
+        </section>
+
+        <section class="section">
+            <h2>Clients</h2>
+            <div id="clientsList"></div>
+        </section>
+
+        <div class="navigation">
+            <a href="index.html">🏠 Accueil</a>
+            <a href="nouveau_client.html">➕ Nouveau client</a>
+            <a href="intervention.html">🛠️ Intervention</a>
+        </div>
+    </div>
+
+    <script>
+        let clients = JSON.parse(localStorage.getItem('clients')) || [];
+
+        window.onload = () => {
+            displayClients(clients);
+        };
+
+        function filterClients() {
+            const nameFilter = document.getElementById('filterName').value.toLowerCase();
+            const villeFilter = document.getElementById('filterVille').value.toLowerCase();
+
+            const filteredClients = clients.filter(client => 
+                client.name.toLowerCase().includes(nameFilter) &&
+                client.ville.toLowerCase().includes(villeFilter)
+            );
+            displayClients(filteredClients);
+        }
+
+        function displayClients(clientsToShow) {
+            const clientsList = document.getElementById('clientsList');
+            clientsList.innerHTML = '';
+            if (clientsToShow.length === 0) {
+                clientsList.textContent = 'Aucun client trouvé.';
+                return;
+            }
+            clientsToShow.forEach(client => {
+                const div = document.createElement('div');
+                div.className = 'client';
+                div.innerHTML = `
+                    <h3>${client.name}</h3>
+                    <p>Ville: ${client.ville}</p>
+                    <p>Téléphone: ${client.telephone || 'Non renseigné'}</p>
+                    <button onclick="viewClient('${client.name}')">Voir détails</button>
+                `;
+                clientsList.appendChild(div);
+            });
+        }
+
+        function viewClient(name) {
+            localStorage.setItem('selectedClient', name);
+            window.location.href = 'fiche_client.html';
+        }
+    </script>
+</body>
+</html>

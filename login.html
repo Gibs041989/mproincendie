@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - MPro Incendie</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Connexion</h1>
+        <div class="section">
+            <label for="username">Nom d'utilisateur :</label>
+            <input type="text" id="username" placeholder="Entrez votre nom d'utilisateur">
+        </div>
+        <div class="section">
+            <label for="password">Mot de passe :</label>
+            <input type="password" id="password" placeholder="Entrez votre mot de passe">
+        </div>
+        <div class="section">
+            <button onclick="login()">Se connecter</button>
+        </div>
+        <div class="error" id="error-message"></div>
+    </div>
+    <script>
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('error-message');
+            if (username === 'admin' && password === 'admin123') {
+                localStorage.setItem('userRole', 'admin');
+                window.location.href = 'index.html';
+            } else if (username === 'tech' && password === 'tech123') {
+                localStorage.setItem('userRole', 'technicien');
+                window.location.href = 'index.html';
+            } else {
+                errorMessage.textContent = 'Nom d’utilisateur ou mot de passe incorrect';
+            }
+        }
+    </script>
+</body>
+</html>
