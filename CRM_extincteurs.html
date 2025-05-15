@@ -16,8 +16,9 @@
         .nav-buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
         .nav-buttons a, .nav-buttons button { flex: 1 1 150px; text-align: center; padding: 12px; font-size: 16px; }
         .footer-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: #f5f5f5; padding: 10px 0; box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); }
-        .footer-nav .navigation { margin: 0; display: flex; flex-direction: row; justify-content: space-around; align-items: center; gap: 15px; }
-        .footer-nav a { flex: 1; text-align: center; padding: 10px; font-size: 22px; }
+        .footer-nav .navigation { margin: 0; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-around; align-items: center; gap: 20px; }
+        .footer-nav a { flex: 1; text-align: center; padding: 10px; font-size: 22px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); transition: background-color 0.3s ease; }
+        .footer-nav a:hover { background-color: #ffebee; }
         .checkbox-container { display: flex; align-items: center; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; background-color: #fff; cursor: pointer; transition: background-color 0.3s ease; }
         .checkbox-container:hover { background-color: #f0f0f0; }
         .checkbox-container.checked { background-color: #e0f7fa; }
