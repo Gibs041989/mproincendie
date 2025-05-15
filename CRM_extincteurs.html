@@ -16,13 +16,13 @@
         .nav-buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
         .nav-buttons a, .nav-buttons button { flex: 1 1 150px; text-align: center; padding: 12px; font-size: 16px; }
         .footer-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: #f5f5f5; padding: 10px 0; box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); }
-        .footer-nav .navigation { margin: 0; display: flex; justify-content: space-around; }
-        .footer-nav a { flex: 1 1 auto; padding: 10px; font-size: 22px; }
-        .checkbox-container { display: flex; justify-content: space-between; align-items: center; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; background-color: #fff; cursor: pointer; transition: background-color 0.3s ease; }
+        .footer-nav .navigation { margin: 0; display: flex; flex-direction: row; justify-content: space-around; align-items: center; gap: 15px; }
+        .footer-nav a { flex: 1; text-align: center; padding: 10px; font-size: 22px; }
+        .checkbox-container { display: flex; align-items: center; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; background-color: #fff; cursor: pointer; transition: background-color 0.3s ease; }
         .checkbox-container:hover { background-color: #f0f0f0; }
         .checkbox-container.checked { background-color: #e0f7fa; }
-        .checkbox-container label { margin: 0; font-weight: normal; flex: 1; }
-        .checkbox-container input { margin: 0; }
+        .checkbox-container label { margin: 0; font-weight: normal; white-space: nowrap; }
+        .checkbox-container input { margin-left: auto; }
         .custom-input { display: none; margin-top: 5px; }
         .extincteur-counter { font-style: italic; color: #666; margin-top: 5px; }
         @media (max-width: 600px) {
@@ -58,21 +58,21 @@
 
         <section class="section">
             <h2>✅ Devoir de conseil</h2>
-            <div class="checkbox-container" onclick="toggleCheckbox('registre')">
+            <div class="checkbox-container">
                 <label for="registre">Registre présent et à jour</label>
-                <input type="checkbox" id="registre">
+                <input type="checkbox" id="registre" onchange="updateCheckboxStyle(this)">
             </div>
-            <div class="checkbox-container" onclick="toggleCheckbox('signaletique')">
+            <div class="checkbox-container">
                 <label for="signaletique">Signalétique à jour</label>
-                <input type="checkbox" id="signaletique">
+                <input type="checkbox" id="signaletique" onchange="updateCheckboxStyle(this)">
             </div>
-            <div class="checkbox-container" onclick="toggleCheckbox('baes')">
+            <div class="checkbox-container">
                 <label for="baes">BAES présents</label>
-                <input type="checkbox" id="baes">
+                <input type="checkbox" id="baes" onchange="updateCheckboxStyle(this)">
             </div>
-            <div class="checkbox-container" onclick="toggleCheckbox('plans')">
+            <div class="checkbox-container">
                 <label for="plans">Plans de sécurité présents et à jour</label>
-                <input type="checkbox" id="plans">
+                <input type="checkbox" id="plans" onchange="updateCheckboxStyle(this)">
             </div>
         </section>
 
@@ -130,7 +130,7 @@
                     </select>
                     <input type="text" class="custom-input customType-${extincteurCount}" placeholder="Type personnalisé">
                 </label>
-                <label>Ext. PP ? <input type="checkbox" class="pp"></label>
+                <label>Ext. PP ? <input type="checkbox" id="pp-${extincteurCount}" class="pp" onchange="updateCheckboxStyle(this)"></label>
                 <label>Fabricant: 
                     <select class="fabricant" onchange="toggleCustomInput(this, 'customFabricant-${extincteurCount}')">
                         <option value="Desautel">Desautel</option>
@@ -150,38 +150,48 @@
                 <label>Niveau: <input type="text" class="niveau" placeholder="Bon, Moyen, Mauvais"></label>
                 <label>Emplacement: <input type="text" class="emplacement" placeholder="Ex. Hall principal"></label>
                 <h4>Opérations effectuées</h4>
-                <div class="checkbox-container" onclick="toggleCheckbox('op-verif-${extincteurCount}')">
+                <div class="checkbox-container">
                     <label for="op-verif-${extincteurCount}">Vérification OK</label>
-                    <input type="checkbox" id="op-verif-${extincteurCount}" class="op-verif">
+                    <input type="checkbox" id="op-verif-${extincteurCount}" class="op-verif" onchange="updateCheckboxStyle(this)">
                 </div>
-                <div class="checkbox-container" onclick="toggleCheckbox('op-quinquennale-${extincteurCount}')">
+                <div class="checkbox-container">
                     <label for="op-quinquennale-${extincteurCount}">Révision quinquennale</label>
-                    <input type="checkbox" id="op-quinquennale-${extincteurCount}" class="op-quinquennale">
+                    <input type="checkbox" id="op-quinquennale-${extincteurCount}" class="op-quinquennale" onchange="updateCheckboxStyle(this)">
                 </div>
-                <div class="checkbox-container" onclick="toggleCheckbox('op-recharge-${extincteurCount}')">
+                <div class="checkbox-container">
                     <label for="op-recharge-${extincteurCount}">Rechargé</label>
-                    <input type="checkbox" id="op-recharge-${extincteurCount}" class="op-recharge">
+                    <input type="checkbox" id="op-recharge-${extincteurCount}" class="op-recharge" onchange="updateCheckboxStyle(this)">
                 </div>
-                <div class="checkbox-container" onclick="toggleCheckbox('op-mise-service-${extincteurCount}')">
+                <div class="checkbox-container">
                     <label for="op-mise-service-${extincteurCount}">Mise en service</label>
-                    <input type="checkbox" id="op-mise-service-${extincteurCount}" class="op-mise-service">
+                    <input type="checkbox" id="op-mise-service-${extincteurCount}" class="op-mise-service" onchange="updateCheckboxStyle(this)">
                 </div>
-                <div class="checkbox-container" onclick="toggleCheckbox('op-echange-${extincteurCount}')">
+                <div class="checkbox-container">
                     <label for="op-echange-${extincteurCount}">Échange standard</label>
-                    <input type="checkbox" id="op-echange-${extincteurCount}" class="op-echange">
+                    <input type="checkbox" id="op-echange-${extincteurCount}" class="op-echange" onchange="updateCheckboxStyle(this)">
                 </div>
                 <label>Observation: <textarea class="observation" rows="2"></textarea></label>
                 <button onclick="validateExtincteur(${extincteurCount})">✅ Valider extincteur</button>
                 <button onclick="removeExtincteur(${extincteurCount})">Supprimer</button>
-                <div class="summary" id="summary-${extincteurCount}">
+                <div class="summary" id="summary-${extincteurCount}" onclick="showEditButtons(${extincteurCount})">
                     <div class="summary-content"></div>
                     <div class="edit-buttons" id="edit-buttons-${extincteurCount}">
-                        <button onclick="editExtincteur(${extincteurCount})">✏️ Modifier</button>
+                        <button onclick="openExtincteurForm(${extincteurCount})">✏️ Modifier</button>
                         <button onclick="deleteExtincteur(${extincteurCount})">🗑️ Supprimer</button>
                     </div>
                 </div>
             `;
             document.getElementById('extincteursList').appendChild(div);
+
+            // Ajouter des gestionnaires d'événements pour les encadrements cliquables
+            div.querySelectorAll('.checkbox-container').forEach(container => {
+                container.addEventListener('click', (e) => {
+                    const checkbox = container.querySelector('input[type="checkbox"]');
+                    if (e.target !== checkbox) {
+                        checkbox.click();
+                    }
+                });
+            });
         }
 
         function toggleCustomInput(select, inputId) {
@@ -194,15 +204,38 @@
             }
         }
 
-        function toggleCheckbox(id) {
-            const checkbox = document.getElementById(id);
-            checkbox.checked = !checkbox.checked;
+        function updateCheckboxStyle(checkbox) {
             const container = checkbox.closest('.checkbox-container');
             if (checkbox.checked) {
                 container.classList.add('checked');
             } else {
                 container.classList.remove('checked');
             }
+        }
+
+        function showEditButtons(id) {
+            const editButtons = document.getElementById(`edit-buttons-${id}`);
+            editButtons.style.display = editButtons.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function openExtincteurForm(id) {
+            const extincteur = document.getElementById(`extincteur-${id}`);
+            const summaryDiv = document.getElementById(`summary-${id}`);
+            const editButtons = document.getElementById(`edit-buttons-${id}`);
+
+            extincteur.querySelectorAll('input, select, textarea').forEach(elem => {
+                elem.removeAttribute('readonly');
+                if (elem.tagName === 'SELECT') elem.disabled = false;
+            });
+            extincteur.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.disabled = false);
+            extincteur.querySelectorAll('h3, label, .checkbox-container').forEach(elem => elem.style.display = 'block');
+            extincteur.querySelectorAll('.custom-input').forEach(elem => {
+                if (elem.value) elem.style.display = 'block';
+            });
+            summaryDiv.style.display = 'none';
+            editButtons.style.display = 'none';
+            extincteur.querySelector('button[onclick^="validateExtincteur"]').style.display = 'inline';
+            extincteur.querySelector('button[onclick^="removeExtincteur"]').style.display = 'inline';
         }
 
         function validateExtincteur(id) {
@@ -239,32 +272,11 @@
                 observation: extincteur.querySelector('.observation').value
             };
 
-            extincteur.querySelectorAll('h3, label, input, select, textarea, .checkbox-container').forEach(elem => {
+            extincteur.querySelectorAll('h3, label, input, select, textarea, .checkbox-container, .custom-input').forEach(elem => {
                 elem.style.display = 'none';
             });
             extincteur.querySelectorAll('button[onclick^="validateExtincteur"], button[onclick^="removeExtincteur"]').forEach(btn => btn.style.display = 'none');
             updateExtincteurCounter();
-        }
-
-        function editExtincteur(id) {
-            const extincteur = document.getElementById(`extincteur-${id}`);
-            const summaryDiv = document.getElementById(`summary-${id}`);
-            const editButtons = document.getElementById(`edit-buttons-${id}`);
-            editButtons.style.display = editButtons.style.display === 'block' ? 'none' : 'block';
-            if (editButtons.style.display === 'block') return;
-
-            extincteur.querySelectorAll('input, select, textarea').forEach(elem => {
-                elem.removeAttribute('readonly');
-                if (elem.tagName === 'SELECT') elem.disabled = false;
-            });
-            extincteur.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.disabled = false);
-            extincteur.querySelectorAll('h3, label, .checkbox-container').forEach(elem => elem.style.display = 'block');
-            extincteur.querySelectorAll('.custom-input').forEach(elem => {
-                if (elem.value) elem.style.display = 'block';
-            });
-            summaryDiv.style.display = 'none';
-            extincteur.querySelector('button[onclick^="validateExtincteur"]').style.display = 'inline';
-            extincteur.querySelector('button[onclick^="removeExtincteur"]').style.display = 'inline';
         }
 
         function deleteExtincteur(id) {
@@ -358,6 +370,16 @@
 
             alert('Compte-rendu validé et sauvegardé !');
         }
+
+        // Ajouter des gestionnaires d'événements pour les encadrements cliquables du Devoir de conseil
+        document.querySelectorAll('.checkbox-container').forEach(container => {
+            container.addEventListener('click', (e) => {
+                const checkbox = container.querySelector('input[type="checkbox"]');
+                if (e.target !== checkbox) {
+                    checkbox.click();
+                }
+            });
+        });
     </script>
 </body>
 </html>
