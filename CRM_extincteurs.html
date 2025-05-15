@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compte-rendu Extincteurs - MPro Incendie</title>
     <link rel="stylesheet" href="css/styles.css">
+    <!-- Styles spécifiques à CRM_extincteurs.html -->
     <style>
         .extincteur { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; background-color: #f9f9f9; }
         .extincteur h3 { margin-top: 0; color: #c62828; }
@@ -23,32 +24,39 @@
         .checkbox-container:hover { background-color: #f0f0f0; }
         .checkbox-container.checked { background-color: #e0f7fa; }
         .checkbox-container label { margin: 0; font-weight: normal; white-space: nowrap; }
-        .checkbox-container input { margin-left: auto; }
+        .checkbox-container input { margin-left: auto; width: 20px; height: 20px; }
         .custom-input { display: none; margin-top: 5px; }
         .extincteur-counter { font-style: italic; color: #666; margin-top: 5px; }
+        .error-message { color: #d32f2f; font-size: 0.9em; margin-top: 5px; display: none; }
         @media (max-width: 600px) {
-            .nav-buttons a, .nav-buttons button { flex: 1 1 100%; }
+            .nav-buttons a, .nav-buttons button { flex: 1 1 100%; padding: 10px; font-size: 18px; }
             .extincteur { padding: 10px; }
-            .footer-nav a { font-size: 18px; padding: 8px; }
+            .footer-nav a { font-size: 20px; padding: 8px; }
+            .checkbox-container { padding: 6px; }
+            .checkbox-container label { font-size: 16px; }
+            .checkbox-container input { width: 24px; height: 24px; }
+            .summary { padding: 8px; font-size: 16px; }
+            .edit-buttons button { font-size: 16px; padding: 8px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Compte-rendu Extincteurs</h1>
-
+        <!-- Section Client -->
         <section class="section">
             <h2>🧾 Client</h2>
             <p><strong>Client:</strong> <span id="clientName">Non sélectionné</span></p>
             <p><strong>Lieu d’intervention:</strong> <span id="lieu">Non sélectionné</span></p>
         </section>
 
+        <!-- Section Détails de l’intervention -->
         <section class="section">
             <h2>📅 Détails de l’intervention</h2>
             <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-15" required></label>
             <label>Technicien intervenant: <input type="text" id="technician" placeholder="Nom du technicien"></label>
         </section>
 
+        <!-- Section Extincteurs -->
         <section class="section">
             <h2>🧯 Extincteurs</h2>
             <div id="extincteursList"></div>
@@ -57,6 +65,7 @@
             <p id="extincteurError" class="error" style="display: none;">Veuillez ajouter au moins un extincteur.</p>
         </section>
 
+        <!-- Section Devoir de conseil -->
         <section class="section">
             <h2>✅ Devoir de conseil</h2>
             <div class="checkbox-container">
@@ -77,17 +86,20 @@
             </div>
         </section>
 
+        <!-- Section Observations générales -->
         <section class="section">
             <h2>📝 Observations générales</h2>
             <textarea id="observations" rows="4" placeholder="Notes sur l'intervention..."></textarea>
         </section>
 
+        <!-- Section Actions (boutons de validation) -->
         <section class="section nav-buttons">
             <button onclick="validateCRM()">✅ Valider le compte rendu</button>
             <a href="bon_intervention.html"><button>➡️ Passer au bon d’intervention</button></a>
         </section>
     </div>
 
+    <!-- Pied de page avec icônes -->
     <div class="footer-nav">
         <div class="navigation nav-buttons">
             <a href="index.html">🏠</a>
@@ -98,10 +110,12 @@
         </div>
     </div>
 
+    <!-- JavaScript pour la logique fonctionnelle -->
     <script>
         let extincteurCount = 0;
         let extincteursValides = [];
 
+        // Charger les données initiales
         window.onload = () => {
             const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
             if (!interventionData || !interventionData.client) {
@@ -114,6 +128,7 @@
             loadDraft();
         };
 
+        // Ajouter un nouvel extincteur
         function addExtincteur() {
             extincteurCount++;
             const div = document.createElement('div');
@@ -124,6 +139,7 @@
                 <label>N° extincteur: <input type="text" class="num" value="EXT-${extincteurCount}" readonly></label>
                 <label>Type d'extincteur: 
                     <select class="type" onchange="toggleCustomInput(this, 'customType-${extincteurCount}')">
+                        <option value="">-- Sélectionner --</option>
                         <option value="Eau 6L">Eau 6L</option>
                         <option value="CO2 2kg">CO2 2kg</option>
                         <option value="Poudre 5kg">Poudre 5kg</option>
@@ -134,6 +150,7 @@
                 <label>Ext. PP ? <input type="checkbox" id="pp-${extincteurCount}" class="pp" onchange="updateCheckboxStyle(this)"></label>
                 <label>Fabricant: 
                     <select class="fabricant" onchange="toggleCustomInput(this, 'customFabricant-${extincteurCount}')">
+                        <option value="">-- Sélectionner --</option>
                         <option value="Desautel">Desautel</option>
                         <option value="Kidde">Kidde</option>
                         <option value="Sicli">Sicli</option>
@@ -143,6 +160,7 @@
                 </label>
                 <label>Millésime: 
                     <select class="millesime" onchange="toggleCustomInput(this, 'customMillesime-${extincteurCount}')">
+                        <option value="">-- Sélectionner --</option>
                         ${Array.from({length: 11}, (_, i) => 2015 + i).map(year => `<option value="${year}">${year}</option>`).join('')}
                         <option value="Autre">Autre</option>
                     </select>
@@ -174,6 +192,7 @@
                 <label>Observation: <textarea class="observation" rows="2"></textarea></label>
                 <button onclick="validateExtincteur(${extincteurCount})">✅ Valider extincteur</button>
                 <button onclick="removeExtincteur(${extincteurCount})">Supprimer</button>
+                <p class="error-message" id="error-${extincteurCount}"></p>
                 <div class="summary" id="summary-${extincteurCount}" onclick="showEditButtons(${extincteurCount})">
                     <div class="summary-content"></div>
                     <div class="edit-buttons" id="edit-buttons-${extincteurCount}">
@@ -228,34 +247,66 @@
                 elem.removeAttribute('readonly');
                 if (elem.tagName === 'SELECT') elem.disabled = false;
             });
-            extincteur.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.disabled = false);
+            extincteur.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.disabled = false;
+                updateCheckboxStyle(cb); // Restaurer le style des cases à cocher
+            });
             extincteur.querySelectorAll('h3, label, .checkbox-container').forEach(elem => elem.style.display = 'block');
             extincteur.querySelectorAll('.custom-input').forEach(elem => {
-                if (elem.value) elem.style.display = 'block';
+                const select = elem.previousElementSibling;
+                if (select.value === 'Autre') elem.style.display = 'block';
             });
             summaryDiv.style.display = 'none';
             editButtons.style.display = 'none';
             extincteur.querySelector('button[onclick^="validateExtincteur"]').style.display = 'inline';
             extincteur.querySelector('button[onclick^="removeExtincteur"]').style.display = 'inline';
+            extincteur.querySelector('.error-message').style.display = 'none'; // Cacher les messages d’erreur lors de la réouverture
         }
 
         function validateExtincteur(id) {
             const extincteur = document.getElementById(`extincteur-${id}`);
+            const errorDiv = document.getElementById(`error-${id}`);
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+
             const num = extincteur.querySelector('.num').value;
             const typeSelect = extincteur.querySelector('.type');
             const type = typeSelect.value === 'Autre' ? extincteur.querySelector(`.customType-${id}`).value : typeSelect.value;
-            const pp = extincteur.querySelector('.pp').checked ? 'PP' : '';
             const fabricantSelect = extincteur.querySelector('.fabricant');
             const fabricant = fabricantSelect.value === 'Autre' ? extincteur.querySelector(`.customFabricant-${id}`).value : fabricantSelect.value;
             const millesimeSelect = extincteur.querySelector('.millesime');
             const millesime = millesimeSelect.value === 'Autre' ? extincteur.querySelector(`.customMillesime-${id}`).value : millesimeSelect.value;
+            const niveau = extincteur.querySelector('.niveau').value;
             const emplacement = extincteur.querySelector('.emplacement').value;
-            const ops = Array.from(extincteur.querySelectorAll('input[type="checkbox"]'))
-                .filter(cb => cb.checked && cb.className !== 'pp')
-                .map(cb => cb.className.split('-')[1].charAt(0).toUpperCase())
-                .join('');
-            const summary = `${num} - ${type} (${emplacement}) [${ops}${pp}]`;
+            const observation = extincteur.querySelector('.observation').value.trim();
 
+            // Vérification des champs obligatoires
+            if (!num || !type || !millesime || !niveau || !emplacement) {
+                errorDiv.textContent = 'Veuillez remplir tous les champs obligatoires : N° Extincteur, Type, Millésime, Niveau, Emplacement.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Vérification de la condition : soit une opération cochée, soit une observation
+            const operations = Array.from(extincteur.querySelectorAll('input[type="checkbox"]'))
+                .filter(cb => cb.checked && cb.className !== 'pp');
+            if (operations.length === 0 && observation === '') {
+                errorDiv.textContent = 'Veuillez cocher au moins une opération ou ajouter une observation.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            const pp = extincteur.querySelector('.pp').checked ? 'PP' : '';
+            const ops = operations.map(cb => {
+                if (cb.className.includes('verif')) return '[VF]';
+                if (cb.className.includes('recharge')) return '[RE]';
+                if (cb.className.includes('quinquennale')) return '[RQ]';
+                if (cb.className.includes('echange')) return '[ES]';
+                if (cb.className.includes('mise-service')) return '[MES]';
+                return '';
+            }).join('');
+
+            const summary = `${num} - ${type} (${emplacement}) ${ops}${pp ? `[${pp}]` : ''}`;
             const summaryDiv = document.getElementById(`summary-${id}`);
             const summaryContent = summaryDiv.querySelector('.summary-content');
             summaryContent.textContent = summary;
@@ -267,10 +318,10 @@
                 pp: pp,
                 fabricant: fabricant,
                 millesime: millesime,
-                niveau: extincteur.querySelector('.niveau').value,
+                niveau: niveau,
                 emplacement: emplacement,
                 operations: ops,
-                observation: extincteur.querySelector('.observation').value
+                observation: observation
             };
 
             extincteur.querySelectorAll('h3, label, input, select, textarea, .checkbox-container, .custom-input').forEach(elem => {
@@ -334,13 +385,14 @@
                 return;
             }
             if (extincteurs.length === 0) {
+                document.getElementById('extincteurError').textContent = 'Vous devez valider au moins un extincteur pour soumettre le compte-rendu.';
                 document.getElementById('extincteurError').style.display = 'block';
                 return;
             }
 
             const summary = Object.values(extincteursValides).map(ext => {
                 const ops = ext.operations || '';
-                return `${ext.num} - ${ext.type} (${ext.emplacement}) [${ops}${ext.pp}]`;
+                return `${ext.num} - ${ext.type} (${ext.emplacement}) ${ops}${ext.pp ? `[${ext.pp}]` : ''}`;
             }).join('\n');
 
             const observations = document.getElementById('observations').value;
@@ -369,7 +421,7 @@
             interventionData.crm_extincteurs = crmData;
             localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
 
-            alert('Compte-rendu validé et sauvegardé !');
+            alert(`Compte-rendu validé avec succès !\nClient: ${client}\nLieu: ${lieu}\nDate: ${date}\nNombre d’extincteurs: ${extincteurs.length}`);
         }
 
         // Ajouter des gestionnaires d'événements pour les encadrements cliquables du Devoir de conseil
