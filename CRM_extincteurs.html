@@ -1,302 +1,334 @@
-    <section class="section">
-        <h2>🧾 Client</h2>
-        <p><strong>Client:</strong> <span id="clientName">Non sélectionné</span></p>
-        <p><strong>Lieu d’intervention:</strong> <span id="lieu">Non sélectionné</span></p>
-    </section>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compte-rendu Extincteurs - MPro Incendie</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .extincteur { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; background-color: #f9f9f9; }
+        .extincteur h3 { margin-top: 0; color: #c62828; }
+        .summary { margin-top: 10px; padding: 10px; background-color: #e0f7fa; border-radius: 4px; cursor: pointer; }
+        .nav-buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .nav-buttons a, .nav-buttons button { flex: 1 1 150px; text-align: center; padding: 12px; font-size: 16px; }
+        .footer-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: #f5f5f5; padding: 10px 0; }
+        .footer-nav .navigation { margin: 0; }
+        .footer-nav a { flex: 1 1 auto; padding: 10px; font-size: 20px; }
+        .checkbox-container { display: flex; justify-content: space-between; align-items: center; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; background-color: #fff; cursor: pointer; transition: background-color 0.3s ease; }
+        .checkbox-container:hover { background-color: #f0f0f0; }
+        .checkbox-container label { margin: 0; font-weight: normal; flex: 1; }
+        .checkbox-container input { margin: 0; }
+        .custom-input { display: none; margin-top: 5px; }
+        @media (max-width: 600px) {
+            .nav-buttons a, .nav-buttons button { flex: 1 1 100%; }
+            .extincteur { padding: 10px; }
+            .footer-nav a { font-size: 18px; padding: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Compte-rendu Extincteurs</h1>
 
-    <section class="section">
-        <h2>📅 Détails de l’intervention</h2>
-        <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-15" required></label>
-        <label>Technicien intervenant: <input type="text" id="technician" placeholder="Nom du technicien"></label>
-    </section>
+        <section class="section">
+            <h2>🧾 Client</h2>
+            <p><strong>Client:</strong> <span id="clientName">Non sélectionné</span></p>
+            <p><strong>Lieu d’intervention:</strong> <span id="lieu">Non sélectionné</span></p>
+        </section>
 
-    <section class="section">
-        <h2>🧯 Extincteurs</h2>
-        <div id="extincteursList"></div>
-        <button onclick="addExtincteur()">➕ Ajouter un extincteur</button>
-        <p id="extincteurError" class="error" style="display: none;">Veuillez ajouter au moins un extincteur.</p>
-    </section>
+        <section class="section">
+            <h2>📅 Détails de l’intervention</h2>
+            <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-15" required></label>
+            <label>Technicien intervenant: <input type="text" id="technician" placeholder="Nom du technicien"></label>
+        </section>
 
-    <section class="section">
-        <h2>✅ Devoir de conseil</h2>
-        <div class="checkbox-container" onclick="document.getElementById('registre').click()">
-            <label for="registre">Registre présent et à jour</label>
-            <input type="checkbox" id="registre">
-        </div>
-        <div class="checkbox-container" onclick="document.getElementById('signaletique').click()">
-            <label for="signaletique">Signalétique à jour</label>
-            <input type="checkbox" id="signaletique">
-        </div>
-        <div class="checkbox-container" onclick="document.getElementById('baes').click()">
-            <label for="baes">BAES présents</label>
-            <input type="checkbox" id="baes">
-        </div>
-        <div class="checkbox-container" onclick="document.getElementById('plans').click()">
-            <label for="plans">Plans de sécurité présents et à jour</label>
-            <input type="checkbox" id="plans">
-        </div>
-    </section>
+        <section class="section">
+            <h2>🧯 Extincteurs</h2>
+            <div id="extincteursList"></div>
+            <button onclick="addExtincteur()">➕ Ajouter un extincteur</button>
+            <p id="extincteurError" class="error" style="display: none;">Veuillez ajouter au moins un extincteur.</p>
+        </section>
 
-    <section class="section">
-        <h2>📝 Observations générales</h2>
-        <textarea id="observations" rows="4" placeholder="Notes sur l'intervention..."></textarea>
-    </section>
+        <section class="section">
+            <h2>✅ Devoir de conseil</h2>
+            <div class="checkbox-container" onclick="document.getElementById('registre').click()">
+                <label for="registre">Registre présent et à jour</label>
+                <input type="checkbox" id="registre">
+            </div>
+            <div class="checkbox-container" onclick="document.getElementById('signaletique').click()">
+                <label for="signaletique">Signalétique à jour</label>
+                <input type="checkbox" id="signaletique">
+            </div>
+            <div class="checkbox-container" onclick="document.getElementById('baes').click()">
+                <label for="baes">BAES présents</label>
+                <input type="checkbox" id="baes">
+            </div>
+            <div class="checkbox-container" onclick="document.getElementById('plans').click()">
+                <label for="plans">Plans de sécurité présents et à jour</label>
+                <input type="checkbox" id="plans">
+            </div>
+        </section>
 
-    <section class="section nav-buttons">
-        <button onclick="validateCRM()">✅ Valider le compte rendu</button>
-        <a href="bon_intervention.html"><button>➡️ Passer au bon d’intervention</button></a>
-    </section>
-</div>
+        <section class="section">
+            <h2>📝 Observations générales</h2>
+            <textarea id="observations" rows="4" placeholder="Notes sur l'intervention..."></textarea>
+        </section>
 
-<div class="footer-nav">
-    <div class="navigation nav-buttons">
-        <a href="index.html">🏠</a>
-        <a href="CRM_extincteurs.html">🧯</a>
-        <a href="CRM_ria.html">🚿</a>
-        <a href="CRM_baes.html">💡</a>
-        <a href="CRM_desenfumage.html">💨</a>
+        <section class="section nav-buttons">
+            <button onclick="validateCRM()">✅ Valider le compte rendu</button>
+            <a href="bon_intervention.html"><button>➡️ Passer au bon d’intervention</button></a>
+        </section>
     </div>
-</div>
 
-<script>
-    let extincteurCount = 0;
-    let extincteursValides = [];
+    <div class="footer-nav">
+        <div class="navigation nav-buttons">
+            <a href="index.html">🏠</a>
+            <a href="CRM_extincteurs.html">🧯</a>
+            <a href="CRM_ria.html">🚿</a>
+            <a href="CRM_baes.html">💡</a>
+            <a href="CRM_desenfumage.html">💨</a>
+        </div>
+    </div>
 
-    window.onload = () => {
-        const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
-        if (!interventionData || !interventionData.client) {
-            alert('Aucun client sélectionné. Veuillez choisir un client depuis la page Interventions.');
-            window.location.href = 'intervention.html';
-            return;
-        }
-        document.getElementById('clientName').textContent = interventionData.client || 'Non sélectionné';
-        document.getElementById('lieu').textContent = interventionData.lieu || 'Non sélectionné';
-        loadDraft();
-    };
+    <script>
+        let extincteurCount = 0;
+        let extincteursValides = [];
 
-    function addExtincteur() {
-        extincteurCount++;
-        const div = document.createElement('div');
-        div.className = 'extincteur';
-        div.id = `extincteur-${extincteurCount}`;
-        div.innerHTML = `
-            <h3>🧯 Nouvel extincteur #${extincteurCount}</h3>
-            <label>N° extincteur: <input type="text" class="num" value="EXT-${extincteurCount}" readonly></label>
-            <label>Type d'extincteur: 
-                <select class="type" onchange="toggleCustomInput(this, 'customType-${extincteurCount}')">
-                    <option value="Eau 6L">Eau 6L</option>
-                    <option value="CO2 2kg">CO2 2kg</option>
-                    <option value="Poudre 5kg">Poudre 5kg</option>
-                    <option value="Autre">Autre</option>
-                </select>
-                <input type="text" class="custom-input customType-${extincteurCount}" placeholder="Type personnalisé">
-            </label>
-            <label>Ext. PP ? <input type="checkbox" class="pp"></label>
-            <label>Fabricant: 
-                <select class="fabricant" onchange="toggleCustomInput(this, 'customFabricant-${extincteurCount}')">
-                    <option value="Desautel">Desautel</option>
-                    <option value="Kidde">Kidde</option>
-                    <option value="Sicli">Sicli</option>
-                    <option value="Autre">Autre</option>
-                </select>
-                <input type="text" class="custom-input customFabricant-${extincteurCount}" placeholder="Fabricant personnalisé">
-            </label>
-            <label>Millésime: 
-                <select class="millesime" onchange="toggleCustomInput(this, 'customMillesime-${extincteurCount}')">
-                    ${Array.from({length: 11}, (_, i) => 2015 + i).map(year => `<option value="`\({year}">\)`{year}</option>`).join('')}
-                    <option value="Autre">Autre</option>
-                </select>
-                <input type="text" class="custom-input customMillesime-${extincteurCount}" placeholder="Année personnalisée">
-            </label>
-            <label>Niveau: <input type="text" class="niveau" placeholder="Bon, Moyen, Mauvais"></label>
-            <label>Emplacement: <input type="text" class="emplacement" placeholder="Ex. Hall principal"></label>
-            <h4>Opérations effectuées</h4>
-            <div class="checkbox-container" onclick="document.getElementById('op-verif-${extincteurCount}').click()">
-                <label for="op-verif-${extincteurCount}">Vérification OK</label>
-                <input type="checkbox" id="op-verif-${extincteurCount}" class="op-verif">
-            </div>
-            <div class="checkbox-container" onclick="document.getElementById('op-quinquennale-${extincteurCount}').click()">
-                <label for="op-quinquennale-${extincteurCount}">Révision quinquennale</label>
-                <input type="checkbox" id="op-quinquennale-${extincteurCount}" class="op-quinquennale">
-            </div>
-            <div class="checkbox-container" onclick="document.getElementById('op-recharge-${extincteurCount}').click()">
-                <label for="op-recharge-${extincteurCount}">Rechargé</label>
-                <input type="checkbox" id="op-recharge-${extincteurCount}" class="op-recharge">
-            </div>
-            <div class="checkbox-container" onclick="document.getElementById('op-mise-service-${extincteurCount}').click()">
-                <label for="op-mise-service-${extincteurCount}">Mise en service</label>
-                <input type="checkbox" id="op-mise-service-${extincteurCount}" class="op-mise-service">
-            </div>
-            <div class="checkbox-container" onclick="document.getElementById('op-echange-${extincteurCount}').click()">
-                <label for="op-echange-${extincteurCount}">Échange standard</label>
-                <input type="checkbox" id="op-echange-${extincteurCount}" class="op-echange">
-            </div>
-            <label>Observation: <textarea class="observation" rows="2"></textarea></label>
-            <button onclick="validateExtincteur(${extincteurCount})">✅ Valider extincteur</button>
-            <button onclick="removeExtincteur(${extincteurCount})">Supprimer</button>
-            <div class="summary" id="summary-${extincteurCount}" onclick="editExtincteur(${extincteurCount})"></div>
-        `;
-        document.getElementById('extincteursList').appendChild(div);
-    }
-
-    function toggleCustomInput(select, inputId) {
-        const input = document.querySelector(`.${inputId}`);
-        if (select.value === 'Autre') {
-            input.style.display = 'block';
-        } else {
-            input.style.display = 'none';
-            input.value = '';
-        }
-    }
-
-    function validateExtincteur(id) {
-        const extincteur = document.getElementById(`extincteur-${id}`);
-        const num = extincteur.querySelector('.num').value;
-        const typeSelect = extincteur.querySelector('.type');
-        const type = typeSelect.value === 'Autre' ? extincteur.querySelector(`.customType-${id}`).value : typeSelect.value;
-        const pp = extincteur.querySelector('.pp').checked ? 'PP' : '';
-        const fabricantSelect = extincteur.querySelector('.fabricant');
-        const fabricant = fabricantSelect.value === 'Autre' ? extincteur.querySelector(`.customFabricant-${id}`).value : fabricantSelect.value;
-        const millesimeSelect = extincteur.querySelector('.millesime');
-        const millesime = millesimeSelect.value === 'Autre' ? extincteur.querySelector(`.customMillesime-${id}`).value : millesimeSelect.value;
-        const emplacement = extincteur.querySelector('.emplacement').value;
-        const ops = Array.from(extincteur.querySelectorAll('input[type="checkbox"]'))
-            .filter(cb => cb.checked && cb.className !== 'pp')
-            .map(cb => cb.className.split('-')[1].charAt(0).toUpperCase())
-            .join('');
-        const summary = `${num} - ${type} (${emplacement}) [${ops}${pp}]`;
-
-        const summaryDiv = document.getElementById(`summary-${id}`);
-        summaryDiv.textContent = summary;
-        summaryDiv.style.display = 'block';
-
-        extincteursValides[id] = {
-            num: num,
-            type: type,
-            pp: pp,
-            fabricant: fabricant,
-            millesime: millesime,
-            niveau: extincteur.querySelector('.niveau').value,
-            emplacement: emplacement,
-            operations: ops,
-            observation: extincteur.querySelector('.observation').value
+        window.onload = () => {
+            const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
+            if (!interventionData || !interventionData.client) {
+                alert('Aucun client sélectionné. Veuillez choisir un client depuis la page Interventions.');
+                window.location.href = 'intervention.html';
+                return;
+            }
+            document.getElementById('clientName').textContent = interventionData.client || 'Non sélectionné';
+            document.getElementById('lieu').textContent = interventionData.lieu || 'Non sélectionné';
+            loadDraft();
         };
 
-        extincteur.querySelectorAll('input, select, textarea').forEach(elem => {
-            elem.setAttribute('readonly', true);
-            if (elem.tagName === 'SELECT') elem.disabled = true;
-        });
-        extincteur.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.disabled = true);
-        extincteur.querySelectorAll('button[onclick^="validateExtincteur"], button[onclick^="removeExtincteur"]').forEach(btn => btn.style.display = 'none');
-        extincteur.querySelectorAll('h3, label, .custom-input').forEach(elem => elem.style.display = 'none');
-        summaryDiv.innerHTML += `
-            <button onclick="editExtincteur(${id})">✏️ Modifier</button>
-            <button onclick="deleteExtincteur(${id})">🗑️ Supprimer</button>
-        `;
-    }
-
-    function editExtincteur(id) {
-        const extincteur = document.getElementById(`extincteur-${id}`);
-        const summaryDiv = document.getElementById(`summary-${id}`);
-        extincteur.querySelectorAll('input, select, textarea').forEach(elem => {
-            elem.removeAttribute('readonly');
-            if (elem.tagName === 'SELECT') elem.disabled = false;
-        });
-        extincteur.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.disabled = false);
-        extincteur.querySelectorAll('h3, label').forEach(elem => elem.style.display = 'block');
-        extincteur.querySelectorAll('.custom-input').forEach(elem => {
-            if (elem.value) elem.style.display = 'block';
-        });
-        summaryDiv.style.display = 'none';
-        extincteur.querySelector('button[onclick^="validateExtincteur"]').style.display = 'inline';
-        extincteur.querySelector('button[onclick^="removeExtincteur"]').style.display = 'inline';
-    }
-
-    function deleteExtincteur(id) {
-        const extincteur = document.getElementById(`extincteur-${id}`);
-        if (extincteur) {
-            extincteur.remove();
-            delete extincteursValides[id];
+        function addExtincteur() {
+            extincteurCount++;
+            const div = document.createElement('div');
+            div.className = 'extincteur';
+            div.id = `extincteur-${extincteurCount}`;
+            div.innerHTML = `
+                <h3>🧯 Nouvel extincteur #${extincteurCount}</h3>
+                <label>N° extincteur: <input type="text" class="num" value="EXT-${extincteurCount}" readonly></label>
+                <label>Type d'extincteur: 
+                    <select class="type" onchange="toggleCustomInput(this, 'customType-${extincteurCount}')">
+                        <option value="Eau 6L">Eau 6L</option>
+                        <option value="CO2 2kg">CO2 2kg</option>
+                        <option value="Poudre 5kg">Poudre 5kg</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                    <input type="text" class="custom-input customType-${extincteurCount}" placeholder="Type personnalisé">
+                </label>
+                <label>Ext. PP ? <input type="checkbox" class="pp"></label>
+                <label>Fabricant: 
+                    <select class="fabricant" onchange="toggleCustomInput(this, 'customFabricant-${extincteurCount}')">
+                        <option value="Desautel">Desautel</option>
+                        <option value="Kidde">Kidde</option>
+                        <option value="Sicli">Sicli</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                    <input type="text" class="custom-input customFabricant-${extincteurCount}" placeholder="Fabricant personnalisé">
+                </label>
+                <label>Millésime: 
+                    <select class="millesime" onchange="toggleCustomInput(this, 'customMillesime-${extincteurCount}')">
+                        ${Array.from({length: 11}, (_, i) => 2015 + i).map(year => `<option value="${year}">${year}</option>`).join('')}
+                        <option value="Autre">Autre</option>
+                    </select>
+                    <input type="text" class="custom-input customMillesime-${extincteurCount}" placeholder="Année personnalisée">
+                </label>
+                <label>Niveau: <input type="text" class="niveau" placeholder="Bon, Moyen, Mauvais"></label>
+                <label>Emplacement: <input type="text" class="emplacement" placeholder="Ex. Hall principal"></label>
+                <h4>Opérations effectuées</h4>
+                <div class="checkbox-container" onclick="document.getElementById('op-verif-${extincteurCount}').click()">
+                    <label for="op-verif-${extincteurCount}">Vérification OK</label>
+                    <input type="checkbox" id="op-verif-${extincteurCount}" class="op-verif">
+                </div>
+                <div class="checkbox-container" onclick="document.getElementById('op-quinquennale-${extincteurCount}').click()">
+                    <label for="op-quinquennale-${extincteurCount}">Révision quinquennale</label>
+                    <input type="checkbox" id="op-quinquennale-${extincteurCount}" class="op-quinquennale">
+                </div>
+                <div class="checkbox-container" onclick="document.getElementById('op-recharge-${extincteurCount}').click()">
+                    <label for="op-recharge-${extincteurCount}">Rechargé</label>
+                    <input type="checkbox" id="op-recharge-${extincteurCount}" class="op-recharge">
+                </div>
+                <div class="checkbox-container" onclick="document.getElementById('op-mise-service-${extincteurCount}').click()">
+                    <label for="op-mise-service-${extincteurCount}">Mise en service</label>
+                    <input type="checkbox" id="op-mise-service-${extincteurCount}" class="op-mise-service">
+                </div>
+                <div class="checkbox-container" onclick="document.getElementById('op-echange-${extincteurCount}').click()">
+                    <label for="op-echange-${extincteurCount}">Échange standard</label>
+                    <input type="checkbox" id="op-echange-${extincteurCount}" class="op-echange">
+                </div>
+                <label>Observation: <textarea class="observation" rows="2"></textarea></label>
+                <button onclick="validateExtincteur(${extincteurCount})">✅ Valider extincteur</button>
+                <button onclick="removeExtincteur(${extincteurCount})">Supprimer</button>
+                <div class="summary" id="summary-${extincteurCount}" onclick="editExtincteur(${extincteurCount})"></div>
+            `;
+            document.getElementById('extincteursList').appendChild(div);
         }
-    }
 
-    function removeExtincteur(id) {
-        const extincteur = document.getElementById(`extincteur-${id}`);
-        if (extincteur) {
-            extincteur.remove();
-        }
-    }
-
-    function loadDraft() {
-        const drafts = JSON.parse(localStorage.getItem('drafts')) || {};
-        const draft = drafts['crm_extincteurs'];
-        if (draft) {
-            document.getElementById('clientName').textContent = draft.client || 'Non sélectionné';
-            document.getElementById('lieu').textContent = draft.lieu || 'Non sélectionné';
-            document.getElementById('interventionDate').value = draft.date;
-            document.getElementById('technician').value = draft.technician;
-            document.getElementById('observations').value = draft.observations;
-            if (draft.devoirConseil) {
-                document.getElementById('registre').checked = draft.devoirConseil.registre;
-                document.getElementById('signaletique').checked = draft.devoirConseil.signaletique;
-                document.getElementById('baes').checked = draft.devoirConseil.baes;
-                document.getElementById('plans').checked = draft.devoirConseil.plans;
+        function toggleCustomInput(select, inputId) {
+            const input = document.querySelector(`.${inputId}`);
+            if (select.value === 'Autre') {
+                input.style.display = 'block';
+            } else {
+                input.style.display = 'none';
+                input.value = '';
             }
         }
-    }
 
-    function validateCRM() {
-        const client = document.getElementById('clientName').textContent;
-        const lieu = document.getElementById('lieu').textContent;
-        const date = document.getElementById('interventionDate').value;
-        const extincteurs = Object.values(extincteursValides);
+        function validateExtincteur(id) {
+            const extincteur = document.getElementById(`extincteur-${id}`);
+            const num = extincteur.querySelector('.num').value;
+            const typeSelect = extincteur.querySelector('.type');
+            const type = typeSelect.value === 'Autre' ? extincteur.querySelector(`.customType-${id}`).value : typeSelect.value;
+            const pp = extincteur.querySelector('.pp').checked ? 'PP' : '';
+            const fabricantSelect = extincteur.querySelector('.fabricant');
+            const fabricant = fabricantSelect.value === 'Autre' ? extincteur.querySelector(`.customFabricant-${id}`).value : fabricantSelect.value;
+            const millesimeSelect = extincteur.querySelector('.millesime');
+            const millesime = millesimeSelect.value === 'Autre' ? extincteur.querySelector(`.customMillesime-${id}`).value : millesimeSelect.value;
+            const emplacement = extincteur.querySelector('.emplacement').value;
+            const ops = Array.from(extincteur.querySelectorAll('input[type="checkbox"]'))
+                .filter(cb => cb.checked && cb.className !== 'pp')
+                .map(cb => cb.className.split('-')[1].charAt(0).toUpperCase())
+                .join('');
+            const summary = `${num} - ${type} (${emplacement}) [${ops}${pp}]`;
 
-        if (!client || client === 'Non sélectionné') {
-            alert('Le nom du client est obligatoire.');
-            return;
+            const summaryDiv = document.getElementById(`summary-${id}`);
+            summaryDiv.textContent = summary;
+            summaryDiv.style.display = 'block';
+
+            extincteursValides[id] = {
+                num: num,
+                type: type,
+                pp: pp,
+                fabricant: fabricant,
+                millesime: millesime,
+                niveau: extincteur.querySelector('.niveau').value,
+                emplacement: emplacement,
+                operations: ops,
+                observation: extincteur.querySelector('.observation').value
+            };
+
+            extincteur.querySelectorAll('input, select, textarea').forEach(elem => {
+                elem.setAttribute('readonly', true);
+                if (elem.tagName === 'SELECT') elem.disabled = true;
+            });
+            extincteur.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.disabled = true);
+            extincteur.querySelectorAll('button[onclick^="validateExtincteur"], button[onclick^="removeExtincteur"]').forEach(btn => btn.style.display = 'none');
+            extincteur.querySelectorAll('h3, label, .custom-input').forEach(elem => elem.style.display = 'none');
+            summaryDiv.innerHTML += `
+                <button onclick="editExtincteur(${id})">✏️ Modifier</button>
+                <button onclick="deleteExtincteur(${id})">🗑️ Supprimer</button>
+            `;
         }
-        if (!date) {
-            alert('La date d’intervention est obligatoire.');
-            return;
+
+        function editExtincteur(id) {
+            const extincteur = document.getElementById(`extincteur-${id}`);
+            const summaryDiv = document.getElementById(`summary-${id}`);
+            extincteur.querySelectorAll('input, select, textarea').forEach(elem => {
+                elem.removeAttribute('readonly');
+                if (elem.tagName === 'SELECT') elem.disabled = false;
+            });
+            extincteur.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.disabled = false);
+            extincteur.querySelectorAll('h3, label').forEach(elem => elem.style.display = 'block');
+            extincteur.querySelectorAll('.custom-input').forEach(elem => {
+                if (elem.value) elem.style.display = 'block';
+            });
+            summaryDiv.style.display = 'none';
+            extincteur.querySelector('button[onclick^="validateExtincteur"]').style.display = 'inline';
+            extincteur.querySelector('button[onclick^="removeExtincteur"]').style.display = 'inline';
         }
-        if (extincteurs.length === 0) {
-            document.getElementById('extincteurError').style.display = 'block';
-            return;
+
+        function deleteExtincteur(id) {
+            const extincteur = document.getElementById(`extincteur-${id}`);
+            if (extincteur) {
+                extincteur.remove();
+                delete extincteursValides[id];
+            }
         }
 
-        const summary = Object.values(extincteursValides).map(ext => {
-            const ops = ext.operations || '';
-            return `${ext.num} - ${ext.type} (${ext.emplacement}) [${ops}${ext.pp}]`;
-        }).join('\n');
+        function removeExtincteur(id) {
+            const extincteur = document.getElementById(`extincteur-${id}`);
+            if (extincteur) {
+                extincteur.remove();
+            }
+        }
 
-        const observations = document.getElementById('observations').value;
-        const devoirConseil = {
-            registre: document.getElementById('registre').checked,
-            signaletique: document.getElementById('signaletique').checked,
-            baes: document.getElementById('baes').checked,
-            plans: document.getElementById('plans').checked
-        };
-        const crmData = {
-            client: client,
-            lieu: lieu,
-            date: date,
-            technician: document.getElementById('technician').value,
-            extincteurs: extincteurs,
-            summary: summary,
-            observations: observations,
-            devoirConseil: devoirConseil
-        };
+        function loadDraft() {
+            const drafts = JSON.parse(localStorage.getItem('drafts')) || {};
+            const draft = drafts['crm_extincteurs'];
+            if (draft) {
+                document.getElementById('clientName').textContent = draft.client || 'Non sélectionné';
+                document.getElementById('lieu').textContent = draft.lieu || 'Non sélectionné';
+                document.getElementById('interventionDate').value = draft.date;
+                document.getElementById('technician').value = draft.technician;
+                document.getElementById('observations').value = draft.observations;
+                if (draft.devoirConseil) {
+                    document.getElementById('registre').checked = draft.devoirConseil.registre;
+                    document.getElementById('signaletique').checked = draft.devoirConseil.signaletique;
+                    document.getElementById('baes').checked = draft.devoirConseil.baes;
+                    document.getElementById('plans').checked = draft.devoirConseil.plans;
+                }
+            }
+        }
 
-        let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
-        drafts['crm_extincteurs'] = crmData;
-        localStorage.setItem('drafts', JSON.stringify(drafts));
+        function validateCRM() {
+            const client = document.getElementById('clientName').textContent;
+            const lieu = document.getElementById('lieu').textContent;
+            const date = document.getElementById('interventionDate').value;
+            const extincteurs = Object.values(extincteursValides);
 
-        let interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
-        interventionData.crm_extincteurs = crmData;
-        localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
+            if (!client || client === 'Non sélectionné') {
+                alert('Le nom du client est obligatoire.');
+                return;
+            }
+            if (!date) {
+                alert('La date d’intervention est obligatoire.');
+                return;
+            }
+            if (extincteurs.length === 0) {
+                document.getElementById('extincteurError').style.display = 'block';
+                return;
+            }
 
-        alert('Compte-rendu validé et sauvegardé !');
-    }
-        </script>
+            const summary = Object.values(extincteursValides).map(ext => {
+                const ops = ext.operations || '';
+                return `${ext.num} - ${ext.type} (${ext.emplacement}) [${ops}${ext.pp}]`;
+            }).join('\n');
+
+            const observations = document.getElementById('observations').value;
+            const devoirConseil = {
+                registre: document.getElementById('registre').checked,
+                signaletique: document.getElementById('signaletique').checked,
+                baes: document.getElementById('baes').checked,
+                plans: document.getElementById('plans').checked
+            };
+            const crmData = {
+                client: client,
+                lieu: lieu,
+                date: date,
+                technician: document.getElementById('technician').value,
+                extincteurs: extincteurs,
+                summary: summary,
+                observations: observations,
+                devoirConseil: devoirConseil
+            };
+
+            let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
+            drafts['crm_extincteurs'] = crmData;
+            localStorage.setItem('drafts', JSON.stringify(drafts));
+
+            let interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
+            interventionData.crm_extincteurs = crmData;
+            localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
+
+            alert('Compte-rendu validé et sauvegardé !');
+        }
+    </script>
 </body>
 </html>
