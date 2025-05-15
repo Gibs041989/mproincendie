@@ -80,7 +80,8 @@ button:active {
 .navigation {
     margin-top: 30px;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: row;
+    flex-wrap: nowrap;
     gap: 10px;
     justify-content: center;
 }
@@ -138,5 +139,5 @@ th {
     h1 { font-size: 24px; }
     h2 { font-size: 20px; }
     input, select, textarea { font-size: 14px; }
-    .navigation a { flex: 1 1 100%; text-align: center; }
+    .navigation a { flex: 1; text-align: center; }
 }
