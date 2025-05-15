@@ -52,7 +52,7 @@
         <!-- Section Détails de l’intervention -->
         <section class="section">
             <h2>📅 Détails de l’intervention</h2>
-            <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-15" required></label>
+            <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-16" required></label>
             <label>Technicien intervenant: <input type="text" id="technician" placeholder="Nom du technicien"></label>
         </section>
 
@@ -168,7 +168,7 @@
                 </label>
                 <label>Niveau: <input type="text" class="niveau" placeholder="Bon, Moyen, Mauvais"></label>
                 <label>Emplacement: <input type="text" class="emplacement" placeholder="Ex. Hall principal"></label>
-                <h4>Opérations effectuées</h4>
+                <h4 class="operations-title">Opérations effectuées</h4>
                 <div class="checkbox-container">
                     <label for="op-verif-${extincteurCount}">Vérification OK</label>
                     <input type="checkbox" id="op-verif-${extincteurCount}" class="op-verif" onchange="updateCheckboxStyle(this)">
@@ -214,6 +214,7 @@
             });
         }
 
+        // Gérer les champs personnalisés (type, fabricant, millésime)
         function toggleCustomInput(select, inputId) {
             const input = document.querySelector(`.${inputId}`);
             if (select.value === 'Autre') {
@@ -224,6 +225,7 @@
             }
         }
 
+        // Mettre à jour le style des cases à cocher
         function updateCheckboxStyle(checkbox) {
             const container = checkbox.closest('.checkbox-container');
             if (checkbox.checked) {
@@ -233,15 +235,24 @@
             }
         }
 
+        // Afficher les boutons Modifier/Supprimer
         function showEditButtons(id) {
             const editButtons = document.getElementById(`edit-buttons-${id}`);
-            editButtons.style.display = editButtons.style.display === 'block' ? 'none' : 'block';
+            if (editButtons) {
+                editButtons.style.display = 'block'; // Toujours afficher les boutons
+            }
         }
 
+        // Rouvrir le formulaire pour modification
         function openExtincteurForm(id) {
             const extincteur = document.getElementById(`extincteur-${id}`);
             const summaryDiv = document.getElementById(`summary-${id}`);
             const editButtons = document.getElementById(`edit-buttons-${id}`);
+
+            if (!extincteur || !summaryDiv || !editButtons) {
+                console.error(`Erreur : un ou plusieurs éléments manquants pour l'extincteur ${id}`);
+                return;
+            }
 
             extincteur.querySelectorAll('input, select, textarea').forEach(elem => {
                 elem.removeAttribute('readonly');
@@ -251,7 +262,7 @@
                 cb.disabled = false;
                 updateCheckboxStyle(cb); // Restaurer le style des cases à cocher
             });
-            extincteur.querySelectorAll('h3, label, .checkbox-container').forEach(elem => elem.style.display = 'block');
+            extincteur.querySelectorAll('h3, label, .checkbox-container, .operations-title').forEach(elem => elem.style.display = 'block');
             extincteur.querySelectorAll('.custom-input').forEach(elem => {
                 const select = elem.previousElementSibling;
                 if (select.value === 'Autre') elem.style.display = 'block';
@@ -260,9 +271,11 @@
             editButtons.style.display = 'none';
             extincteur.querySelector('button[onclick^="validateExtincteur"]').style.display = 'inline';
             extincteur.querySelector('button[onclick^="removeExtincteur"]').style.display = 'inline';
-            extincteur.querySelector('.error-message').style.display = 'none'; // Cacher les messages d’erreur lors de la réouverture
+            const errorMessage = extincteur.querySelector('.error-message');
+            if (errorMessage) errorMessage.style.display = 'none'; // Cacher les messages d’erreur lors de la réouverture
         }
 
+        // Valider un extincteur avec les règles demandées
         function validateExtincteur(id) {
             const extincteur = document.getElementById(`extincteur-${id}`);
             const errorDiv = document.getElementById(`error-${id}`);
@@ -324,13 +337,14 @@
                 observation: observation
             };
 
-            extincteur.querySelectorAll('h3, label, input, select, textarea, .checkbox-container, .custom-input').forEach(elem => {
+            extincteur.querySelectorAll('h3, label, input, select, textarea, .checkbox-container, .custom-input, .operations-title').forEach(elem => {
                 elem.style.display = 'none';
             });
             extincteur.querySelectorAll('button[onclick^="validateExtincteur"], button[onclick^="removeExtincteur"]').forEach(btn => btn.style.display = 'none');
             updateExtincteurCounter();
         }
 
+        // Supprimer un extincteur validé
         function deleteExtincteur(id) {
             const extincteur = document.getElementById(`extincteur-${id}`);
             if (extincteur) {
@@ -340,6 +354,7 @@
             }
         }
 
+        // Supprimer un extincteur non validé
         function removeExtincteur(id) {
             const extincteur = document.getElementById(`extincteur-${id}`);
             if (extincteur) {
@@ -347,11 +362,13 @@
             }
         }
 
+        // Mettre à jour le compteur d'extincteurs validés
         function updateExtincteurCounter() {
             const count = Object.keys(extincteursValides).length;
             document.getElementById('extincteurCounter').textContent = `Extincteurs validés : ${count}`;
         }
 
+        // Charger un brouillon existant
         function loadDraft() {
             const drafts = JSON.parse(localStorage.getItem('drafts')) || {};
             const draft = drafts['crm_extincteurs'];
@@ -370,6 +387,7 @@
             }
         }
 
+        // Valider le compte-rendu (CRM)
         function validateCRM() {
             const client = document.getElementById('clientName').textContent;
             const lieu = document.getElementById('lieu').textContent;
