@@ -68,13 +68,13 @@
             <p id="crmSummary">Aucun CRM associé pour le moment.</p>
         </section>
 
-        <section class="section">
+        <section class="section nav-buttons">
             <button onclick="validateBon()">✅ Valider le bon</button>
             <button onclick="generatePDF()">📄 Générer le PDF</button>
             <a href="intervention.html"><button>⬅️ Retour à l’intervention</button></a>
         </section>
 
-        <div class="navigation">
+        <div class="navigation nav-buttons">
             <a href="index.html">🏠 Accueil</a>
             <a href="client.html">📁 Clients</a>
             <a href="intervention.html">🛠️ Intervention</a>
@@ -85,15 +85,15 @@
     <script>
         let prestations = [];
 
-        // Pré-remplir client, lieu et résumé CRM
         window.onload = () => {
             const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
-            if (interventionData.client) {
-                document.getElementById('clientName').value = interventionData.client;
+            if (!interventionData || !interventionData.client) {
+                alert('Aucun client sélectionné. Veuillez choisir un client depuis la page Interventions.');
+                window.location.href = 'intervention.html';
+                return;
             }
-            if (interventionData.lieu) {
-                document.getElementById('lieu').value = interventionData.lieu;
-            }
+            document.getElementById('clientName').value = interventionData.client || '';
+            document.getElementById('lieu').value = interventionData.lieu || '';
             if (interventionData.crm_extincteurs) {
                 document.getElementById('crmSummary').textContent = interventionData.crm_extincteurs.summary || 'Aucun résumé disponible.';
             }
@@ -160,7 +160,6 @@
                 date: document.getElementById('signatureDate').value
             };
 
-            // Sauvegarde comme brouillon
             let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
             drafts['bon_intervention'] = bonData;
             localStorage.setItem('drafts', JSON.stringify(drafts));

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="css/styles.css">
     <style>
         .extincteur { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; background-color: #f9f9f9; }
-        .extincteur h3 { margin-top: 0; }
+        .extincteur h3 { margin-top: 0; color: #c62828; }
         .summary { display: none; margin-top: 10px; padding: 10px; background-color: #e0f7fa; border-radius: 4px; }
         .nav-buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
         .nav-buttons a, .nav-buttons button { flex: 1 1 150px; text-align: center; padding: 12px; font-size: 16px; }
@@ -73,12 +73,13 @@
 
         window.onload = () => {
             const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
-            if (interventionData.nom_client) {
-                document.getElementById('clientName').value = interventionData.nom_client;
+            if (!interventionData || !interventionData.client) {
+                alert('Aucun client sélectionné. Veuillez choisir un client depuis la page Interventions.');
+                window.location.href = 'intervention.html';
+                return;
             }
-            if (interventionData.lieu_intervention) {
-                document.getElementById('lieu').value = interventionData.lieu_intervention;
-            }
+            document.getElementById('clientName').value = interventionData.client || '';
+            document.getElementById('lieu').value = interventionData.lieu || '';
             loadDraft();
         };
 
@@ -171,6 +172,7 @@
 
         function validateCRM() {
             const client = document.getElementById('clientName').value;
+            const lieu = document.getElementById('lieu').value;
             const date = document.getElementById('interventionDate').value;
             const extincteurs = Object.values(extincteursValides);
 
@@ -201,7 +203,7 @@
             };
             const crmData = {
                 client: client,
-                lieu: document.getElementById('lieu').value,
+                lieu: lieu,
                 date: date,
                 technician: document.getElementById('technician').value,
                 extincteurs: extincteurs,
