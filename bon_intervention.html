@@ -1,226 +1,142 @@
-
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Bon d’intervention - Mendes Protection Incendie</title>
-<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bon d'intervention</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
+        h1 { color: #d32f2f; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #d32f2f; color: white; }
+        input, select { width: 100%; padding: 5px; margin: 5px 0; }
+        button { padding: 10px; background-color: #d32f2f; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #b71c1c; }
+        .navigation { margin-top: 20px; }
+        .navigation a { margin-right: 10px; text-decoration: none; color: #d32f2f; }
+        @media (max-width: 600px) { .container { padding: 10px; } button { width: 100%; } }
+    </style>
 </head>
-<body class="min-h-screen bg-gray-100 text-gray-800 pb-24">
-<header class="bg-white shadow p-4">
-<h1 class="text-xl font-bold text-red-700">🧾 Bon d’intervention</h1>
-<div class="mt-2 text-sm space-y-1" id="client-coordonnees"></div>
-<div class="mt-3 text-sm bg-blue-50 border-l-4 border-blue-500 p-2" id="crm-resume"></div>
-</header>
-<div class="bg-white p-4 shadow rounded mb-4" id="bandeau-client">
-<p class="text-sm text-gray-700"><strong>🧾 Client :</strong> <span id="nom-client">[Nom client]</span></p>
-<p class="text-sm text-gray-700"><strong>📍 Lieu d’intervention :</strong> <span id="lieu-intervention">[Lieu d’intervention]</span></p>
-</div>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const nom = localStorage.getItem("nom_client");
-    const lieu = localStorage.getItem("lieu_intervention");
-    const elNom = document.getElementById("nom-client");
-    const elLieu = document.getElementById("lieu-intervention");
+<body>
+    <div class="container">
+        <h1>🧾 Bon d’intervention</h1>
 
-    if (nom) {
-      elNom.textContent = nom;
-    } else {
-      elNom.textContent = "❌ Aucune information client reçue";
-      elNom.classList.add("text-red-600", "font-semibold");
-    }
+        <section>
+            <h2>📦 Prestations & matériel</h2>
+            <table id="facturationTable">
+                <thead>
+                    <tr>
+                        <th>Code article</th>
+                        <th>Désignation</th>
+                        <th>Qté</th>
+                        <th>PU €</th>
+                        <th>Total €</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="facturationBody"></tbody>
+            </table>
+            <button onclick="addPrestation()">➕ Ajouter une ligne</button>
+            <p>Montant total HT: <span id="totalHT">0</span> €</p>
+            <p>Montant TTC: <span id="totalTTC">0</span> €</p>
+        </section>
 
-    if (lieu) {
-      elLieu.textContent = lieu;
-    } else {
-      elLieu.textContent = "❌ Aucun lieu d’intervention précisé";
-      elLieu.classList.add("text-red-600", "font-semibold");
-    }
-  });
-</script>
+        <section>
+            <h2>⚙️ Modalités de règlement</h2>
+            <label>Mode de paiement:
+                <select id="paymentMode">
+                    <option value="virement">Virement</option>
+                    <option value="cheque">Chèque</option>
+                    <option value="cb">Carte bancaire</option>
+                    <option value="especes">Espèces</option>
+                </select>
+            </label>
+            <label>Délai de paiement:
+                <select id="paymentDelay">
+                    <option value="reception">A réception</option>
+                    <option value="30jours">30 jours</option>
+                    <option value="finmois">Fin de mois</option>
+                </select>
+            </label>
+        </section>
 
-<main class="p-4 space-y-6">
-<section class="bg-white p-4 shadow rounded-xl">
-<h2 class="text-lg font-semibold mb-2">📦 Prestations &amp; matériel</h2>
-<table class="w-full text-sm border">
-<thead class="bg-gray-200 text-left">
-<tr>
-<th class="p-2">Code article</th>
-<th class="p-2">Désignation</th>
-<th class="p-2 text-right">Qté</th>
-<th class="p-2 text-right">PU €</th>
-<th class="p-2 text-right">Total €</th>
-</tr>
-</thead>
-<tbody class="divide-y" id="tableau-lignes"></tbody>
-</table>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mt-4">
-<div>
-<label class="block mb-1 text-gray-600">Montant total HT</label>
-<input class="w-full border p-2 rounded text-right" id="montant-ht" placeholder="€" readonly=""/>
-</div>
-<div>
-<label class="block mb-1 text-gray-600">Montant TTC</label>
-<input class="w-full border p-2 rounded text-right" id="montant-ttc" placeholder="€" readonly=""/>
-</div>
-</div>
-<button class="mt-3 text-sm text-blue-600 underline" onclick="ajouterLigne()">➕ Ajouter une ligne</button>
-</section>
-<section class="bg-white p-4 shadow rounded-xl">
-<h2 class="text-lg font-semibold mb-2">⚙️ Modalités de règlement</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-<div>
-<label class="block mb-1 text-gray-600">Mode de paiement</label>
-<select class="w-full border p-2 rounded" id="mode-paiement">
-<option>Virement</option>
-<option>Chèque</option>
-<option>Carte bancaire</option>
-<option>Espèces</option>
-</select>
-</div>
-<div>
-<label class="block mb-1 text-gray-600">Délai de paiement</label>
-<select class="w-full border p-2 rounded" id="delai-paiement">
-<option>A réception</option>
-<option>30 jours</option>
-<option>Fin de mois</option>
-</select>
-</div>
-<div>
-<label class="block mb-1 text-gray-600">Montant total HT</label>
-<input class="w-full border p-2 rounded text-right" id="montant-ht" placeholder="€" readonly=""/>
-</div>
-<div>
-<label class="block mb-1 text-gray-600">Montant TTC</label>
-<input class="w-full border p-2 rounded text-right" id="montant-ttc" placeholder="€" readonly=""/>
-</div>
-</div>
-</section>
-<section class="bg-white p-4 shadow rounded-xl">
-<h2 class="text-lg font-semibold mb-2">✍️ Signatures</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-<div>
-<label class="block mb-1">Nom du client signataire</label>
-<input class="w-full p-2 border rounded" id="nom-client"/>
-<p class="mt-2 italic">Fait à <span id="lieu-signature"></span>, le <span id="date-signature"></span></p>
-<textarea class="w-full h-24 border border-dashed p-2 text-sm text-gray-700" placeholder="Signature manuscrite ou note client..."></textarea>
-</div>
-<div>
-<label class="block mb-1">Nom du technicien</label>
-<input class="w-full p-2 border rounded" id="nom-tech"/>
-<p class="mt-5 text-transparent">_</p>
-<textarea class="w-full h-24 border border-dashed p-2 text-sm text-gray-700" placeholder="Signature manuscrite ou note client..."></textarea>
-</div>
-</div>
-</section>
-<section class="bg-white p-4 shadow rounded-xl mt-6">
-<button class="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-lg" id="generer-pdf" onclick="genererPDF()">📄 Générer le PDF</button>
-</section>
+        <section>
+            <h2>✍️ Signatures</h2>
+            <label>Nom du client signataire: <input type="text" id="signatureClient"></label>
+            <label>Fait à: <input type="text" id="signatureLieu" value="Paris"></label>
+            <label>Le: <input type="date" id="signatureDate" value="2025-05-15"></label>
+            <label>Nom du technicien: <input type="text" id="signatureTech"></label>
+        </section>
 
-<section class="bg-white p-4 shadow rounded-xl mt-6">
-<h2 class="text-lg font-semibold mb-2">✍️ Signatures</h2>
-<p class="text-sm mb-4">Fait à <span id="ville-signature">[ville]</span>, le <span id="date-signature"></span></p>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-<div>
-<label class="block text-sm mb-1">Nom du client</label>
-<input class="w-full border p-2 rounded mb-2" id="nom-client-signature" readonly=""/>
-<canvas class="border rounded w-full h-32 bg-gray-50" id="signature-client"></canvas>
-</div>
-<div>
-<label class="block text-sm mb-1">Nom du technicien</label>
-<input class="w-full border p-2 rounded mb-2" id="nom-tech" readonly=""/>
-<canvas class="border rounded w-full h-32 bg-gray-50" id="signature-tech"></canvas>
-</div>
-</div>
-</section>
-<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const nom = localStorage.getItem("nom_client") || "";
-    const lieu = localStorage.getItem("lieu_intervention") || "";
-    const tech = localStorage.getItem("nom_technicien") || "Technicien MPRO";
+        <section>
+            <h2>📄 Résumé CRM</h2>
+            <p id="crmSummary">Aucun CRM associé pour le moment.</p>
+        </section>
 
-    // Champs
-    document.getElementById("nom-client-signature").value = nom;
-    document.getElementById("nom-tech").value = tech;
-    document.getElementById("ville-signature").textContent = lieu || "Lieu non précisé";
-    document.getElementById("date-signature").textContent = new Date().toLocaleDateString("fr-FR");
+        <button onclick="generatePDF()">📄 Générer le PDF</button>
 
-    // Signatures
-    new SignaturePad(document.getElementById("signature-client"));
-    new SignaturePad(document.getElementById("signature-tech"));
-  });
-</script>
-</main>
-<footer class="fixed bottom-0 left-0 right-0 bg-white border-t shadow flex justify-around p-3 text-xs z-50">
-<a class="flex flex-col items-center gap-1" href="index.html">
-<span class="text-xl">🏠</span>
-<span>Accueil</span>
-</a>
-<a class="flex flex-col items-center gap-1" href="clients.html">
-<span class="text-xl">📁</span>
-<span>Clients</span>
-</a>
-<a class="flex flex-col items-center gap-1" href="intervention.html">
-<span class="text-xl">🛠️</span>
-<span>Intervention</span>
-</a>
-</footer>
+        <div class="navigation">
+            <a href="index.html">🏠 Accueil</a>
+            <a href="client.html">📁 Clients</a>
+            <a href="intervention.html">🛠️ Intervention</a>
+        </div>
+    </div>
 
-<script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  // Coordonnées client
-  const client = localStorage.getItem("nom_client") || "Client inconnu";
-  const lieu = localStorage.getItem("lieu_intervention") || "Lieu non précisé";
-  document.getElementById("client-coordonnees").innerHTML = `
-    <strong>🧾 Client :</strong> ${client}<br>
-    <strong>📍 Lieu d’intervention :</strong> ${lieu}
-  `;
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        let prestations = [];
 
-  // Résumé CRM simulé depuis stockage
-  const resumeCRM = localStorage.getItem("crm_extincteurs_CLIENT123");
-  if (resumeCRM) {
-    const extrait = new DOMParser().parseFromString(resumeCRM, "text/html");
-    const blocs = extrait.querySelectorAll("details summary");
-    const lignes = [...blocs].map(b => `<li>${b.textContent}</li>`).join("");
-    document.getElementById("crm-resume").innerHTML = `
-      <p class="font-semibold mb-1">Résumé du compte-rendu :</p>
-      <ul class="list-disc ml-6">${lignes}</ul>
-    `;
-  }
+        function addPrestation() {
+            const tbody = document.getElementById('facturationBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="code" placeholder="Code"></td>
+                <td><input type="text" class="designation" placeholder="Désignation"></td>
+                <td><input type="number" class="qty" value="1" min="1" onchange="updateTotals()"></td>
+                <td><input type="number" class="pu" value="0" min="0" step="0.01" onchange="updateTotals()"></td>
+                <td class="total">0</td>
+                <td><button onclick="this.parentElement.parentElement.remove(); updateTotals()">Supprimer</button></td>
+            `;
+            tbody.appendChild(row);
+            updateTotals();
+        }
 
-  // Calcul des totaux
-  window.ajouterLigne = function () {
-    const tbody = document.getElementById("tableau-lignes");
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="p-1"><input class="w-full p-1 border rounded text-xs" placeholder="Code"></td>
-      <td class="p-1"><input class="w-full p-1 border rounded text-xs" placeholder="Désignation"></td>
-      <td class="p-1 text-right"><input class="w-full p-1 border rounded text-xs text-right" type="number" value="1" min="1" onchange="recalculerTotal()"></td>
-      <td class="p-1 text-right"><input class="w-full p-1 border rounded text-xs text-right" type="number" value="0" min="0" onchange="recalculerTotal()"></td>
-      <td class="p-1 text-right total-ht">0 €</td>
-    `;
-    tbody.appendChild(tr);
-    recalculerTotal();
-  };
+        function updateTotals() {
+            let totalHT = 0;
+            document.querySelectorAll('#facturationBody tr').forEach(row => {
+                const qty = parseFloat(row.querySelector('.qty').value) || 0;
+                const pu = parseFloat(row.querySelector('.pu').value) || 0;
+                const total = qty * pu;
+                row.querySelector('.total').textContent = total.toFixed(2);
+                totalHT += total;
+            });
+            const tva = 0.2; // 20% TVA
+            const totalTTC = totalHT * (1 + tva);
+            document.getElementById('totalHT').textContent = totalHT.toFixed(2);
+            document.getElementById('totalTTC').textContent = totalTTC.toFixed(2);
+        }
 
-  window.recalculerTotal = function () {
-    const rows = document.querySelectorAll("#tableau-lignes tr");
-    let totalHT = 0;
-    rows.forEach(row => {
-      const qty = parseFloat(row.cells[2].querySelector("input").value || 0);
-      const pu = parseFloat(row.cells[3].querySelector("input").value || 0);
-      const lineTotal = qty * pu;
-      totalHT += lineTotal;
-      row.cells[4].textContent = `${lineTotal.toFixed(2)} €`;
-    });
-    document.getElementById("montant-ht").value = `${totalHT.toFixed(2)} €`;
-    document.getElementById("montant-ttc").value = `${(totalHT * 1.2).toFixed(2)} €`;
-  };
-});
-</script>
-</script></body>
+        function generatePDF() {
+            const element = document.querySelector('.container');
+            const opt = {
+                margin: 1,
+                filename: 'bon_intervention.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // Simuler récupération du résumé CRM (à connecter avec CRM_extincteurs.html)
+        window.onload = () => {
+            const savedDraft = JSON.parse(localStorage.getItem('drafts')) || {};
+            if (savedDraft.crm) {
+                document.getElementById('crmSummary').textContent = savedDraft.crm;
+            }
+        };
+    </script>
+</body>
 </html>
