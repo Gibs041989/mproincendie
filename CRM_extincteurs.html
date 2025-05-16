@@ -13,7 +13,7 @@
         .summary-content { display: flex; align-items: center; gap: 5px; }
         .summary-content::before { content: "🧯"; }
         .edit-buttons { margin-top: 5px; }
-        .edit-buttons button:first-child { background-color: #f0ad4e; color: white; border: none; padding: 5px 10px; margin-right: 5px; cursor: pointer; border-radius: 4px; }
+        .edit-buttons button { background-color: #f0ad4e; color: white; border: none; padding: 5px 10px; margin-right: 5px; cursor: pointer; border-radius: 4px; }
         .nav-buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
         .nav-buttons a, .nav-buttons button { flex: 1 1 150px; text-align: center; padding: 12px; font-size: 16px; }
         .footer-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: #f5f5f5; padding: 10px 0; box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); }
@@ -33,7 +33,7 @@
         .extincteur .form-content.read-only input,
         .extincteur .form-content.read-only select,
         .extincteur .form-content.read-only textarea,
-        .extincteur .form-content.read-only .checkbox-container {
+        .extincteur .form-content.read-only .checkbox-container input {
             background-color: #e0e0e0;
             pointer-events: none;
         }
@@ -185,14 +185,14 @@
                     </div>
                     <label>Observation: <textarea class="observation" rows="2"></textarea></label>
                     <button onclick="validateExtincteur(${extincteurCount})">✅ Valider extincteur</button>
-                    <button onclick="removeExtincteur(${extincteurCount})">Supprimer</button>
+                    <button onclick="removeExtincteur(${extincteurCount})">🗑️ Supprimer</button>
                     <p class="error-message" id="error-${extincteurCount}"></p>
                 </div>
                 <div class="summary" id="summary-${extincteurCount}" onclick="toggleExtincteurForm(${extincteurCount})">
                     <div class="summary-content"></div>
                     <div class="edit-buttons" id="edit-buttons-${extincteurCount}">
-                        <button onclick="openExtincteurForm(${extincteurCount})">✏️ Modifier</button>
-                        <button onclick="deleteExtincteur(${extincteurCount})">🗑️ Supprimer</button>
+                        <button id="edit-button-${extincteurCount}" onclick="openExtincteurForm(${extincteurCount})">✏️ Modifier</button>
+                        <button id="validate-button-${extincteurCount}" style="display: none;" onclick="validateExtincteur(${extincteurCount})">✅ Valider modifications</button>
                     </div>
                 </div>
             `;
@@ -200,7 +200,7 @@
             div.querySelectorAll('.checkbox-container').forEach(container => {
                 container.addEventListener('click', (e) => {
                     const checkbox = container.querySelector('input[type="checkbox"]');
-                    if (e.target !== checkbox) {
+                    if (e.target !== checkbox && !container.closest('.form-content').classList.contains('read-only')) {
                         checkbox.click();
                     }
                 });
@@ -229,24 +229,27 @@
         function toggleExtincteurForm(id) {
             const extincteur = document.getElementById(`extincteur-${id}`);
             const formContent = extincteur.querySelector('.form-content');
-            const editButtons = document.getElementById(`edit-buttons-${id}`);
+            const editButton = document.getElementById(`edit-button-${id}`);
+            const validateButton = document.getElementById(`validate-button-${id}`);
             if (formContent.classList.contains('hidden')) {
                 formContent.classList.remove('hidden');
                 formContent.classList.add('read-only');
-                editButtons.classList.add('visible');
+                editButton.style.display = 'inline';
+                validateButton.style.display = 'none';
             } else {
                 formContent.classList.add('hidden');
                 formContent.classList.remove('read-only');
-                editButtons.classList.remove('visible');
+                editButton.style.display = 'none';
+                validateButton.style.display = 'none';
             }
         }
         function openExtincteurForm(id) {
             console.log(`Tentative d'ouverture du formulaire pour l'extincteur ${id}`);
             const extincteur = document.getElementById(`extincteur-${id}`);
             const formContent = extincteur.querySelector('.form-content');
-            const summaryDiv = document.getElementById(`summary-${id}`);
-            const editButtons = document.getElementById(`edit-buttons-${id}`);
-            if (!extincteur || !summaryDiv || !editButtons) {
+            const editButton = document.getElementById(`edit-button-${id}`);
+            const validateButton = document.getElementById(`validate-button-${id}`);
+            if (!extincteur || !formContent) {
                 console.error(`Erreur : un ou plusieurs éléments manquants pour l'extincteur ${id}`);
                 return;
             }
@@ -324,13 +327,13 @@
                 updateCheckboxStyle(cb);
                 console.log(`Case à cocher réactivée:`, cb);
             });
-            const validateButton = extincteur.querySelector('button[onclick^="validateExtincteur"]');
+            const validateButtonForm = extincteur.querySelector('button[onclick^="validateExtincteur"]');
             const removeButton = extincteur.querySelector('button[onclick^="removeExtincteur"]');
-            if (validateButton) {
-                validateButton.style.display = 'inline';
-                validateButton.style.pointerEvents = 'auto';
-                validateButton.style.visibility = 'visible';
-                validateButton.textContent = '✅ Valider modifications';
+            if (validateButtonForm) {
+                validateButtonForm.style.display = 'inline';
+                validateButtonForm.style.pointerEvents = 'auto';
+                validateButtonForm.style.visibility = 'visible';
+                validateButtonForm.textContent = '✅ Valider modifications';
                 console.log(`Bouton Valider réaffiché pour l'extincteur ${id}`);
             }
             if (removeButton) {
@@ -340,7 +343,8 @@
                 console.log(`Bouton Supprimer réaffiché pour l'extincteur ${id}`);
             }
             formContent.classList.remove('read-only');
-            editButtons.classList.remove('visible');
+            editButton.style.display = 'none';
+            validateButton.style.display = 'inline';
             console.log(`Formulaire de l'extincteur ${id} ouvert pour modification`);
         }
         function validateExtincteur(id) {
@@ -348,7 +352,8 @@
             const extincteur = document.getElementById(`extincteur-${id}`);
             const formContent = extincteur.querySelector('.form-content');
             const summaryDiv = document.getElementById(`summary-${id}`);
-            const editButtons = document.getElementById(`edit-buttons-${id}`);
+            const editButton = document.getElementById(`edit-button-${id}`);
+            const validateButton = document.getElementById(`validate-button-${id}`);
             const errorDiv = document.getElementById(`error-${id}`);
             errorDiv.style.display = 'none';
             errorDiv.textContent = '';
@@ -402,7 +407,8 @@
                 observation: observation
             };
             formContent.classList.add('hidden');
-            editButtons.classList.remove('visible');
+            editButton.style.display = 'inline';
+            validateButton.style.display = 'none';
             updateExtincteurCounter();
             console.log(`Extincteur ${id} validé avec succès`);
         }
@@ -493,7 +499,7 @@
         document.querySelectorAll('.checkbox-container').forEach(container => {
             container.addEventListener('click', (e) => {
                 const checkbox = container.querySelector('input[type="checkbox"]');
-                if (e.target !== checkbox) {
+                if (e.target !== checkbox && !container.closest('.form-content').classList.contains('read-only')) {
                     checkbox.click();
                 }
             });
