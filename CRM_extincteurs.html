@@ -34,6 +34,7 @@
             visibility: visible !important;
             opacity: 1 !important;
         }
+        .extincteur .operations-title.hidden { display: none !important; }
         .extincteur .checkbox-container { display: flex !important; }
         .extincteur .custom-input.visible { display: block !important; }
         .edit-buttons { display: none !important; }
@@ -202,7 +203,7 @@
                 });
             });
             console.log(`Extincteur ${extincteurCount} ajouté`);
-        }
+        };
         function toggleCustomInput(select, inputId) {
             const input = document.querySelector(`.${inputId}`);
             if (select.value === 'Autre') {
@@ -293,6 +294,7 @@
             if (operationsTitle) {
                 operationsTitle.style.display = 'block';
                 operationsTitle.style.visibility = 'visible';
+                operationsTitle.classList.remove('hidden');
                 console.log(`Operations title réaffiché:`, operationsTitle);
             }
             const customInputs = extincteur.querySelectorAll('.custom-input');
@@ -338,7 +340,7 @@
                 errorMessage.style.display = 'none';
             }
             console.log(`Formulaire de l'extincteur ${id} ouvert pour modification`);
-        }
+        };
         function validateExtincteur(id) {
             console.log(`Validation de l'extincteur ${id}`);
             const extincteur = document.getElementById(`extincteur-${id}`);
@@ -401,10 +403,13 @@
                 if (elem.classList.contains('custom-input')) {
                     elem.classList.remove('visible');
                 }
+                if (elem.classList.contains('operations-title')) {
+                    elem.classList.add('hidden');
+                }
             });
             updateExtincteurCounter();
             console.log(`Extincteur ${id} validé avec succès`);
-        }
+        };
         function deleteExtincteur(id) {
             const extincteur = document.getElementById(`extincteur-${id}`);
             if (extincteur) {
