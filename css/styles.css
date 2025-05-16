@@ -80,7 +80,8 @@ button:active {
 .navigation {
     margin-top: 30px;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: row;
+    flex-wrap: nowrap;
     gap: 10px;
     justify-content: center;
 }
@@ -133,10 +134,32 @@ th {
 }
 
 @media (max-width: 600px) {
-    .container { padding: 15px; }
-    button { width: 100%; padding: 12px; }
+    body { padding: 10px; }
+    .container { 
+        padding: 15px; 
+        margin-bottom: 60px; /* Ajout d'une marge pour éviter le chevauchement avec le pied de page */
+    }
+    button { 
+        width: 100%; 
+        padding: 12px; 
+        font-size: 18px; /* Texte plus grand pour faciliter le clic */
+    }
     h1 { font-size: 24px; }
     h2 { font-size: 20px; }
-    input, select, textarea { font-size: 14px; }
-    .navigation a { flex: 1 1 100%; text-align: center; }
+    input, select, textarea { 
+        font-size: 16px; /* Texte plus grand pour une meilleure lisibilité */
+        padding: 8px; 
+    }
+    label { 
+        font-size: 16px; /* Texte plus grand pour les labels */
+    }
+    .navigation a { 
+        flex: 1; 
+        text-align: center; 
+        font-size: 20px; /* Icônes plus grandes sur mobile */
+        padding: 8px; 
+    }
+    .section, .extincteur { 
+        padding: 10px; /* Réduit l’espacement pour maximiser l’espace */
+    }
 }
