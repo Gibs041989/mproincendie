@@ -13,7 +13,7 @@
         .summary:hover { background-color: #b3e5fc; }
         .summary-content { display: flex; align-items: center; gap: 5px; }
         .summary-content::before { content: "🧯"; }
-        .edit-buttons { display: none; margin-top: 5px; }
+        .edit-buttons { margin-top: 5px; }
         .edit-buttons button:first-child { background-color: #f0ad4e; color: white; border: none; padding: 5px 10px; margin-right: 5px; cursor: pointer; border-radius: 4px; }
         .nav-buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
         .nav-buttons a, .nav-buttons button { flex: 1 1 150px; text-align: center; padding: 12px; font-size: 16px; }
@@ -30,14 +30,16 @@
         .extincteur-counter { font-style: italic; color: #666; margin-top: 5px; }
         .error-message { color: #d32f2f; font-size: 0.9em; margin-top: 5px; display: none; }
         /* S'assurer que les champs sont modifiables et visibles */
-        input, select, textarea, .checkbox-container, label, h3, h4, .operations-title {
+        .extincteur h3, .extincteur label, .extincteur input, .extincteur select, .extincteur textarea, .extincteur .checkbox-container, .extincteur .operations-title, .extincteur button {
             pointer-events: auto !important;
             user-select: auto !important;
-            display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
         }
-        .custom-input.visible { display: block !important; }
+        .extincteur .checkbox-container { display: flex !important; }
+        .extincteur .custom-input.visible { display: block !important; }
+        .edit-buttons { display: none !important; }
+        .edit-buttons.visible { display: block !important; }
         @media (max-width: 600px) {
             .nav-buttons a, .nav-buttons button { flex: 1 1 100%; padding: 10px; font-size: 18px; }
             .extincteur { padding: 10px; }
@@ -253,6 +255,7 @@
             const editButtons = document.getElementById(`edit-buttons-${id}`);
             if (editButtons) {
                 editButtons.style.display = 'block';
+                editButtons.classList.add('visible');
                 editButtons.style.visibility = 'visible';
                 console.log(`Boutons d'édition affichés pour l'extincteur ${id}`);
             } else {
@@ -307,22 +310,46 @@
             });
 
             // Réafficher tous les éléments du formulaire
-            extincteur.querySelectorAll('h3, label, .checkbox-container, .operations-title, .custom-input').forEach(elem => {
-                if (elem.classList.contains('custom-input')) {
-                    const select = elem.previousElementSibling;
-                    if (select && select.value === 'Autre') {
-                        elem.style.display = 'block';
-                        elem.classList.add('visible');
-                    } else {
-                        elem.style.display = 'none';
-                        elem.classList.remove('visible');
-                    }
+            const h3 = extincteur.querySelector('h3');
+            if (h3) {
+                h3.style.display = 'block';
+                h3.style.visibility = 'visible';
+                console.log(`H3 réaffiché:`, h3);
+            }
+
+            const labels = extincteur.querySelectorAll('label');
+            labels.forEach((label, index) => {
+                label.style.display = 'block';
+                label.style.visibility = 'visible';
+                console.log(`Label ${index} réaffiché:`, label);
+            });
+
+            const checkboxContainers = extincteur.querySelectorAll('.checkbox-container');
+            checkboxContainers.forEach((container, index) => {
+                container.style.display = 'flex';
+                container.style.visibility = 'visible';
+                console.log(`Checkbox container ${index} réaffiché:`, container);
+            });
+
+            const operationsTitle = extincteur.querySelector('.operations-title');
+            if (operationsTitle) {
+                operationsTitle.style.display = 'block';
+                operationsTitle.style.visibility = 'visible';
+                console.log(`Operations title réaffiché:`, operationsTitle);
+            }
+
+            const customInputs = extincteur.querySelectorAll('.custom-input');
+            customInputs.forEach((input, index) => {
+                const select = input.previousElementSibling;
+                if (select && select.value === 'Autre') {
+                    input.style.display = 'block';
+                    input.classList.add('visible');
                 } else {
-                    elem.style.display = 'block';
+                    input.style.display = 'none';
+                    input.classList.remove('visible');
                 }
-                elem.style.pointerEvents = 'auto';
-                elem.style.visibility = 'visible';
-                console.log(`Élément réaffiché:`, elem);
+                input.style.visibility = 'visible';
+                console.log(`Custom input ${index} réaffiché:`, input);
             });
 
             // Restaurer les styles des cases à cocher
@@ -354,6 +381,7 @@
             // Masquer résumé et boutons d'édition
             summaryDiv.style.display = 'none';
             editButtons.style.display = 'none';
+            editButtons.classList.remove('visible');
 
             // Cacher message d'erreur
             const errorMessage = extincteur.querySelector('.error-message');
@@ -430,16 +458,15 @@
                 observation: observation
             };
 
-            // Masquer temporairement le formulaire sans désactiver
-            extincteur.querySelectorAll('h3, label, input, select, textarea, .checkbox-container, .custom-input, .operations-title').forEach(elem => {
-                if (elem.classList.contains('custom-input') && elem.previousElementSibling.value !== 'Autre') {
-                    elem.style.display = 'none';
+            // Masquer le formulaire
+            const formElements = extincteur.querySelectorAll('h3, label, input, select, textarea, .checkbox-container, .custom-input, .operations-title, button');
+            formElements.forEach(elem => {
+                elem.style.display = 'none';
+                if (elem.classList.contains('custom-input')) {
                     elem.classList.remove('visible');
-                } else {
-                    elem.style.display = 'none';
                 }
             });
-            extincteur.querySelectorAll('button[onclick^="validateExtincteur"], button[onclick^="removeExtincteur"]').forEach(btn => btn.style.display = 'none');
+
             updateExtincteurCounter();
             console.log(`Extincteur ${id} validé avec succès`);
         }
