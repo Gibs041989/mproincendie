@@ -28,17 +28,18 @@
         .custom-input { display: none; margin-top: 5px; }
         .extincteur-counter { font-style: italic; color: #666; margin-top: 5px; }
         .error-message { color: #d32f2f; font-size: 0.9em; margin-top: 5px; display: none; }
-        .extincteur h3, .extincteur label, .extincteur input, .extincteur select, .extincteur textarea, .extincteur .checkbox-container, .extincteur .operations-title, .extincteur button {
-            pointer-events: auto !important;
-            user-select: auto !important;
-            visibility: visible !important;
-            opacity: 1 !important;
+        .extincteur .form-content { display: block; }
+        .extincteur .form-content.hidden { display: none; }
+        .extincteur .form-content.read-only input,
+        .extincteur .form-content.read-only select,
+        .extincteur .form-content.read-only textarea,
+        .extincteur .form-content.read-only .checkbox-container {
+            background-color: #e0e0e0;
+            pointer-events: none;
         }
-        .extincteur .operations-title.hidden { display: none !important; }
-        .extincteur .checkbox-container { display: flex !important; }
-        .extincteur .custom-input.visible { display: block !important; }
-        .edit-buttons { display: none !important; }
-        .edit-buttons.visible { display: block !important; }
+        .extincteur .form-content.read-only button { display: none; }
+        .edit-buttons { display: none; }
+        .edit-buttons.visible { display: block; }
         @media (max-width: 600px) {
             .nav-buttons a, .nav-buttons button { flex: 1 1 100%; padding: 10px; font-size: 18px; }
             .extincteur { padding: 10px; }
@@ -127,65 +128,67 @@
             div.className = 'extincteur';
             div.id = `extincteur-${extincteurCount}`;
             div.innerHTML = `
-                <h3>🧯 Nouvel extincteur #${extincteurCount}</h3>
-                <label>N° extincteur: <input type="text" class="num" value="EXT-${extincteurCount}"></label>
-                <label>Type d'extincteur: 
-                    <select class="type" onchange="toggleCustomInput(this, 'customType-${extincteurCount}')">
-                        <option value="">-- Sélectionner --</option>
-                        <option value="Eau 6L">Eau 6L</option>
-                        <option value="CO2 2kg">CO2 2kg</option>
-                        <option value="Poudre 5kg">Poudre 5kg</option>
-                        <option value="Autre">Autre</option>
-                    </select>
-                    <input type="text" class="custom-input customType-${extincteurCount}" placeholder="Type personnalisé">
-                </label>
-                <label>Ext. PP ? <input type="checkbox" id="pp-${extincteurCount}" class="pp" onchange="updateCheckboxStyle(this)"></label>
-                <label>Fabricant: 
-                    <select class="fabricant" onchange="toggleCustomInput(this, 'customFabricant-${extincteurCount}')">
-                        <option value="">-- Sélectionner --</option>
-                        <option value="Desautel">Desautel</option>
-                        <option value="Kidde">Kidde</option>
-                        <option value="Sicli">Sicli</option>
-                        <option value="Autre">Autre</option>
-                    </select>
-                    <input type="text" class="custom-input customFabricant-${extincteurCount}" placeholder="Fabricant personnalisé">
-                </label>
-                <label>Millésime: 
-                    <select class="millesime" onchange="toggleCustomInput(this, 'customMillesime-${extincteurCount}')">
-                        <option value="">-- Sélectionner --</option>
-                        ${Array.from({length: 11}, (_, i) => 2015 + i).map(year => `<option value="${year}">${year}</option>`).join('')}
-                        <option value="Autre">Autre</option>
-                    </select>
-                    <input type="text" class="custom-input customMillesime-${extincteurCount}" placeholder="Année personnalisée">
-                </label>
-                <label>Étage: <input type="text" class="etage" placeholder="Ex. Rez-de-chaussée, 1er étage"></label>
-                <label>Emplacement: <input type="text" class="emplacement" placeholder="Ex. Hall principal"></label>
-                <h4 class="operations-title">Opérations effectuées</h4>
-                <div class="checkbox-container">
-                    <label for="op-verif-${extincteurCount}">Vérification OK</label>
-                    <input type="checkbox" id="op-verif-${extincteurCount}" class="op-verif" onchange="updateCheckboxStyle(this)">
+                <div class="form-content">
+                    <h3>🧯 Nouvel extincteur #${extincteurCount}</h3>
+                    <label>N° extincteur: <input type="text" class="num" value="EXT-${extincteurCount}"></label>
+                    <label>Type d'extincteur: 
+                        <select class="type" onchange="toggleCustomInput(this, 'customType-${extincteurCount}')">
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Eau 6L">Eau 6L</option>
+                            <option value="CO2 2kg">CO2 2kg</option>
+                            <option value="Poudre 5kg">Poudre 5kg</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                        <input type="text" class="custom-input customType-${extincteurCount}" placeholder="Type personnalisé">
+                    </label>
+                    <label>Ext. PP ? <input type="checkbox" id="pp-${extincteurCount}" class="pp" onchange="updateCheckboxStyle(this)"></label>
+                    <label>Fabricant: 
+                        <select class="fabricant" onchange="toggleCustomInput(this, 'customFabricant-${extincteurCount}')">
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Desautel">Desautel</option>
+                            <option value="Kidde">Kidde</option>
+                            <option value="Sicli">Sicli</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                        <input type="text" class="custom-input customFabricant-${extincteurCount}" placeholder="Fabricant personnalisé">
+                    </label>
+                    <label>Millésime: 
+                        <select class="millesime" onchange="toggleCustomInput(this, 'customMillesime-${extincteurCount}')">
+                            <option value="">-- Sélectionner --</option>
+                            ${Array.from({length: 11}, (_, i) => 2015 + i).map(year => `<option value="${year}">${year}</option>`).join('')}
+                            <option value="Autre">Autre</option>
+                        </select>
+                        <input type="text" class="custom-input customMillesime-${extincteurCount}" placeholder="Année personnalisée">
+                    </label>
+                    <label>Étage: <input type="text" class="etage" placeholder="Ex. Rez-de-chaussée, 1er étage"></label>
+                    <label>Emplacement: <input type="text" class="emplacement" placeholder="Ex. Hall principal"></label>
+                    <h4 class="operations-title">Opérations effectuées</h4>
+                    <div class="checkbox-container">
+                        <label for="op-verif-${extincteurCount}">Vérification OK</label>
+                        <input type="checkbox" id="op-verif-${extincteurCount}" class="op-verif" onchange="updateCheckboxStyle(this)">
+                    </div>
+                    <div class="checkbox-container">
+                        <label for="op-quinquennale-${extincteurCount}">Révision quinquennale</label>
+                        <input type="checkbox" id="op-quinquennale-${extincteurCount}" class="op-quinquennale" onchange="updateCheckboxStyle(this)">
+                    </div>
+                    <div class="checkbox-container">
+                        <label for="op-recharge-${extincteurCount}">Rechargé</label>
+                        <input type="checkbox" id="op-recharge-${extincteurCount}" class="op-recharge" onchange="updateCheckboxStyle(this)">
+                    </div>
+                    <div class="checkbox-container">
+                        <label for="op-mise-service-${extincteurCount}">Mise en service</label>
+                        <input type="checkbox" id="op-mise-service-${extincteurCount}" class="op-mise-service" onchange="updateCheckboxStyle(this)">
+                    </div>
+                    <div class="checkbox-container">
+                        <label for="op-echange-${extincteurCount}">Échange standard</label>
+                        <input type="checkbox" id="op-echange-${extincteurCount}" class="op-echange" onchange="updateCheckboxStyle(this)">
+                    </div>
+                    <label>Observation: <textarea class="observation" rows="2"></textarea></label>
+                    <button onclick="validateExtincteur(${extincteurCount})">✅ Valider extincteur</button>
+                    <button onclick="removeExtincteur(${extincteurCount})">Supprimer</button>
+                    <p class="error-message" id="error-${extincteurCount}"></p>
                 </div>
-                <div class="checkbox-container">
-                    <label for="op-quinquennale-${extincteurCount}">Révision quinquennale</label>
-                    <input type="checkbox" id="op-quinquennale-${extincteurCount}" class="op-quinquennale" onchange="updateCheckboxStyle(this)">
-                </div>
-                <div class="checkbox-container">
-                    <label for="op-recharge-${extincteurCount}">Rechargé</label>
-                    <input type="checkbox" id="op-recharge-${extincteurCount}" class="op-recharge" onchange="updateCheckboxStyle(this)">
-                </div>
-                <div class="checkbox-container">
-                    <label for="op-mise-service-${extincteurCount}">Mise en service</label>
-                    <input type="checkbox" id="op-mise-service-${extincteurCount}" class="op-mise-service" onchange="updateCheckboxStyle(this)">
-                </div>
-                <div class="checkbox-container">
-                    <label for="op-echange-${extincteurCount}">Échange standard</label>
-                    <input type="checkbox" id="op-echange-${extincteurCount}" class="op-echange" onchange="updateCheckboxStyle(this)">
-                </div>
-                <label>Observation: <textarea class="observation" rows="2"></textarea></label>
-                <button onclick="validateExtincteur(${extincteurCount})">✅ Valider extincteur</button>
-                <button onclick="removeExtincteur(${extincteurCount})">Supprimer</button>
-                <p class="error-message" id="error-${extincteurCount}"></p>
-                <div class="summary" id="summary-${extincteurCount}" onclick="showEditButtons(${extincteurCount})">
+                <div class="summary" id="summary-${extincteurCount}" onclick="toggleExtincteurForm(${extincteurCount})">
                     <div class="summary-content"></div>
                     <div class="edit-buttons" id="edit-buttons-${extincteurCount}">
                         <button onclick="openExtincteurForm(${extincteurCount})">✏️ Modifier</button>
@@ -223,20 +226,25 @@
                 container.classList.remove('checked');
             }
         }
-        function showEditButtons(id) {
+        function toggleExtincteurForm(id) {
+            const extincteur = document.getElementById(`extincteur-${id}`);
+            const formContent = extincteur.querySelector('.form-content');
+            const summaryDiv = document.getElementById(`summary-${id}`);
             const editButtons = document.getElementById(`edit-buttons-${id}`);
-            if (editButtons) {
-                editButtons.style.display = 'block';
+            if (formContent.classList.contains('hidden')) {
+                formContent.classList.remove('hidden');
+                formContent.classList.add('read-only');
                 editButtons.classList.add('visible');
-                editButtons.style.visibility = 'visible';
-                console.log(`Boutons d'édition affichés pour l'extincteur ${id}`);
             } else {
-                console.error(`Boutons d'édition introuvables pour l'extincteur ${id}`);
+                formContent.classList.add('hidden');
+                formContent.classList.remove('read-only');
+                editButtons.classList.remove('visible');
             }
         }
         function openExtincteurForm(id) {
             console.log(`Tentative d'ouverture du formulaire pour l'extincteur ${id}`);
             const extincteur = document.getElementById(`extincteur-${id}`);
+            const formContent = extincteur.querySelector('.form-content');
             const summaryDiv = document.getElementById(`summary-${id}`);
             const editButtons = document.getElementById(`edit-buttons-${id}`);
             if (!extincteur || !summaryDiv || !editButtons) {
@@ -294,7 +302,6 @@
             if (operationsTitle) {
                 operationsTitle.style.display = 'block';
                 operationsTitle.style.visibility = 'visible';
-                operationsTitle.classList.remove('hidden');
                 console.log(`Operations title réaffiché:`, operationsTitle);
             }
             const customInputs = extincteur.querySelectorAll('.custom-input');
@@ -324,6 +331,7 @@
                 validateButton.style.display = 'inline';
                 validateButton.style.pointerEvents = 'auto';
                 validateButton.style.visibility = 'visible';
+                validateButton.textContent = '✅ Valider modifications';
                 console.log(`Bouton Valider réaffiché pour l'extincteur ${id}`);
             }
             if (removeButton) {
@@ -332,18 +340,14 @@
                 removeButton.style.visibility = 'visible';
                 console.log(`Bouton Supprimer réaffiché pour l'extincteur ${id}`);
             }
-            summaryDiv.style.display = 'none';
-            editButtons.style.display = 'none';
+            formContent.classList.remove('read-only');
             editButtons.classList.remove('visible');
-            const errorMessage = extincteur.querySelector('.error-message');
-            if (errorMessage) {
-                errorMessage.style.display = 'none';
-            }
             console.log(`Formulaire de l'extincteur ${id} ouvert pour modification`);
-        };
+        }
         function validateExtincteur(id) {
             console.log(`Validation de l'extincteur ${id}`);
             const extincteur = document.getElementById(`extincteur-${id}`);
+            const formContent = extincteur.querySelector('.form-content');
             const errorDiv = document.getElementById(`error-${id}`);
             errorDiv.style.display = 'none';
             errorDiv.textContent = '';
@@ -397,19 +401,10 @@
                 operations: ops,
                 observation: observation
             };
-            const formElements = extincteur.querySelectorAll('h3, label, input, select, textarea, .checkbox-container, .custom-input, .operations-title, button');
-            formElements.forEach(elem => {
-                elem.style.display = 'none';
-                if (elem.classList.contains('custom-input')) {
-                    elem.classList.remove('visible');
-                }
-                if (elem.classList.contains('operations-title')) {
-                    elem.classList.add('hidden');
-                }
-            });
+            formContent.classList.add('hidden');
             updateExtincteurCounter();
             console.log(`Extincteur ${id} validé avec succès`);
-        };
+        }
         function deleteExtincteur(id) {
             const extincteur = document.getElementById(`extincteur-${id}`);
             if (extincteur) {
