@@ -229,7 +229,6 @@
         function toggleExtincteurForm(id) {
             const extincteur = document.getElementById(`extincteur-${id}`);
             const formContent = extincteur.querySelector('.form-content');
-            const summaryDiv = document.getElementById(`summary-${id}`);
             const editButtons = document.getElementById(`edit-buttons-${id}`);
             if (formContent.classList.contains('hidden')) {
                 formContent.classList.remove('hidden');
@@ -348,6 +347,8 @@
             console.log(`Validation de l'extincteur ${id}`);
             const extincteur = document.getElementById(`extincteur-${id}`);
             const formContent = extincteur.querySelector('.form-content');
+            const summaryDiv = document.getElementById(`summary-${id}`);
+            const editButtons = document.getElementById(`edit-buttons-${id}`);
             const errorDiv = document.getElementById(`error-${id}`);
             errorDiv.style.display = 'none';
             errorDiv.textContent = '';
@@ -385,7 +386,6 @@
                 return '';
             }).join('');
             const summary = `${num} - ${type} (${emplacement}) ${ops}${pp ? `[${pp}]` : ''}`;
-            const summaryDiv = document.getElementById(`summary-${id}`);
             const summaryContent = summaryDiv.querySelector('.summary-content');
             summaryContent.textContent = summary;
             summaryDiv.style.display = 'block';
@@ -402,6 +402,7 @@
                 observation: observation
             };
             formContent.classList.add('hidden');
+            editButtons.classList.remove('visible');
             updateExtincteurCounter();
             console.log(`Extincteur ${id} validé avec succès`);
         }
