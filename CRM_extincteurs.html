@@ -137,7 +137,7 @@
             div.id = `extincteur-${extincteurCount}`;
             div.innerHTML = `
                 <h3>🧯 Nouvel extincteur #${extincteurCount}</h3>
-                <label>N° extincteur: <input type="text" class="num" value="EXT-${extincteurCount}" readonly></label>
+                <label>N° extincteur: <input type="text" class="num" value="EXT-${extincteurCount}"></label>
                 <label>Type d'extincteur: 
                     <select class="type" onchange="toggleCustomInput(this, 'customType-${extincteurCount}')">
                         <option value="">-- Sélectionner --</option>
@@ -167,7 +167,7 @@
                     </select>
                     <input type="text" class="custom-input customMillesime-${extincteurCount}" placeholder="Année personnalisée">
                 </label>
-                <label>Niveau: <input type="text" class="niveau" placeholder="Bon, Moyen, Mauvais"></label>
+                <label>Étage: <input type="text" class="etage" placeholder="Ex. Rez-de-chaussée, 1er étage"></label>
                 <label>Emplacement: <input type="text" class="emplacement" placeholder="Ex. Hall principal"></label>
                 <h4 class="operations-title">Opérations effectuées</h4>
                 <div class="checkbox-container">
@@ -298,13 +298,13 @@
             const fabricant = fabricantSelect.value === 'Autre' ? extincteur.querySelector(`.customFabricant-${id}`).value : fabricantSelect.value;
             const millesimeSelect = extincteur.querySelector('.millesime');
             const millesime = millesimeSelect.value === 'Autre' ? extincteur.querySelector(`.customMillesime-${id}`).value : millesimeSelect.value;
-            const niveau = extincteur.querySelector('.niveau').value;
+            const etage = extincteur.querySelector('.etage').value;
             const emplacement = extincteur.querySelector('.emplacement').value;
             const observation = extincteur.querySelector('.observation').value.trim();
 
             // Vérification des champs obligatoires
-            if (!num || !type || !millesime || !niveau || !emplacement) {
-                errorDiv.textContent = 'Veuillez remplir tous les champs obligatoires : N° Extincteur, Type, Millésime, Niveau, Emplacement.';
+            if (!num || !type || !millesime || !etage || !emplacement) {
+                errorDiv.textContent = 'Veuillez remplir tous les champs obligatoires : N° Extincteur, Type, Millésime, Étage, Emplacement.';
                 errorDiv.style.display = 'block';
                 return;
             }
@@ -340,7 +340,7 @@
                 pp: pp,
                 fabricant: fabricant,
                 millesime: millesime,
-                niveau: niveau,
+                etage: etage,
                 emplacement: emplacement,
                 operations: ops,
                 observation: observation
