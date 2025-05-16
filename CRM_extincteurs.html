@@ -258,17 +258,22 @@
             // Réactiver tous les champs
             extincteur.querySelectorAll('input, select, textarea').forEach(elem => {
                 elem.removeAttribute('readonly');
-                elem.disabled = false;
+                elem.removeAttribute('disabled');
             });
 
-            // Afficher tous les éléments du formulaire
+            // Réafficher tous les éléments du formulaire
             extincteur.querySelectorAll('h3, label, .checkbox-container, .operations-title, .custom-input').forEach(elem => {
-                const select = elem.previousElementSibling;
-                if (elem.classList.contains('custom-input') && (!select || select.value !== 'Autre')) {
-                    elem.style.display = 'none';
+                if (elem.classList.contains('custom-input')) {
+                    const select = elem.previousElementSibling;
+                    elem.style.display = select && select.value === 'Autre' ? 'block' : 'none';
                 } else {
-                    elem.style.display = 'block';
+                    elem.style.display = '';
                 }
+            });
+
+            // Restaurer les styles des cases à cocher
+            extincteur.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                updateCheckboxStyle(cb);
             });
 
             // Réafficher les boutons de validation/suppression
@@ -282,6 +287,8 @@
             // Cacher message d'erreur
             const errorMessage = extincteur.querySelector('.error-message');
             if (errorMessage) errorMessage.style.display = 'none';
+
+            console.log(`Formulaire de l'extincteur ${id} ouvert pour modification`);
         }
 
         // Valider un extincteur avec les règles demandées
