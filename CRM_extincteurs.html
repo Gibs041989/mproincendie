@@ -14,6 +14,7 @@
         .summary-content { display: flex; align-items: center; gap: 5px; }
         .summary-content::before { content: "🧯"; }
         .edit-buttons { display: none; margin-top: 5px; }
+        .edit-buttons button:first-child { background-color: #f0ad4e; color: white; border: none; padding: 5px 10px; margin-right: 5px; cursor: pointer; border-radius: 4px; }
         .nav-buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
         .nav-buttons a, .nav-buttons button { flex: 1 1 150px; text-align: center; padding: 12px; font-size: 16px; }
         .footer-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: #f5f5f5; padding: 10px 0; box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); }
@@ -136,11 +137,7 @@
             div.id = `extincteur-${extincteurCount}`;
             div.innerHTML = `
                 <h3>🧯 Nouvel extincteur #${extincteurCount}</h3>
-<<<<<<< HEAD
-                <label>N° extincteur: <input type="text" class="num" value="EXT-${extincteurCount}"></label>
-=======
                 <label>N° extincteur: <input type="text" class="num" value="EXT-${extincteurCount}" readonly></label>
->>>>>>> a2664305aef19b316c0f124df0742896c7948347
                 <label>Type d'extincteur: 
                     <select class="type" onchange="toggleCustomInput(this, 'customType-${extincteurCount}')">
                         <option value="">-- Sélectionner --</option>
@@ -207,7 +204,7 @@
             `;
             document.getElementById('extincteursList').appendChild(div);
 
-            // Ajouter des gestionnaires d'événements pour les encadrements cliquables
+            // Ajouter des gestionnaires d'événements pour les cases à cocher cliquables
             div.querySelectorAll('.checkbox-container').forEach(container => {
                 container.addEventListener('click', (e) => {
                     const checkbox = container.querySelector('input[type="checkbox"]');
@@ -243,12 +240,7 @@
         function showEditButtons(id) {
             const editButtons = document.getElementById(`edit-buttons-${id}`);
             if (editButtons) {
-                editButtons.style.display = 'block'; // Toujours afficher les boutons
-<<<<<<< HEAD
-            } else {
-                console.error(`Erreur : edit-buttons-${id} introuvable`);
-=======
->>>>>>> a2664305aef19b316c0f124df0742896c7948347
+                editButtons.style.display = 'block';
             }
         }
 
@@ -263,54 +255,33 @@
                 return;
             }
 
-<<<<<<< HEAD
-            // Réactiver et réafficher tous les champs
+            // Réactiver tous les champs
             extincteur.querySelectorAll('input, select, textarea').forEach(elem => {
                 elem.removeAttribute('readonly');
-                elem.removeAttribute('disabled');
-                elem.style.display = 'block';
+                elem.disabled = false;
             });
-            extincteur.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-                cb.disabled = false;
-                cb.style.display = 'block';
-                updateCheckboxStyle(cb); // Restaurer le style des cases à cocher
-            });
-            extincteur.querySelectorAll('h3, label, .checkbox-container, .operations-title').forEach(elem => {
-                elem.style.display = 'block';
-            });
-            extincteur.querySelectorAll('.custom-input').forEach(elem => {
+
+            // Afficher tous les éléments du formulaire
+            extincteur.querySelectorAll('h3, label, .checkbox-container, .operations-title, .custom-input').forEach(elem => {
                 const select = elem.previousElementSibling;
-                if (select && select.value === 'Autre') {
+                if (elem.classList.contains('custom-input') && (!select || select.value !== 'Autre')) {
+                    elem.style.display = 'none';
+                } else {
                     elem.style.display = 'block';
                 }
             });
-            summaryDiv.style.display = 'none';
-            editButtons.style.display = 'none';
-            const validateBtn = extincteur.querySelector('button[onclick^="validateExtincteur"]');
-            const removeBtn = extincteur.querySelector('button[onclick^="removeExtincteur"]');
-            if (validateBtn) validateBtn.style.display = 'inline';
-            if (removeBtn) removeBtn.style.display = 'inline';
-=======
-            extincteur.querySelectorAll('input, select, textarea').forEach(elem => {
-                elem.removeAttribute('readonly');
-                if (elem.tagName === 'SELECT') elem.disabled = false;
-            });
-            extincteur.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-                cb.disabled = false;
-                updateCheckboxStyle(cb); // Restaurer le style des cases à cocher
-            });
-            extincteur.querySelectorAll('h3, label, .checkbox-container, .operations-title').forEach(elem => elem.style.display = 'block');
-            extincteur.querySelectorAll('.custom-input').forEach(elem => {
-                const select = elem.previousElementSibling;
-                if (select.value === 'Autre') elem.style.display = 'block';
-            });
-            summaryDiv.style.display = 'none';
-            editButtons.style.display = 'none';
+
+            // Réafficher les boutons de validation/suppression
             extincteur.querySelector('button[onclick^="validateExtincteur"]').style.display = 'inline';
             extincteur.querySelector('button[onclick^="removeExtincteur"]').style.display = 'inline';
->>>>>>> a2664305aef19b316c0f124df0742896c7948347
+
+            // Masquer résumé et boutons d'édition
+            summaryDiv.style.display = 'none';
+            editButtons.style.display = 'none';
+
+            // Cacher message d'erreur
             const errorMessage = extincteur.querySelector('.error-message');
-            if (errorMessage) errorMessage.style.display = 'none'; // Cacher les messages d’erreur lors de la réouverture
+            if (errorMessage) errorMessage.style.display = 'none';
         }
 
         // Valider un extincteur avec les règles demandées
@@ -338,7 +309,7 @@
                 return;
             }
 
-            // Vérification de la condition : soit une opération cochée, soit une observation
+            // Vérification : une opération cochée ou une observation
             const operations = Array.from(extincteur.querySelectorAll('input[type="checkbox"]'))
                 .filter(cb => cb.checked && cb.className !== 'pp');
             if (operations.length === 0 && observation === '') {
@@ -375,8 +346,13 @@
                 observation: observation
             };
 
+            // Masquer temporairement le formulaire sans désactiver
             extincteur.querySelectorAll('h3, label, input, select, textarea, .checkbox-container, .custom-input, .operations-title').forEach(elem => {
-                elem.style.display = 'none';
+                if (elem.classList.contains('custom-input') && elem.previousElementSibling.value !== 'Autre') {
+                    elem.style.display = 'none';
+                } else {
+                    elem.style.display = 'none';
+                }
             });
             extincteur.querySelectorAll('button[onclick^="validateExtincteur"], button[onclick^="removeExtincteur"]').forEach(btn => btn.style.display = 'none');
             updateExtincteurCounter();
@@ -480,7 +456,7 @@
             alert(`Compte-rendu validé avec succès !\nClient: ${client}\nLieu: ${lieu}\nDate: ${date}\nNombre d’extincteurs: ${extincteurs.length}`);
         }
 
-        // Ajouter des gestionnaires d'événements pour les encadrements cliquables du Devoir de conseil
+        // Ajouter des gestionnaires d'événements pour les cases à cocher du Devoir de conseil
         document.querySelectorAll('.checkbox-container').forEach(container => {
             container.addEventListener('click', (e) => {
                 const checkbox = container.querySelector('input[type="checkbox"]');
