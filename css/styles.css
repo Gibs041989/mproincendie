@@ -38,6 +38,10 @@ input, select, textarea {
     border: 1px solid #ddd;
     border-radius: 4px;
     box-sizing: border-box;
+    pointer-events: auto !important;
+    user-select: auto !important;
+    display: block !important;
+    visibility: visible !important;
 }
 
 button {
@@ -48,14 +52,35 @@ button {
     border-radius: 4px;
     cursor: pointer;
     margin: 5px 0;
+    pointer-events: auto !important;
+    display: inline !important;
+    visibility: visible !important;
 }
 
 button:hover {
     background-color: #b71c1c;
 }
 
-/* S'assurer que les champs sont modifiables */
-input, select, textarea, .checkbox-container {
+.checkbox-container {
     pointer-events: auto !important;
-    user-select: auto !important;
+    display: flex !important;
+    visibility: visible !important;
+}
+
+.custom-input {
+    display: none !important;
+}
+
+.custom-input.visible {
+    display: block !important;
+    visibility: visible !important;
+}
+
+.edit-buttons {
+    display: none !important;
+}
+
+.edit-buttons.visible {
+    display: block !important;
+    visibility: visible !important;
 }
