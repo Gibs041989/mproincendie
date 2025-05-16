@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compte-rendu Extincteurs - MPro Incendie</title>
     <link rel="stylesheet" href="css/styles.css">
-    <!-- Styles spécifiques à CRM_extincteurs.html -->
     <style>
         .extincteur { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; background-color: #f9f9f9; }
         .extincteur h3 { margin-top: 0; color: #c62828; }
@@ -29,7 +28,6 @@
         .custom-input { display: none; margin-top: 5px; }
         .extincteur-counter { font-style: italic; color: #666; margin-top: 5px; }
         .error-message { color: #d32f2f; font-size: 0.9em; margin-top: 5px; display: none; }
-        /* S'assurer que les champs sont modifiables et visibles */
         .extincteur h3, .extincteur label, .extincteur input, .extincteur select, .extincteur textarea, .extincteur .checkbox-container, .extincteur .operations-title, .extincteur button {
             pointer-events: auto !important;
             user-select: auto !important;
@@ -54,21 +52,16 @@
 </head>
 <body>
     <div class="container">
-        <!-- Section Client -->
         <section class="section">
             <h2>🧾 Client</h2>
             <p><strong>Client:</strong> <span id="clientName">Non sélectionné</span></p>
             <p><strong>Lieu d’intervention:</strong> <span id="lieu">Non sélectionné</span></p>
         </section>
-
-        <!-- Section Détails de l’intervention -->
         <section class="section">
             <h2>📅 Détails de l’intervention</h2>
             <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-16" required></label>
             <label>Technicien intervenant: <input type="text" id="technician" placeholder="Nom du technicien"></label>
         </section>
-
-        <!-- Section Extincteurs -->
         <section class="section">
             <h2>🧯 Extincteurs</h2>
             <div id="extincteursList"></div>
@@ -76,8 +69,6 @@
             <button onclick="addExtincteur()">➕ Ajouter un extincteur</button>
             <p id="extincteurError" class="error" style="display: none;">Veuillez ajouter au moins un extincteur.</p>
         </section>
-
-        <!-- Section Devoir de conseil -->
         <section class="section">
             <h2>✅ Devoir de conseil</h2>
             <div class="checkbox-container">
@@ -97,21 +88,15 @@
                 <input type="checkbox" id="plans" onchange="updateCheckboxStyle(this)">
             </div>
         </section>
-
-        <!-- Section Observations générales -->
         <section class="section">
             <h2>📝 Observations générales</h2>
             <textarea id="observations" rows="4" placeholder="Notes sur l'intervention..."></textarea>
         </section>
-
-        <!-- Section Actions (boutons de validation) -->
         <section class="section nav-buttons">
             <button onclick="validateCRM()">✅ Valider le compte rendu</button>
             <a href="bon_intervention.html"><button>➡️ Passer au bon d’intervention</button></a>
         </section>
     </div>
-
-    <!-- Pied de page avec icônes -->
     <div class="footer-nav">
         <div class="navigation nav-buttons">
             <a href="index.html">🏠</a>
@@ -121,13 +106,9 @@
             <a href="CRM_desenfumage.html">💨</a>
         </div>
     </div>
-
-    <!-- JavaScript pour la logique fonctionnelle -->
     <script>
         let extincteurCount = 0;
         let extincteursValides = [];
-
-        // Charger les données initiales
         window.onload = () => {
             const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
             if (!interventionData || !interventionData.client) {
@@ -139,8 +120,6 @@
             document.getElementById('lieu').textContent = interventionData.lieu || 'Non sélectionné';
             loadDraft();
         };
-
-        // Ajouter un nouvel extincteur
         function addExtincteur() {
             extincteurCount++;
             const div = document.createElement('div');
@@ -214,8 +193,6 @@
                 </div>
             `;
             document.getElementById('extincteursList').appendChild(div);
-
-            // Ajouter des gestionnaires d'événements pour les cases à cocher cliquables
             div.querySelectorAll('.checkbox-container').forEach(container => {
                 container.addEventListener('click', (e) => {
                     const checkbox = container.querySelector('input[type="checkbox"]');
@@ -226,8 +203,6 @@
             });
             console.log(`Extincteur ${extincteurCount} ajouté`);
         }
-
-        // Gérer les champs personnalisés (type, fabricant, millésime)
         function toggleCustomInput(select, inputId) {
             const input = document.querySelector(`.${inputId}`);
             if (select.value === 'Autre') {
@@ -239,8 +214,6 @@
                 input.value = '';
             }
         }
-
-        // Mettre à jour le style des cases à cocher
         function updateCheckboxStyle(checkbox) {
             const container = checkbox.closest('.checkbox-container');
             if (checkbox.checked) {
@@ -249,8 +222,6 @@
                 container.classList.remove('checked');
             }
         }
-
-        // Afficher les boutons Modifier/Supprimer
         function showEditButtons(id) {
             const editButtons = document.getElementById(`edit-buttons-${id}`);
             if (editButtons) {
@@ -262,24 +233,18 @@
                 console.error(`Boutons d'édition introuvables pour l'extincteur ${id}`);
             }
         }
-
-        // Rouvrir le formulaire pour modification
         function openExtincteurForm(id) {
             console.log(`Tentative d'ouverture du formulaire pour l'extincteur ${id}`);
             const extincteur = document.getElementById(`extincteur-${id}`);
             const summaryDiv = document.getElementById(`summary-${id}`);
             const editButtons = document.getElementById(`edit-buttons-${id}`);
-
             if (!extincteur || !summaryDiv || !editButtons) {
                 console.error(`Erreur : un ou plusieurs éléments manquants pour l'extincteur ${id}`);
                 return;
             }
-
-            // Réactiver tous les champs
             const inputs = extincteur.querySelectorAll('input');
             const selects = extincteur.querySelectorAll('select');
             const textareas = extincteur.querySelectorAll('textarea');
-
             inputs.forEach((elem, index) => {
                 elem.removeAttribute('readonly');
                 elem.removeAttribute('disabled');
@@ -289,7 +254,6 @@
                 elem.style.visibility = 'visible';
                 console.log(`Input ${index} réactivé:`, elem);
             });
-
             selects.forEach((elem, index) => {
                 elem.removeAttribute('disabled');
                 elem.style.pointerEvents = 'auto';
@@ -298,7 +262,6 @@
                 elem.style.visibility = 'visible';
                 console.log(`Select ${index} réactivé:`, elem);
             });
-
             textareas.forEach((elem, index) => {
                 elem.removeAttribute('readonly');
                 elem.removeAttribute('disabled');
@@ -308,36 +271,30 @@
                 elem.style.visibility = 'visible';
                 console.log(`Textarea ${index} réactivé:`, elem);
             });
-
-            // Réafficher tous les éléments du formulaire
             const h3 = extincteur.querySelector('h3');
             if (h3) {
                 h3.style.display = 'block';
                 h3.style.visibility = 'visible';
                 console.log(`H3 réaffiché:`, h3);
             }
-
             const labels = extincteur.querySelectorAll('label');
             labels.forEach((label, index) => {
                 label.style.display = 'block';
                 label.style.visibility = 'visible';
                 console.log(`Label ${index} réaffiché:`, label);
             });
-
             const checkboxContainers = extincteur.querySelectorAll('.checkbox-container');
             checkboxContainers.forEach((container, index) => {
                 container.style.display = 'flex';
                 container.style.visibility = 'visible';
                 console.log(`Checkbox container ${index} réaffiché:`, container);
             });
-
             const operationsTitle = extincteur.querySelector('.operations-title');
             if (operationsTitle) {
                 operationsTitle.style.display = 'block';
                 operationsTitle.style.visibility = 'visible';
                 console.log(`Operations title réaffiché:`, operationsTitle);
             }
-
             const customInputs = extincteur.querySelectorAll('.custom-input');
             customInputs.forEach((input, index) => {
                 const select = input.previousElementSibling;
@@ -351,8 +308,6 @@
                 input.style.visibility = 'visible';
                 console.log(`Custom input ${index} réaffiché:`, input);
             });
-
-            // Restaurer les styles des cases à cocher
             extincteur.querySelectorAll('input[type="checkbox"]').forEach(cb => {
                 cb.removeAttribute('disabled');
                 cb.style.pointerEvents = 'auto';
@@ -361,8 +316,6 @@
                 updateCheckboxStyle(cb);
                 console.log(`Case à cocher réactivée:`, cb);
             });
-
-            // Réafficher les boutons de validation/suppression
             const validateButton = extincteur.querySelector('button[onclick^="validateExtincteur"]');
             const removeButton = extincteur.querySelector('button[onclick^="removeExtincteur"]');
             if (validateButton) {
@@ -377,29 +330,21 @@
                 removeButton.style.visibility = 'visible';
                 console.log(`Bouton Supprimer réaffiché pour l'extincteur ${id}`);
             }
-
-            // Masquer résumé et boutons d'édition
             summaryDiv.style.display = 'none';
             editButtons.style.display = 'none';
             editButtons.classList.remove('visible');
-
-            // Cacher message d'erreur
             const errorMessage = extincteur.querySelector('.error-message');
             if (errorMessage) {
                 errorMessage.style.display = 'none';
             }
-
             console.log(`Formulaire de l'extincteur ${id} ouvert pour modification`);
         }
-
-        // Valider un extincteur avec les règles demandées
         function validateExtincteur(id) {
             console.log(`Validation de l'extincteur ${id}`);
             const extincteur = document.getElementById(`extincteur-${id}`);
             const errorDiv = document.getElementById(`error-${id}`);
             errorDiv.style.display = 'none';
             errorDiv.textContent = '';
-
             const num = extincteur.querySelector('.num').value;
             const typeSelect = extincteur.querySelector('.type');
             const type = typeSelect.value === 'Autre' ? extincteur.querySelector(`.customType-${id}`).value : typeSelect.value;
@@ -410,16 +355,12 @@
             const etage = extincteur.querySelector('.etage').value;
             const emplacement = extincteur.querySelector('.emplacement').value;
             const observation = extincteur.querySelector('.observation').value.trim();
-
-            // Vérification des champs obligatoires
             if (!num || !type || !millesime || !etage || !emplacement) {
                 errorDiv.textContent = 'Veuillez remplir tous les champs obligatoires : N° Extincteur, Type, Millésime, Étage, Emplacement.';
                 errorDiv.style.display = 'block';
                 console.log('Erreur de validation : champs obligatoires manquants');
                 return;
             }
-
-            // Vérification : une opération cochée ou une observation
             const operations = Array.from(extincteur.querySelectorAll('input[type="checkbox"]'))
                 .filter(cb => cb.checked && cb.className !== 'pp');
             if (operations.length === 0 && observation === '') {
@@ -428,7 +369,6 @@
                 console.log('Erreur de validation : opération ou observation requise');
                 return;
             }
-
             const pp = extincteur.querySelector('.pp').checked ? 'PP' : '';
             const ops = operations.map(cb => {
                 if (cb.className.includes('verif')) return '[VF]';
@@ -438,14 +378,12 @@
                 if (cb.className.includes('mise-service')) return '[MES]';
                 return '';
             }).join('');
-
             const summary = `${num} - ${type} (${emplacement}) ${ops}${pp ? `[${pp}]` : ''}`;
             const summaryDiv = document.getElementById(`summary-${id}`);
             const summaryContent = summaryDiv.querySelector('.summary-content');
             summaryContent.textContent = summary;
             summaryDiv.style.display = 'block';
             summaryDiv.style.visibility = 'visible';
-
             extincteursValides[id] = {
                 num: num,
                 type: type,
@@ -457,8 +395,6 @@
                 operations: ops,
                 observation: observation
             };
-
-            // Masquer le formulaire
             const formElements = extincteur.querySelectorAll('h3, label, input, select, textarea, .checkbox-container, .custom-input, .operations-title, button');
             formElements.forEach(elem => {
                 elem.style.display = 'none';
@@ -466,12 +402,9 @@
                     elem.classList.remove('visible');
                 }
             });
-
             updateExtincteurCounter();
             console.log(`Extincteur ${id} validé avec succès`);
         }
-
-        // Supprimer un extincteur validé
         function deleteExtincteur(id) {
             const extincteur = document.getElementById(`extincteur-${id}`);
             if (extincteur) {
@@ -481,8 +414,6 @@
                 console.log(`Extincteur ${id} supprimé`);
             }
         }
-
-        // Supprimer un extincteur non validé
         function removeExtincteur(id) {
             const extincteur = document.getElementById(`extincteur-${id}`);
             if (extincteur) {
@@ -490,14 +421,10 @@
                 console.log(`Extincteur ${id} (non validé) supprimé`);
             }
         }
-
-        // Mettre à jour le compteur d'extincteurs validés
         function updateExtincteurCounter() {
             const count = Object.keys(extincteursValides).length;
             document.getElementById('extincteurCounter').textContent = `Extincteurs validés : ${count}`;
         }
-
-        // Charger un brouillon existant
         function loadDraft() {
             const drafts = JSON.parse(localStorage.getItem('drafts')) || {};
             const draft = drafts['crm_extincteurs'];
@@ -515,14 +442,11 @@
                 }
             }
         }
-
-        // Valider le compte-rendu (CRM)
         function validateCRM() {
             const client = document.getElementById('clientName').textContent;
             const lieu = document.getElementById('lieu').textContent;
             const date = document.getElementById('interventionDate').value;
             const extincteurs = Object.values(extincteursValides);
-
             if (!client || client === 'Non sélectionné') {
                 alert('Le nom du client est obligatoire.');
                 return;
@@ -536,12 +460,10 @@
                 document.getElementById('extincteurError').style.display = 'block';
                 return;
             }
-
             const summary = Object.values(extincteursValides).map(ext => {
                 const ops = ext.operations || '';
                 return `${ext.num} - ${ext.type} (${ext.emplacement}) ${ops}${ext.pp ? `[${ext.pp}]` : ''}`;
             }).join('\n');
-
             const observations = document.getElementById('observations').value;
             const devoirConseil = {
                 registre: document.getElementById('registre').checked,
@@ -559,19 +481,14 @@
                 observations: observations,
                 devoirConseil: devoirConseil
             };
-
             let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
             drafts['crm_extincteurs'] = crmData;
             localStorage.setItem('drafts', JSON.stringify(drafts));
-
             let interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
             interventionData.crm_extincteurs = crmData;
             localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
-
             alert(`Compte-rendu validé avec succès !\nClient: ${client}\nLieu: ${lieu}\nDate: ${date}\nNombre d’extincteurs: ${extincteurs.length}`);
         }
-
-        // Ajouter des gestionnaires d'événements pour les cases à cocher du Devoir de conseil
         document.querySelectorAll('.checkbox-container').forEach(container => {
             container.addEventListener('click', (e) => {
                 const checkbox = container.querySelector('input[type="checkbox"]');
