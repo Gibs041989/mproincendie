@@ -136,7 +136,11 @@
             div.id = `extincteur-${extincteurCount}`;
             div.innerHTML = `
                 <h3>🧯 Nouvel extincteur #${extincteurCount}</h3>
+<<<<<<< HEAD
                 <label>N° extincteur: <input type="text" class="num" value="EXT-${extincteurCount}"></label>
+=======
+                <label>N° extincteur: <input type="text" class="num" value="EXT-${extincteurCount}" readonly></label>
+>>>>>>> a2664305aef19b316c0f124df0742896c7948347
                 <label>Type d'extincteur: 
                     <select class="type" onchange="toggleCustomInput(this, 'customType-${extincteurCount}')">
                         <option value="">-- Sélectionner --</option>
@@ -240,8 +244,11 @@
             const editButtons = document.getElementById(`edit-buttons-${id}`);
             if (editButtons) {
                 editButtons.style.display = 'block'; // Toujours afficher les boutons
+<<<<<<< HEAD
             } else {
                 console.error(`Erreur : edit-buttons-${id} introuvable`);
+=======
+>>>>>>> a2664305aef19b316c0f124df0742896c7948347
             }
         }
 
@@ -256,6 +263,7 @@
                 return;
             }
 
+<<<<<<< HEAD
             // Réactiver et réafficher tous les champs
             extincteur.querySelectorAll('input, select, textarea').forEach(elem => {
                 elem.removeAttribute('readonly');
@@ -282,6 +290,25 @@
             const removeBtn = extincteur.querySelector('button[onclick^="removeExtincteur"]');
             if (validateBtn) validateBtn.style.display = 'inline';
             if (removeBtn) removeBtn.style.display = 'inline';
+=======
+            extincteur.querySelectorAll('input, select, textarea').forEach(elem => {
+                elem.removeAttribute('readonly');
+                if (elem.tagName === 'SELECT') elem.disabled = false;
+            });
+            extincteur.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.disabled = false;
+                updateCheckboxStyle(cb); // Restaurer le style des cases à cocher
+            });
+            extincteur.querySelectorAll('h3, label, .checkbox-container, .operations-title').forEach(elem => elem.style.display = 'block');
+            extincteur.querySelectorAll('.custom-input').forEach(elem => {
+                const select = elem.previousElementSibling;
+                if (select.value === 'Autre') elem.style.display = 'block';
+            });
+            summaryDiv.style.display = 'none';
+            editButtons.style.display = 'none';
+            extincteur.querySelector('button[onclick^="validateExtincteur"]').style.display = 'inline';
+            extincteur.querySelector('button[onclick^="removeExtincteur"]').style.display = 'inline';
+>>>>>>> a2664305aef19b316c0f124df0742896c7948347
             const errorMessage = extincteur.querySelector('.error-message');
             if (errorMessage) errorMessage.style.display = 'none'; // Cacher les messages d’erreur lors de la réouverture
         }
