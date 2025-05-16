@@ -29,6 +29,11 @@
         .custom-input { display: none; margin-top: 5px; }
         .extincteur-counter { font-style: italic; color: #666; margin-top: 5px; }
         .error-message { color: #d32f2f; font-size: 0.9em; margin-top: 5px; display: none; }
+        /* S'assurer que les champs sont modifiables */
+        input, select, textarea, .checkbox-container {
+            pointer-events: auto !important;
+            user-select: auto !important;
+        }
         @media (max-width: 600px) {
             .nav-buttons a, .nav-buttons button { flex: 1 1 100%; padding: 10px; font-size: 18px; }
             .extincteur { padding: 10px; }
@@ -259,6 +264,8 @@
             extincteur.querySelectorAll('input, select, textarea').forEach(elem => {
                 elem.removeAttribute('readonly');
                 elem.removeAttribute('disabled');
+                elem.style.pointerEvents = 'auto'; // S'assurer que les champs sont interactifs
+                elem.style.userSelect = 'auto';
             });
 
             // Réafficher tous les éléments du formulaire
@@ -269,10 +276,12 @@
                 } else {
                     elem.style.display = '';
                 }
+                elem.style.pointerEvents = 'auto';
             });
 
             // Restaurer les styles des cases à cocher
             extincteur.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.removeAttribute('disabled');
                 updateCheckboxStyle(cb);
             });
 
@@ -431,7 +440,7 @@
 
             const summary = Object.values(extincteursValides).map(ext => {
                 const ops = ext.operations || '';
-                return `${ext.num} - ${ext.type} (${ext.emplacement}) ${ops}${ext.pp ? `[${ext.pp}]` : ''}`;
+                return `${ext.num} - ${ext.type} (${ext.emplacement}) ${ops}${ext.pp ? `[${pp}]` : ''}`;
             }).join('\n');
 
             const observations = document.getElementById('observations').value;
