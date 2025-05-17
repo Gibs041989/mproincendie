@@ -12,8 +12,8 @@
 
         <section class="section">
             <h2>👤 Client</h2>
-            <label>Nom client: <input type="text" id="clientName" placeholder="Nom du client" readonly></label>
-            <label>Lieu d’intervention: <input type="text" id="lieu" placeholder="Lieu d’intervention" readonly></label>
+            <label>Nom client: <input type="text" id="clientName" readonly></label>
+            <label>Lieu d’intervention: <input type="text" id="lieu" readonly></label>
         </section>
 
         <section class="section">
@@ -21,8 +21,9 @@
             <table id="facturationTable">
                 <thead>
                     <tr>
-                        <th>Code article</th>
+                        <th>Code</th>
                         <th>Désignation</th>
+                        <th>Opération</th>
                         <th>Qté</th>
                         <th>PU €</th>
                         <th>Total €</th>
@@ -40,6 +41,7 @@
             <h2>⚙️ Modalités de règlement</h2>
             <label>Mode de paiement:
                 <select id="paymentMode">
+                    <option value="">Sélectionner</option>
                     <option value="virement">Virement</option>
                     <option value="cheque">Chèque</option>
                     <option value="cb">Carte bancaire</option>
@@ -48,6 +50,7 @@
             </label>
             <label>Délai de paiement:
                 <select id="paymentDelay">
+                    <option value="">Sélectionner</option>
                     <option value="reception">A réception</option>
                     <option value="30jours">30 jours</option>
                     <option value="finmois">Fin de mois</option>
@@ -59,19 +62,20 @@
             <h2>✍️ Signatures</h2>
             <label>Nom du client signataire: <input type="text" id="signatureClient"></label>
             <label>Fait à: <input type="text" id="signatureLieu" value="Paris"></label>
-            <label>Le: <input type="date" id="signatureDate" value="2025-05-15"></label>
+            <label>Le: <input type="date" id="signatureDate" value="2025-05-17"></label>
             <label>Nom du technicien: <input type="text" id="signatureTech"></label>
         </section>
 
         <section class="section">
             <h2>📄 Résumé CRM</h2>
-            <p id="crmSummary">Aucun CRM associé pour le moment.</p>
+            <p id="crmSummary">Aucun CRM associé (client particulier ou intervention directe).</p>
         </section>
 
         <section class="section nav-buttons">
             <button onclick="validateBon()">✅ Valider le bon</button>
             <button onclick="generatePDF()">📄 Générer le PDF</button>
-            <a href="intervention.html"><button>⬅️ Retour à l’intervention</button></a>
+            <button onclick="sendEmail()">📧 Envoyer par email</button>
+            <a href="intervention.html"><button>⬅️ Retour</button></a>
         </section>
 
         <div class="navigation nav-buttons">
@@ -83,19 +87,18 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
-        let prestations = [];
-
         window.onload = () => {
             const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
-            if (!interventionData || !interventionData.client) {
-                alert('Aucun client sélectionné. Veuillez choisir un client depuis la page Interventions.');
+            if (!interventionData.client || !interventionData.lieu) {
+                alert('Sélectionnez un client et un lieu depuis Interventions.');
                 window.location.href = 'intervention.html';
                 return;
             }
-            document.getElementById('clientName').value = interventionData.client || '';
-            document.getElementById('lieu').value = interventionData.lieu || '';
+            document.getElementById('clientName').value = interventionData.client;
+            document.getElementById('lieu').value = interventionData.lieu;
             if (interventionData.crm_extincteurs) {
-                document.getElementById('crmSummary').textContent = interventionData.crm_extincteurs.summary || 'Aucun résumé disponible.';
+                interventionData.crm_extincteurs.forEach(item => addPrestationFromCRM(item));
+                document.getElementById('crmSummary').textContent = interventionData.crm_summary || 'Résumé des opérations CRM chargé.';
             }
         };
 
@@ -105,8 +108,25 @@
             row.innerHTML = `
                 <td><input type="text" class="code" placeholder="Code"></td>
                 <td><input type="text" class="designation" placeholder="Désignation"></td>
+                <td><input type="text" class="operation" placeholder="[VF], [RE]..."></td>
                 <td><input type="number" class="qty" value="1" min="1" onchange="updateTotals()"></td>
                 <td><input type="number" class="pu" value="0" min="0" step="0.01" onchange="updateTotals()"></td>
+                <td class="total">0</td>
+                <td><button onclick="this.parentElement.parentElement.remove(); updateTotals()">Supprimer</button></td>
+            `;
+            tbody.appendChild(row);
+            updateTotals();
+        }
+
+        function addPrestationFromCRM(item) {
+            const tbody = document.getElementById('facturationBody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" class="code" value="${item.code || ''}"></td>
+                <td><input type="text" class="designation" value="${item.designation || ''}"></td>
+                <td><input type="text" class="operation" value="${item.operation || ''}"></td>
+                <td><input type="number" class="qty" value="1" min="1" onchange="updateTotals()"></td>
+                <td><input type="number" class="pu" value="${item.prix || 0}" min="0" step="0.01" onchange="updateTotals()"></td>
                 <td class="total">0</td>
                 <td><button onclick="this.parentElement.parentElement.remove(); updateTotals()">Supprimer</button></td>
             `;
@@ -133,28 +153,29 @@
             const client = document.getElementById('clientName').value;
             const signatureClient = document.getElementById('signatureClient').value;
             const signatureTech = document.getElementById('signatureTech').value;
+            const prestations = document.querySelectorAll('#facturationBody tr');
+            const paymentMode = document.getElementById('paymentMode').value;
+            const paymentDelay = document.getElementById('paymentDelay').value;
 
-            if (!client) {
-                alert('Le nom du client est obligatoire.');
-                return;
-            }
-            if (!signatureClient || !signatureTech) {
-                alert('Les signatures sont obligatoires.');
-                return;
-            }
+            if (!client) { alert("Nom client obligatoire."); return; }
+            if (!prestations.length) { alert("Ajoutez une prestation."); return; }
+            if (!paymentMode) { alert("Mode de paiement requis."); return; }
+            if (!paymentDelay) { alert("Délai de paiement requis."); return; }
+            if (!signatureClient || !signatureTech) { alert("Signatures obligatoires."); return; }
 
             const bonData = {
                 client: client,
                 lieu: document.getElementById('lieu').value,
-                prestations: Array.from(document.querySelectorAll('#facturationBody tr')).map(row => ({
+                prestations: Array.from(prestations).map(row => ({
                     code: row.querySelector('.code').value,
                     designation: row.querySelector('.designation').value,
+                    operation: row.querySelector('.operation').value,
                     qty: row.querySelector('.qty').value,
                     pu: row.querySelector('.pu').value,
                     total: row.querySelector('.total').textContent
                 })),
-                paymentMode: document.getElementById('paymentMode').value,
-                paymentDelay: document.getElementById('paymentDelay').value,
+                paymentMode: paymentMode,
+                paymentDelay: paymentDelay,
                 signatureClient: signatureClient,
                 signatureTech: signatureTech,
                 date: document.getElementById('signatureDate').value
@@ -164,7 +185,7 @@
             drafts['bon_intervention'] = bonData;
             localStorage.setItem('drafts', JSON.stringify(drafts));
 
-            alert('Bon d’intervention validé et sauvegardé !');
+            alert('Bon validé et sauvegardé !');
         }
 
         function generatePDF() {
@@ -177,6 +198,13 @@
                 jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
             };
             html2pdf().set(opt).from(element).save();
+        }
+
+        function sendEmail() {
+            const bonData = JSON.parse(localStorage.getItem('drafts'))?.bon_intervention;
+            if (!bonData) { alert('Validez le bon d’abord.'); return; }
+            alert('Envoi email non disponible sans serveur. Données prêtes : ' + JSON.stringify(bonData));
+            // Futur : POST vers serveur
         }
     </script>
 </body>
