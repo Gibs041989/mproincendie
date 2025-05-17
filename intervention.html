@@ -40,11 +40,11 @@
             <h2>🔧 Type d’intervention</h2>
             <select id="typeIntervention">
                 <option value="">-- Choisir --</option>
-                <option value="extincteurs">🧯 Extincteurs</option>
-                <option value="baes">💡 BAES</option>
-                <option value="ria">🚿 RIA</option>
-                <option value="desenfumage">💨 Désenfumage</option>
-                <option value="bon_intervention">🧾 Bon d’intervention</option>
+                <option value="extincteurs">🧯 Extincteurs (CRM)</option>
+                <option value="baes">💡 BAES (CRM)</option>
+                <option value="ria">🚿 RIA (CRM)</option>
+                <option value="desenfumage">💨 Désenfumage (CRM)</option>
+                <option value="bon_intervention">🧾 Bon d’intervention (direct)</option>
             </select>
             <div class="nav-buttons">
                 <button onclick="startIntervention()">Démarrer l’intervention</button>
@@ -90,11 +90,10 @@
 
         function selectClient() {
             const client = document.getElementById('clientSelect').value;
-            const lieu = document.getElementById('lieuDifferent').checked ? document.getElementById('lieuAdresse').value : document.getElementById('lieuSelect').value;
-            const interventionData = {
-                client: client,
-                lieu: lieu
-            };
+            const lieu = document.getElementById('lieuDifferent').checked 
+                ? document.getElementById('lieuAdresse').value 
+                : document.getElementById('lieuSelect').value;
+            const interventionData = { client, lieu };
             localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
 
             const lieuSelect = document.getElementById('lieuSelect');
@@ -113,14 +112,23 @@
         function startIntervention() {
             const type = document.getElementById('typeIntervention').value;
             const client = document.getElementById('clientSelect').value;
+            const lieu = document.getElementById('lieuDifferent').checked 
+                ? document.getElementById('lieuAdresse').value 
+                : document.getElementById('lieuSelect').value;
             if (!client) {
                 alert('Veuillez sélectionner un client.');
+                return;
+            }
+            if (!lieu) {
+                alert('Veuillez sélectionner ou entrer un lieu.');
                 return;
             }
             if (!type) {
                 alert('Veuillez sélectionner un type d’intervention.');
                 return;
             }
+            const interventionData = { client, lieu };
+            localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
             if (type === 'bon_intervention') {
                 window.location.href = 'bon_intervention.html';
             } else {
@@ -136,7 +144,8 @@
                 brouillonsList.textContent = 'Aucun brouillon en cours.';
                 return;
             }
-            for (const [key, draft] of Object.entries(drafts)) {
+            for
+            (const [key, draft] of Object.entries(drafts)) {
                 const div = document.createElement('div');
                 div.className = 'brouillon';
                 div.innerHTML = `
