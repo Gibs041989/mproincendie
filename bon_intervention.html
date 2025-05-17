@@ -25,18 +25,20 @@
         .validate-btn { color: #00ff00 !important; } /* Vert vif */
         .delete-btn { color: #ff0000 !important; } /* Rouge vif */
         .totals-table { 
-            width: 120px; border-collapse: collapse; 
+            width: 100px; border-collapse: collapse; 
             float: right; margin-left: 10px; 
         }
         .totals-table th, .totals-table td { 
             border: 1px solid #ddd; padding: 4px; font-size: 12px; text-align: right; 
             white-space: nowrap; 
         }
-        .totals-table th { background: #f4f4f4; }
+        .totals-table th { width: 60px; background: #f4f4f4; }
+        .totals-table td { width: 40px; }
         textarea { resize: vertical; }
         @media (max-width: 600px) {
             .facturation-section { flex-direction: column; }
             .totals-table { float: none; width: 100%; margin: 10px 0; }
+            .totals-table th, .totals-table td { width: auto; }
             .facturation-section table { font-size: 14px; }
             .facturation-section input, select, textarea { font-size: 14px; padding: 6px; }
             .facturation-section th, td { padding: 6px; }
