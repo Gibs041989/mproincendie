@@ -9,9 +9,9 @@
         .facturation-section { display: grid; gap: 20px; margin-bottom: 20px; }
         .facturation-section table { width: 100%; border-collapse: collapse; }
         .facturation-section th, td { padding: 8px; border: 1px solid #ddd; }
-        .facturation-section input, select { width: 100%; padding: 5px; }
+        .facturation-section input, select, textarea { width: 100%; padding: 5px; }
         .facturation-section button { padding: 10px; font-size: 16px; }
-        .totals { font-weight: bold; }
+        .totals { font-weight: bold; display: grid; gap: 10px; }
         @media (max-width: 600px) {
             .facturation-section { grid-template-columns: 1fr; }
             .facturation-section table { font-size: 14px; }
@@ -35,27 +35,43 @@
                 <table id="facturationTable">
                     <thead>
                         <tr>
-                            <th>Code</th>
+                            <th>Code article</th>
                             <th>Désignation</th>
-                            <th>Qté</th>
-                            <th>PU €</th>
-                            <th>Total €</th>
+                            <th>Quantité</th>
+                            <th>PU HT €</th>
+                            <th>Total HT €</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="facturationBody"></tbody>
                 </table>
                 <button onclick="addPrestation()">➕ Ajouter une ligne</button>
-                <p class="totals">Montant total HT: <span id="totalHT">0</span> €</p>
-                <p class="totals">Montant TTC: <span id="totalTTC">0</span> €</p>
+                <div class="totals">
+                    <p>Total HT: <span id="totalHT">0</span> €</p>
+                    <p>Total TVA (20%): <span id="totalTVA">0</span> €</p>
+                    <p>Total TTC: <span id="totalTTC">0</span> €</p>
+                </div>
             </div>
             <div>
                 <h3>Modalités de règlement</h3>
                 <label>Mode de paiement:
-                    <select id="paymentMode"></select>
+                    <select id="paymentMode">
+                        <option value="">Sélectionner</option>
+                        <option value="Chèque">Chèque</option>
+                        <option value="Virement">Virement</option>
+                        <option value="Espèces">Espèces</option>
+                    </select>
                 </label>
                 <label>Délai de paiement:
-                    <select id="paymentDelay"></select>
+                    <select id="paymentDelay">
+                        <option value="">Sélectionner</option>
+                        <option value="À l’intervention">À l’intervention</option>
+                        <option value="À réception de facture">À réception de facture</option>
+                        <option value="À réception de facture sous 30 jours">À réception de facture sous 30 jours</option>
+                    </select>
+                </label>
+                <label>Observations:
+                    <textarea id="observations" rows="4" placeholder="Texte libre"></textarea>
                 </label>
             </div>
         </section>
@@ -103,31 +119,7 @@
                 interventionData.crm_extincteurs.forEach(item => addPrestationFromCRM(item));
                 document.getElementById('crmSummary').textContent = interventionData.crm_summary || 'Résumé des opérations CRM chargé.';
             }
-            loadPaymentOptions();
         };
-
-        function loadPaymentOptions() {
-            const settings = JSON.parse(localStorage.getItem('settings')) || {
-                paymentModes: ['virement', 'cheque', 'cb', 'especes'],
-                paymentDelays: ['reception', '30jours', 'finmois']
-            };
-            const paymentModeSelect = document.getElementById('paymentMode');
-            const paymentDelaySelect = document.getElementById('paymentDelay');
-            paymentModeSelect.innerHTML = '<option value="">Sélectionner</option>';
-            paymentDelaySelect.innerHTML = '<option value="">Sélectionner</option>';
-            settings.paymentModes.forEach(mode => {
-                const option = document.createElement('option');
-                option.value = mode;
-                option.textContent = mode;
-                paymentModeSelect.appendChild(option);
-            });
-            settings.paymentDelays.forEach(delay => {
-                const option = document.createElement('option');
-                option.value = delay;
-                option.textContent = delay;
-                paymentDelaySelect.appendChild(option);
-            });
-        }
 
         function addPrestation() {
             const tbody = document.getElementById('facturationBody');
@@ -152,4 +144,87 @@
                 <td><input type="text" class="designation" value="${item.designation || ''}"></td>
                 <td><input type="number" class="qty" value="1" min="1" onchange="updateTotals()"></td>
                 <td><input type="number" class="pu" value="${item.prix || 0}" min="0" step="0.01" onchange="updateTotals()"></td>
-                <td class="
+                <td class="total">0</td>
+                <td><button onclick="this.parentElement.parentElement.remove(); updateTotals()">Supprimer</button></td>
+            `;
+            tbody.appendChild(row);
+            updateTotals();
+        }
+
+        function updateTotals() {
+            let totalHT = 0;
+            document.querySelectorAll('#facturationBody tr').forEach(row => {
+                const qty = parseFloat(row.querySelector('.qty').value) || 0;
+                const pu = parseFloat(row.querySelector('.pu').value) || 0;
+                const total = qty * pu;
+                row.querySelector('.total').textContent = total.toFixed(2);
+                totalHT += total;
+            });
+            const tva = 0.2; // 20% TVA
+            const totalTVA = totalHT * tva;
+            const totalTTC = totalHT + totalTVA;
+            document.getElementById('totalHT').textContent = totalHT.toFixed(2);
+            document.getElementById('totalTVA').textContent = totalTVA.toFixed(2);
+            document.getElementById('totalTTC').textContent = totalTTC.toFixed(2);
+        }
+
+        function validateBon() {
+            const client = document.getElementById('clientName').value;
+            const signatureClient = document.getElementById('signatureClient').value;
+            const signatureTech = document.getElementById('signatureTech').value;
+            const prestations = document.querySelectorAll('#facturationBody tr');
+            const paymentMode = document.getElementById('paymentMode').value;
+            const paymentDelay = document.getElementById('paymentDelay').value;
+            const observations = document.getElementById('observations').value;
+
+            if (!client) { alert("Nom client obligatoire."); return; }
+            if (!prestations.length) { alert("Ajoutez une prestation."); return; }
+            if (!paymentMode) { alert("Mode de paiement requis."); return; }
+            if (!paymentDelay) { alert("Délai de paiement requis."); return; }
+            if (!signatureClient || !signatureTech) { alert("Signatures obligatoires."); return; }
+
+            const bonData = {
+                client: client,
+                lieu: document.getElementById('lieu').value,
+                prestations: Array.from(prestations).map(row => ({
+                    code: row.querySelector('.code').value,
+                    designation: row.querySelector('.designation').value,
+                    qty: row.querySelector('.qty').value,
+                    pu: row.querySelector('.pu').value,
+                    total: row.querySelector('.total').textContent
+                })),
+                paymentMode: paymentMode,
+                paymentDelay: paymentDelay,
+                observations: observations,
+                signatureClient: signatureClient,
+                signatureTech: signatureTech,
+                date: document.getElementById('signatureDate').value
+            };
+
+            let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
+            drafts['bon_intervention'] = bonData;
+            localStorage.setItem('drafts', JSON.stringify(drafts));
+
+            alert('Bon validé et sauvegardé !');
+        }
+
+        function generatePDF() {
+            const element = document.querySelector('.container');
+            const opt = {
+                margin: 1,
+                filename: 'bon_intervention.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function sendEmail() {
+            const bonData = JSON.parse(localStorage.getItem('drafts'))?.bon_intervention;
+            if (!bonData) { alert('Validez le bon d’abord.'); return; }
+            alert('Envoi email non disponible sans serveur. Données prêtes : ' + JSON.stringify(bonData));
+        }
+    </script>
+</body>
+</html>
