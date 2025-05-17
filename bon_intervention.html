@@ -37,7 +37,11 @@
         textarea { resize: vertical; }
         @media (max-width: 600px) {
             .facturation-section { flex-direction: column; }
-            .totals-table { float: none; width: 100%; margin: 10px 0; }
+            .totals-table { 
+                float: none; 
+                width: 200px; /* Environ 50% sur un écran de 400-600px */
+                margin: 10px auto; /* Centré */
+            }
             .totals-table th, .totals-table td { width: auto; }
             .facturation-section table { font-size: 14px; }
             .facturation-section input, select, textarea { font-size: 14px; padding: 6px; }
