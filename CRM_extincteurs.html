@@ -438,6 +438,13 @@
 
         function openExtincteurForm(id) {
             console.log(`Ouverture du formulaire pour l'extincteur ${id}`);
+            const dialog = document.querySelector('.action-dialog');
+            if (dialog) {
+                closeDialog(dialog);
+            } else {
+                console.warn('Dialogue non trouvé pour la fermeture.');
+            }
+
             const extincteur = document.getElementById(`extincteur-${id}`);
             if (!extincteur) {
                 console.error(`Extincteur ${id} non trouvé.`);
@@ -480,7 +487,6 @@
             if (removeButton) {
                 removeButton.style.display = 'inline';
             }
-            closeDialog(document.querySelector('.action-dialog'));
         }
 
         function validateExtincteur(id) {
@@ -590,8 +596,19 @@
 
         function closeDialog(dialog) {
             console.log("Fermeture du dialogue");
-            dialog.previousElementSibling.remove();
-            dialog.remove();
+            if (dialog && dialog.parentElement) {
+                const overlay = dialog.previousElementSibling;
+                if (overlay && overlay.className === 'overlay') {
+                    overlay.remove();
+                }
+                dialog.remove();
+            } else {
+                console.warn("Dialogue ou overlay non trouvé pour la fermeture.");
+                const overlay = document.querySelector('.overlay');
+                const dialogToRemove = document.querySelector('.action-dialog');
+                if (overlay) overlay.remove();
+                if (dialogToRemove) dialogToRemove.remove();
+            }
         }
 
         function updateExtincteurCounter() {
