@@ -15,7 +15,7 @@
         .action-buttons { text-align: right; margin-top: 4px; display: flex; justify-content: flex-end; }
         .action-buttons button { font-size: 16px; padding: 5px; margin: 0 3px; border: none; background: none; cursor: pointer; }
         .action-buttons button:disabled { opacity: 0.5; cursor: not-allowed; }
-        .section { margin-bottom: 20px; }
+        .section { margin-bottom: 30px; }
         .table-container { width: 100%; }
         #prestationsTable { width: 100%; border-collapse: collapse; }
         #prestationsTable th, #prestationsTable td { padding: 8px; text-align: left; border: 1px solid #ddd; font-size: 14px; }
@@ -33,16 +33,15 @@
         .footer-nav a { flex: 1; text-align: center; padding: 6px; font-size: 18px; background-color: transparent; border-radius: 5px; transition: background-color 0.3s ease; }
         .footer-nav a:hover { background-color: #ffebee; }
         .signature-pad { border: 1px solid #ddd; border-radius: 5px; margin-top: 6px; width: 100%; height: 90px; pointer-events: none; }
+        .signature-block { margin-bottom: 20px; }
         .floating-btn { position: fixed; bottom: 70px; right: 10px; background-color: #10b981; color: white; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1001; }
         .floating-btn:hover::after { content: "Ajouter une prestation"; position: absolute; right: 60px; background: #333; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; }
-        /* Modal for signatures */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1002; }
         .modal-content { background: #fff; margin: 10% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px; }
         .modal-content canvas { width: 100%; height: 200px; border: 1px solid #ddd; border-radius: 5px; }
         .modal-buttons { display: flex; justify-content: space-between; margin-top: 10px; }
-        /* Optimisation mobile */
         @media (max-width: 600px) {
-            .section { margin-bottom: 10px; }
+            .section { margin-bottom: 20px; }
             #prestationsTable th { display: none; }
             #prestationsTable tr { display: block; margin-bottom: 8px; border: 1px solid #ddd; padding: 6px; border-radius: 5px; background: #fff; }
             #prestationsTable td:nth-child(1) { display: block; width: 100%; padding: 4px 0; }
@@ -113,7 +112,7 @@
                     <option value="Sous 30 jours à réception de facture">Sous 30 jours à réception de facture</option>
                     <option value="custom">Saisie libre</option>
                 </select>
-                <input type="text" id="delaiCustom" style="display:none;" placeholder="Délais personnalisé">
+                <input type="text" id="delaiCustom" style="display:none;" placeholder="Délais personnalisé" oninput="saveDraft()">
             </label>
             <label>Moyen de règlement:
                 <select id="moyenReglement" onchange="toggleMoyenInput()">
@@ -122,26 +121,26 @@
                     <option value="Espèces">Espèces</option>
                     <option value="custom">Saisie libre</option>
                 </select>
-                <input type="text" id="moyenCustom" style="display:none;" placeholder="Moyen personnalisé">
+                <input type="text" id="moyenCustom" style="display:none;" placeholder="Moyen personnalisé" oninput="saveDraft()">
             </label>
             <label>Observations:
-                <textarea id="observations" rows="3" placeholder="Notes supplémentaires"></textarea>
+                <textarea id="observations" rows="3" placeholder="Notes supplémentaires" oninput="saveDraft()"></textarea>
             </label>
         </section>
         <section class="section">
             <h2>📅 Détails de l’intervention</h2>
-            <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-18" required></label>
-            <label>Technicien intervenant: <input type="text" id="technician" placeholder="Nom du technicien"></label>
-            <label>Durée (heures): <input type="number" id="duration" placeholder="Durée en heures"></label>
+            <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-18" required oninput="saveDraft()"></label>
+            <label>Technicien intervenant: <input type="text" id="technician" placeholder="Nom du technicien" oninput="saveDraft()"></label>
+            <label>Durée (heures): <input type="number" id="duration" placeholder="Durée en heures" oninput="saveDraft()"></label>
         </section>
         <section class="section">
             <h2>✍️ Signatures</h2>
-            <div>
+            <div class="signature-block">
                 <h3>Client</h3>
                 <button class="action" onclick="openSignatureModal('client')">Signer</button>
                 <canvas id="client-signature-pad" class="signature-pad"></canvas>
             </div>
-            <div>
+            <div class="signature-block">
                 <h3>Technicien</h3>
                 <button class="action" onclick="openSignatureModal('technician')">Signer</button>
                 <canvas id="technician-signature-pad" class="signature-pad"></canvas>
@@ -162,8 +161,6 @@
             <a href="parametres.html">⚙️</a>
         </div>
     </div>
-    <div class="floating-btn" onclick="addPrestation()">➕</div>
-    <!-- Modal for signatures -->
     <div id="signature-modal" class="modal">
         <div class="modal-content">
             <h3 id="modal-title">Signature</h3>
@@ -230,6 +227,7 @@
                 signatures.technician = dataURL;
             }
             localStorage.setItem('signatures', JSON.stringify(signatures));
+            saveDraft();
             closeSignatureModal();
         }
         window.onload = () => {
@@ -250,8 +248,8 @@
             loadPrestations();
             loadSignatures();
             loadDraft();
+            setInterval(saveDraft, 10000);
         };
-        // Simulation base de données articles
         const articlesDB = [
             { name: "Extincteur CO2 5kg", unitPrice: 150.00 },
             { name: "Maintenance RIA", unitPrice: 80.00 },
