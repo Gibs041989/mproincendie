@@ -451,6 +451,7 @@
         function openExtincteurForm(id) {
             const extincteur = document.getElementById(`extincteur-${id}`);
             const formContent = extincteur.querySelector('.form-content');
+            formContent.classList.remove('hidden');
             formContent.classList.remove('read-only');
             const inputs = extincteur.querySelectorAll('input');
             const selects = extincteur.querySelectorAll('select');
@@ -465,26 +466,13 @@
             const validateButtonForm = extincteur.querySelector('button[onclick^="validateExtincteur"]');
             const removeButton = extincteur.querySelector('button[onclick^="removeExtincteur"]');
             validateButtonForm.style.display = 'inline';
+            validateButtonForm.textContent = '✅ Valider modification';
+            validateButtonForm.setAttribute('onclick', `updateExtincteur(${id})`);
             removeButton.style.display = 'inline';
             closeDialog(document.querySelector('.action-dialog'));
         }
 
-        function removeExtincteurWithDialog(id) {
-            const extincteur = document.getElementById(`extincteur-${id}`);
-            if (extincteur) {
-                extincteur.remove();
-                delete extincteursValides[id];
-                updateExtincteurCounter();
-            }
-            closeDialog(document.querySelector('.action-dialog'));
-        }
-
-        function closeDialog(dialog) {
-            dialog.previousElementSibling.remove();
-            dialog.remove();
-        }
-
-        function validateExtincteur(id) {
+        function updateExtincteur(id) {
             const extincteur = document.getElementById(`extincteur-${id}`);
             const formContent = extincteur.querySelector('.form-content');
             const summaryDiv = document.getElementById(`summary-${id}`);
@@ -539,7 +527,7 @@
                 fabricant: fabricant,
                 millesime: millesime,
                 etage: etage,
-                emplacement: emplacement,
+                emplacement: emplacementರ:display: none;
                 operations: ops,
                 observation: observation
             };
@@ -548,13 +536,19 @@
             updateExtincteurCounter();
         }
 
-        function removeExtincteur(id) {
+        function removeExtincteurWithDialog(id) {
             const extincteur = document.getElementById(`extincteur-${id}`);
             if (extincteur) {
                 extincteur.remove();
                 delete extincteursValides[id];
                 updateExtincteurCounter();
             }
+            closeDialog(document.querySelector('.action-dialog'));
+        }
+
+        function closeDialog(dialog) {
+            dialog.previousElementSibling.remove();
+            dialog.remove();
         }
 
         function updateExtincteurCounter() {
