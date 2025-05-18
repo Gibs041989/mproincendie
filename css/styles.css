@@ -11,44 +11,44 @@
 /* Styles généraux pour le corps */
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: #f5f7fa;
-    color: #333;
+    background-color: #f8f8f8;
+    color: #1d1d1d;
     line-height: 1.6;
 }
 
 /* Conteneur principal */
 .container {
     max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
+    margin: 30px auto;
+    padding: 30px;
+    background-color: #ffffff;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
 }
 
 /* Titres */
 h1 {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 20px;
+    color: #e63946; /* Rouge du logo */
+    margin-bottom: 30px;
     text-align: center;
 }
 
 h2 {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 500;
-    color: #34495e;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #3498db;
-    padding-bottom: 5px;
+    color: #1d1d1d; /* Noir du logo */
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e63946; /* Rouge pour cohérence */
 }
 
 h3 {
     font-size: 18px;
     font-weight: 500;
-    color: #34495e;
-    margin-bottom: 10px;
+    color: #1d1d1d;
+    margin-bottom: 15px;
 }
 
 /* Labels */
@@ -57,23 +57,23 @@ label {
     font-size: 14px;
     color: #555;
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
 }
 
 /* Inputs, selects et textarea */
 input, select, textarea {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     font-size: 14px;
     border: 1px solid #ddd;
-    border-radius: 6px;
+    border-radius: 8px;
     transition: border-color 0.3s ease;
 }
 
 input:focus, select:focus, textarea:focus {
     outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 5px rgba(52, 152, 219, 0.2);
+    border-color: #e63946;
+    box-shadow: 0 0 5px rgba(230, 57, 70, 0.2);
 }
 
 textarea {
@@ -84,7 +84,7 @@ textarea {
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     background-color: #fff;
     border-radius: 8px;
     overflow: hidden;
@@ -92,14 +92,14 @@ table {
 }
 
 th, td {
-    padding: 12px;
+    padding: 15px;
     border: 1px solid #eee;
     text-align: left;
 }
 
 th {
-    background-color: #3498db;
-    color: #fff;
+    background-color: #1d1d1d; /* Noir du logo */
+    color: #ffffff; /* Blanc du logo */
     font-weight: 500;
 }
 
@@ -110,9 +110,9 @@ td {
 /* Boutons */
 button {
     font-size: 14px;
-    padding: 8px 16px;
+    padding: 10px 20px;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.1s ease;
 }
@@ -125,51 +125,96 @@ button:active {
     transform: translateY(0);
 }
 
-.nav-buttons {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 20px;
+/* Boutons principaux (ex. "Valider le bon") */
+button.primary {
+    background-color: #e63946; /* Rouge du logo */
+    color: #ffffff;
+    font-size: 16px;
+    padding: 12px 24px;
+    font-weight: 500;
 }
 
-.nav-buttons a, .nav-buttons button {
-    text-decoration: none;
-    color: #fff;
-    background-color: #3498db;
-    padding: 8px 16px;
-    border-radius: 6px;
-    transition: background-color 0.3s ease;
+button.primary:hover {
+    background-color: #d00000;
 }
 
-.nav-buttons a:hover, .nav-buttons button:hover {
-    background-color: #2980b9;
+/* Boutons secondaires (ex. "Générer le PDF", "Envoyer par email") */
+button.secondary {
+    background-color: #1d1d1d; /* Noir du logo */
+    color: #ffffff;
 }
 
-/* Boutons spécifiques */
+button.secondary:hover {
+    background-color: #333;
+}
+
+/* Boutons neutres (ex. "Retour", raccourcis en bas) */
+button.neutral {
+    background-color: #f1f1f1;
+    color: #555;
+    border: 1px solid #ddd;
+}
+
+button.neutral:hover {
+    background-color: #e0e0e0;
+}
+
+/* Boutons spécifiques (Valider/Supprimer sous les lignes) */
 .validate-btn { color: #008000; }
 .validate-btn i { font-size: 16px; }
 .delete-btn { color: #ff0000; }
 .delete-btn i { font-size: 14px; }
 .clear-btn, .validate-signature-btn {
-    background-color: #ecf0f1;
+    background-color: #f1f1f1;
     color: #555;
-    margin-top: 5px;
+    margin-top: 8px;
 }
 
 .clear-btn:hover, .validate-signature-btn:hover {
-    background-color: #dfe6e9;
+    background-color: #e0e0e0;
+}
+
+/* Navigation */
+.nav-buttons {
+    display: flex;
+    gap: 15px; /* Plus d’espace entre les boutons */
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.nav-buttons a, .nav-buttons button {
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+/* Navigation en bas de page (raccourcis) */
+.navigation.nav-buttons {
+    margin-top: 40px; /* Plus d’espace avec le contenu */
+    padding: 15px;
+    background-color: #fafafa;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.navigation.nav-buttons a {
+    background-color: #1d1d1d; /* Noir pour les raccourcis */
+    color: #ffffff;
+}
+
+.navigation.nav-buttons a:hover {
+    background-color: #333;
 }
 
 /* Styles responsives */
 @media (max-width: 600px) {
     .container {
-        padding: 10px;
-        margin: 10px;
+        padding: 15px;
+        margin: 15px;
     }
 
     h1 {
-        font-size: 24px;
+        font-size: 26px;
     }
 
     h2 {
@@ -182,15 +227,24 @@ button:active {
 
     button {
         font-size: 12px;
-        padding: 6px 12px;
+        padding: 8px 16px;
+    }
+
+    button.primary {
+        font-size: 14px;
+        padding: 10px 20px;
     }
 
     input, select, textarea {
         font-size: 14px;
-        padding: 8px;
+        padding: 10px;
     }
 
     th, td {
-        padding: 8px;
+        padding: 10px;
+    }
+
+    .nav-buttons {
+        gap: 10px;
     }
 }
