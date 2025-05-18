@@ -1,118 +1,93 @@
-/* styles.css */
-body {
-    font-family: Arial, sans-serif;
+/* Reset des marges et paddings pour une base cohérente */
+* {
     margin: 0;
-    padding: 20px;
-    background-color: #f0f0f0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
+/* Styles généraux pour le conteneur principal */
 .container {
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
-    background-color: white;
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Styles pour les sections */
 .section {
     margin-bottom: 20px;
 }
 
-h2 {
-    color: #333;
-    font-size: 24px;
-    margin-bottom: 10px;
+/* Styles pour les tableaux */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
 }
 
-label {
-    display: block;
-    margin: 5px 0;
-    font-weight: bold;
-    font-size: 16px;
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
 }
 
+/* Styles pour les inputs et selects */
 input, select, textarea {
     width: 100%;
     padding: 8px;
-    margin: 5px 0;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-sizing: border-box;
-    pointer-events: auto !important;
-    user-select: auto !important;
-    display: block !important;
-    visibility: visible !important;
     font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
+/* Styles pour les boutons */
 button {
-    padding: 10px 15px;
-    background-color: #c62828;
-    color: white;
+    font-size: 14px;
+    padding: 5px 10px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin: 5px 0;
-    pointer-events: auto !important;
-    display: inline !important;
-    visibility: visible !important;
-    font-size: 16px;
 }
 
-button:hover {
-    background-color: #b71c1c;
+/* Styles pour les liens de navigation */
+.nav-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
 }
 
-.checkbox-container {
-    pointer-events: auto !important;
-    display: flex !important;
-    visibility: visible !important;
+.nav-buttons a, .nav-buttons button {
+    text-decoration: none;
+    color: #333;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 
-.custom-input {
-    display: none !important;
+/* Styles pour les sous-titres (h3) */
+h3 {
+    font-size: 18px;
+    font-weight: bold;
 }
 
-.custom-input.visible {
-    display: block !important;
-    visibility: visible !important;
+/* Styles pour les labels */
+label {
+    font-weight: normal;
+    font-size: 14px;
 }
 
-.edit-buttons {
-    display: none !important;
-}
-
-.edit-buttons.visible {
-    display: block !important;
-}
-
+/* Styles responsives */
 @media (max-width: 600px) {
-    body {
-        padding: 10px;
-    }
     .container {
         padding: 10px;
     }
-    h2 {
-        font-size: 26px;
-    }
-    label {
-        font-size: 18px;
-    }
-    input, select, textarea {
-        padding: 12px;
-        font-size: 18px;
-    }
+
     button {
-        padding: 12px 18px;
-        font-size: 18px;
+        font-size: 12px;
+        padding: 4px 8px;
     }
-    .checkbox-container label {
-        font-size: 18px;
-    }
-    .checkbox-container input {
-        width: 28px;
-        height: 28px;
+
+    input, select, textarea {
+        font-size: 14px;
+        padding: 6px;
     }
 }
