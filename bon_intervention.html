@@ -3,31 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bon d'intervention</title>
+    <title>Bon d'Intervention - MPro Incendie</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
-        .facturation-section { 
-            display: flex; 
-            gap: 30px; 
-            margin-bottom: 30px; 
-            flex-wrap: wrap; 
-            justify-content: space-between; 
-        }
-        .prestations { 
-            flex: 1; 
-        }
-        .facturation-section tr { 
+        table tr { 
             cursor: pointer; 
         }
-        .facturation-section tr.active { 
+        table tr.active { 
             background: #f5f5f5; 
         }
-        .facturation-section th:nth-child(1) { width: 16%; } /* Code article */
-        .facturation-section th:nth-child(2) { width: 38%; } /* Désignation */
-        .facturation-section th:nth-child(3) { width: 10%; } /* Qté */
-        .facturation-section th:nth-child(4) { width: 18%; } /* PU HT */
-        .facturation-section th:nth-child(5) { width: 18%; } /* Total HT */
         .action-buttons { 
             display: none; 
             text-align: right; 
@@ -40,490 +25,319 @@
             border: none; 
             background: none; 
         }
-        .totals-table { 
-            width: 80px; 
-            border-collapse: collapse; 
+        .section {
+            margin-bottom: 40px; /* Plus d'espace entre les sections */
         }
-        .totals-table th, .totals-table td { 
-            border: 1px solid #ddd; 
-            padding: 4px 4px; 
-            font-size: 13px; 
-            text-align: right; 
-            white-space: nowrap; 
+        table {
+            margin-bottom: 40px; /* Plus d'espace sous les tableaux */
         }
-        .totals-table th { 
-            width: 55px; 
+        /* Élargir les colonnes du tableau */
+        table th, table td {
+            padding: 15px; /* Padding existant */
+            min-width: 60px; /* Largeur minimale pour chaque cellule */
+            text-align: left;
         }
-        .totals-table td { 
-            width: 25px; 
+        /* Ajustement spécifique pour la colonne Qté */
+        table th:nth-child(2), table td:nth-child(2) { /* Colonne "Qté" */
+            min-width: 80px; /* Largeur plus importante pour Qté */
         }
-        .totals-table-wrapper { 
+        /* Ajustement pour les autres colonnes */
+        table th:nth-child(1), table td:nth-child(1) { /* Colonne "Prestation" */
+            min-width: 150px;
+        }
+        table th:nth-child(3), table td:nth-child(3) { /* Colonne "Prix unitaire" */
+            min-width: 100px;
+        }
+        table th:nth-child(4), table td:nth-child(4) { /* Colonne "Total" */
+            min-width: 100px;
+        }
+        .nav-buttons {
+            margin-top: 40px; /* Plus d'espace au-dessus des boutons */
+            padding-bottom: 60px; /* Espace pour éviter chevauchement avec footer-nav */
+        }
+        .footer-nav { 
+            position: fixed; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            background-color: #f5f5f5; 
+            padding: 10px 0; 
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
+            z-index: 1000; 
+        }
+        .footer-nav .navigation { 
+            margin: 0; 
             display: flex; 
-            justify-content: flex-end; 
-            margin-left: 10px; 
+            flex-direction: row; 
+            flex-wrap: nowrap; 
+            justify-content: space-around; 
+            align-items: center; 
+            gap: 20px; 
         }
-        textarea { 
-            resize: vertical; 
+        .footer-nav a { 
+            flex: 1; 
+            text-align: center; 
+            padding: 10px; 
+            font-size: 22px; 
+            background-color: transparent; 
+            border-radius: 8px; 
+            transition: background-color 0.3s ease; 
         }
-        canvas { 
-            border: 1px solid #ddd; 
-            display: block; 
-            margin-top: 8px; 
-            margin-right: auto; 
-            width: 250px; 
-            height: 250px; 
+        .footer-nav a:hover { 
+            background-color: #ffebee; 
         }
-        /* Styles pour le PDF */
-        .pdf-mode .container {
-            margin: 0;
-            padding: 10px;
-        }
-        .pdf-mode canvas { 
-            border: 1px solid #000; 
-            margin: 5px 0; 
-        }
-        .pdf-mode .section {
-            page-break-inside: avoid;
+        .signature-pad {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 10px;
         }
         @media (max-width: 600px) {
-            .facturation-section { 
-                flex-direction: column; 
-                align-items: stretch; 
+            table th, table td {
+                padding: 10px;
+                min-width: 50px; /* Ajustement pour mobile */
             }
-            .totals-table-wrapper { 
-                display: flex; 
-                justify-content: flex-end !important; 
-                margin: 10px 0 !important; 
+            table th:nth-child(1), table td:nth-child(1) {
+                min-width: 120px;
             }
-            .totals-table { 
-                width: 200px !important; 
+            table th:nth-child(2), table td:nth-child(2) {
+                min-width: 60px;
             }
-            .totals-table th, .totals-table td { 
-                width: auto; 
+            table th:nth-child(3), table td:nth-child(3) {
+                min-width: 80px;
             }
-            .facturation-section th:nth-child(1) { width: 15%; } /* Code article */
-            .facturation-section th:nth-child(2) { width: 37%; } /* Désignation */
-            .facturation-section th:nth-child(3) { width: 8%; } /* Qté */
-            .facturation-section th:nth-child(4) { width: 18%; } /* PU HT */
-            .facturation-section th:nth-child(5) { width: 14%; } /* Total HT */
-            canvas { 
-                width: 250px; 
-                height: 250px; 
+            table th:nth-child(4), table td:nth-child(4) {
+                min-width: 80px;
             }
-            .action-dialog { 
-                width: 80%; 
+            .nav-buttons a, .nav-buttons button {
+                flex: 1 1 100%;
+                padding: 12px;
+                font-size: 20px;
+            }
+            .footer-nav a {
+                font-size: 24px;
+                padding: 10px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🧾 Bon d’intervention</h1>
+        <h1>🔥 Bon d'Intervention</h1>
 
         <section class="section">
-            <h2>👤 Client</h2>
-            <label>Nom client: <input type="text" id="clientName" readonly></label>
-            <label>Lieu d’intervention: <input type="text" id="lieu" readonly></label>
+            <h2>🧾 Client</h2>
+            <p><strong>Client:</strong> <span id="clientName">Non sélectionné</span></p>
+            <p><strong>Adresse:</strong> <span id="adresse">Non sélectionnée</span></p>
+            <p><strong>Code postal:</strong> <span id="codePostal">Non sélectionné</span></p>
+            <p><strong>Ville:</strong> <span id="ville">Non sélectionnée</span></p>
+            <p><strong>Téléphone:</strong> <span id="telephone">Non sélectionné</span></p>
+            <p><strong>Email:</strong> <span id="email">Non sélectionné</span></p>
         </section>
 
-        <section class="facturation-section">
-            <div class="prestations">
-                <h3>Prestations & matériel</h3>
-                <table id="facturationTable">
-                    <thead>
-                        <tr>
-                            <th>Code article</th>
-                            <th>Désignation</th>
-                            <th>Qté</th>
-                            <th>PU HT €</th>
-                            <th>Total HT €</th>
-                        </tr>
-                    </thead>
-                    <tbody id="facturationBody"></tbody>
-                </table>
-                <div id="actionButtons" class="action-buttons"></div>
-                <button class="action" onclick="addPrestation()">➕ Ajouter une ligne</button>
-            </div>
-            <div class="totals-table-wrapper">
-                <table class="totals-table">
-                    <tr><th>Total HT</th><td><span id="totalHT">0</span> €</td></tr>
-                    <tr><th>Total TVA (20%)</th><td><span id="totalTVA">0</span> €</td></tr>
-                    <tr><th>Total TTC</th><td><span id="totalTTC">0</span> €</td></tr>
-                </table>
-            </div>
+        <section class="section" id="crmSummary">
+            <h2>📄 Résumé des CRM</h2>
+            <p id="crmSummaryText">Aucun CRM enregistré.</p>
+        </section>
+
+        <section class="section">
+            <h2>📋 Prestations & Matériel</h2>
+            <table id="prestationsTable">
+                <thead>
+                    <tr>
+                        <th>Prestation</th>
+                        <th>Qté</th>
+                        <th>Prix unitaire</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="prestationsBody"></tbody>
+            </table>
+            <button class="action" onclick="addPrestation()">➕ Ajouter une ligne</button>
+        </section>
+
+        <section class="section">
+            <h2>📅 Détails de l’intervention</h2>
+            <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-16" required></label>
+            <label>Technicien intervenant: <input type="text" id="technician" placeholder="Nom du technicien"></label>
+            <label>Durée (heures): <input type="number" id="duration" placeholder="Durée en heures"></label>
+        </section>
+
+        <section class="section">
+            <h2>✍️ Signature du client</h2>
+            <canvas id="signature-pad" class="signature-pad" width="400" height="200"></canvas>
             <div>
-                <h3>Modalités de règlement</h3>
-                <label>Mode de paiement:
-                    <select id="paymentMode">
-                        <option value="">Sélectionner</option>
-                        <option value="Chèque">Chèque</option>
-                        <option value="Virement">Virement</option>
-                        <option value="Espèces">Espèces</option>
-                    </select>
-                </label>
-                <label>Délai de paiement:
-                    <select id="paymentDelay">
-                        <option value="">Sélectionner</option>
-                        <option value="À l’intervention">À l’intervention</option>
-                        <option value="À réception de facture">À réception de facture</option>
-                        <option value="À réception de facture sous 30 jours">À réception de facture sous 30 jours</option>
-                    </select>
-                </label>
-                <label>Observations:
-                    <textarea id="observations" rows="4" placeholder="Texte libre"></textarea>
-                </label>
+                <button class="clear-btn" onclick="clearSignature()">Effacer</button>
+                <button class="validate-signature-btn" onclick="validateSignature()">Valider la signature</button>
             </div>
-        </section>
-
-        <section class="section">
-            <h2>✍️ Signatures</h2>
-            <label>Nom du client signataire: <input type="text" id="signatureClient"></label>
-            <label>Signature client: 
-                <canvas id="canvasClient"></canvas>
-                <button class="clear-btn" onclick="clearCanvas('canvasClient')">Effacer</button>
-                <button class="validate-signature-btn" onclick="validateSignature('canvasClient')">Valider</button>
-            </label>
-            <label>Fait à: <input type="text" id="signatureLieu" value="Paris"></label>
-            <label>Le: <input type="date" id="signatureDate" value="2025-05-17"></label>
-            <label>Nom du technicien: <input type="text" id="signatureTech"></label>
-            <label>Signature technicien: 
-                <canvas id="canvasTech"></canvas>
-                <button class="clear-btn" onclick="clearCanvas('canvasTech')">Effacer</button>
-                <button class="validate-signature-btn" onclick="validateSignature('canvasTech')">Valider</button>
-            </label>
-        </section>
-
-        <section class="section">
-            <h2>📄 Résumé CRM</h2>
-            <p id="crmSummary">Aucun CRM associé (client particulier ou intervention directe).</p>
         </section>
 
         <section class="section nav-buttons">
-            <button class="primary" onclick="validateBon()">✅ Valider le bon</button>
             <button class="secondary" onclick="generatePDF()">📄 Générer le PDF</button>
             <button class="secondary" onclick="sendEmail()">📧 Envoyer par email</button>
             <a href="intervention.html"><button class="neutral">⬅️ Retour</button></a>
         </section>
 
-        <div class="navigation nav-buttons">
-            <a href="index.html">🏠</a>
-            <a href="client.html">📁</a>
-            <a href="intervention.html">🛠️</a>
-            <a href="parametres.html">⚙️</a>
+        <div class="footer-nav">
+            <div class="navigation nav-buttons">
+                <a href="index.html">🏠</a>
+                <a href="client.html">📁</a>
+                <a href="intervention.html">🛠️</a>
+                <a href="parametres.html">⚙️</a>
+            </div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <script>
+        const canvas = document.getElementById('signature-pad');
+        const signaturePad = new SignaturePad(canvas);
+
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext('2d').scale(ratio, ratio);
+            signaturePad.clear();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function clearSignature() {
+            signaturePad.clear();
+        }
+
+        function validateSignature() {
+            if (signaturePad.isEmpty()) {
+                alert('Veuillez apposer une signature avant de valider.');
+                return;
+            }
+            alert('Signature validée avec succès !');
+        }
+
         window.onload = () => {
             const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
-            if (!interventionData.client || !interventionData.lieu) {
-                alert('Sélectionnez un client et un lieu depuis Interventions.');
+            if (!interventionData || !interventionData.client) {
+                alert('Aucun client sélectionné. Veuillez choisir un client depuis la page Interventions.');
                 window.location.href = 'intervention.html';
                 return;
             }
-            document.getElementById('clientName').value = interventionData.client;
-            document.getElementById('lieu').value = interventionData.lieu;
-            if (interventionData.crm_extincteurs) {
-                interventionData.crm_extincteurs.forEach(item => addPrestationFromCRM(item));
+            document.getElementById('clientName').textContent = interventionData.client || 'Non sélectionné';
+            document.getElementById('adresse').textContent = interventionData.adresse || 'Non sélectionnée';
+            document.getElementById('codePostal').textContent = interventionData.codePostal || 'Non sélectionné';
+            document.getElementById('ville').textContent = interventionData.ville || 'Non sélectionnée';
+            document.getElementById('telephone').textContent = interventionData.telephone || 'Non sélectionné';
+            document.getElementById('email').textContent = interventionData.email || 'Non sélectionné';
+
+            const drafts = JSON.parse(localStorage.getItem('drafts')) || {};
+            if (drafts['crm_extincteurs']) {
+                document.getElementById('crmSummaryText').textContent = drafts['crm_extincteurs'].summary || 'Aucun CRM enregistré.';
             }
-            setupCanvas('canvasClient');
-            setupCanvas('canvasTech');
+
+            const prestationsData = JSON.parse(localStorage.getItem('prestationsData')) || [];
+            const tbody = document.getElementById('prestationsBody');
+            prestationsData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.id = `row-${index}`;
+                row.innerHTML = `
+                    <td><input type="text" class="prestation" value="${item.prestation || ''}" readonly></td>
+                    <td><input type="number" class="quantity" value="${item.quantity || ''}" readonly></td>
+                    <td><input type="number" class="unitPrice" value="${item.unitPrice || ''}" readonly></td>
+                    <td><input type="number" class="total" value="${item.total || ''}" readonly></td>
+                `;
+                row.classList.add('active');
+                row.onclick = () => editRow(index);
+                tbody.appendChild(row);
+            });
         };
 
         let activeRow = null;
-        let rowCounter = 0;
-        let validatedSignatures = { 'canvasClient': false, 'canvasTech': false };
 
         function addPrestation() {
             if (activeRow) {
                 alert('Veuillez valider ou supprimer la ligne en cours avant d’ajouter une nouvelle.');
                 return;
             }
-            const tbody = document.getElementById('facturationBody');
+            const tbody = document.getElementById('prestationsBody');
             const row = document.createElement('tr');
-            row.id = `row-${rowCounter++}`;
+            const index = tbody.children.length;
+            row.id = `row-${index}`;
             row.innerHTML = `
-                <td><input type="text" class="code" placeholder="Code"></td>
-                <td><input type="text" class="designation" placeholder="Désignation"></td>
-                <td><input type="number" class="qty" value="1" min="1" onchange="updateTotals()"></td>
-                <td><input type="number" class="pu" value="0" min="0" step="0.01" onchange="updateTotals()"></td>
-                <td class="total">0</td>
+                <td><input type="text" class="prestation" placeholder="Prestation"></td>
+                <td><input type="number" class="quantity" placeholder="Qté" oninput="calculateTotal(this)"></td>
+                <td><input type="number" class="unitPrice" placeholder="Prix unitaire" oninput="calculateTotal(this)"></td>
+                <td><input type="number" class="total" readonly></td>
+            `;
+            const actionDiv = document.createElement('div');
+            actionDiv.className = 'action-buttons';
+            actionDiv.innerHTML = `
+                <button class="validate-btn" onclick="validateRow(this.parentElement.parentElement, this.parentElement)" title="Valider"><i class="fas fa-check-circle"></i></button>
+                <button class="delete-btn" onclick="this.parentElement.parentElement.remove()" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
             `;
             tbody.appendChild(row);
+            row.appendChild(actionDiv);
             activeRow = row;
-            const actionDiv = document.getElementById('actionButtons');
-            actionDiv.innerHTML = `
-                <button class="validate-btn" onclick="validateRow('${row.id}')" title="Valider"><i class="fas fa-check-circle"></i></button>
-                <button class="delete-btn" onclick="deleteRow('${row.id}')" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
-            `;
             actionDiv.style.display = 'block';
-            updateTotals();
         }
 
-        function addPrestationFromCRM(item) {
-            if (activeRow) {
-                alert('Veuillez valider ou supprimer la ligne en cours avant d’ajouter une nouvelle.');
-                return;
-            }
-            const tbody = document.getElementById('facturationBody');
-            const row = document.createElement('tr');
-            row.id = `row-${rowCounter++}`;
-            row.innerHTML = `
-                <td><input type="text" class="code" value="${item.code || ''}"></td>
-                <td><input type="text" class="designation" value="${item.designation || ''}"></td>
-                <td><input type="number" class="qty" value="1" min="1" onchange="updateTotals()"></td>
-                <td><input type="number" class="pu" value="${item.prix || 0}" min="0" step="0.01" onchange="updateTotals()"></td>
-                <td class="total">0</td>
-            `;
-            tbody.appendChild(row);
-            activeRow = row;
-            const actionDiv = document.getElementById('actionButtons');
-            actionDiv.innerHTML = `
-                <button class="validate-btn" onclick="validateRow('${row.id}')" title="Valider"><i class="fas fa-check-circle"></i></button>
-                <button class="delete-btn" onclick="deleteRow('${row.id}')" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
-            `;
-            actionDiv.style.display = 'block';
-            updateTotals();
+        function calculateTotal(input) {
+            const row = input.closest('tr');
+            const quantity = row.querySelector('.quantity').value;
+            const unitPrice = row.querySelector('.unitPrice').value;
+            const totalInput = row.querySelector('.total');
+            totalInput.value = quantity && unitPrice ? (quantity * unitPrice).toFixed(2) : '';
         }
 
-        function validateRow(rowId) {
-            const row = document.getElementById(rowId);
+        function validateRow(row, actionDiv) {
             const inputs = row.querySelectorAll('input');
             inputs.forEach(input => input.readOnly = true);
             row.classList.add('active');
-            const actionDiv = document.getElementById('actionButtons');
             actionDiv.style.display = 'none';
             activeRow = null;
-            row.onclick = () => showActionDialog(rowId);
-            updateTotals();
+            row.onclick = () => editRow(row.id.split('-')[1]);
+            savePrestations();
         }
 
-        function deleteRow(rowId) {
-            const row = document.getElementById(rowId);
-            row.remove();
-            activeRow = null;
-            const actionDiv = document.getElementById('actionButtons');
-            actionDiv.style.display = 'none';
-            updateTotals();
-        }
-
-        function showActionDialog(rowId) {
-            const overlay = document.createElement('div');
-            overlay.className = 'overlay';
-            document.body.appendChild(overlay);
-
-            const dialog = document.createElement('div');
-            dialog.className = 'action-dialog';
-            dialog.innerHTML = `
-                <p>Que voulez-vous faire ?</p>
-                <button onclick="editRow(this.parentElement, '${rowId}')">Modifier</button>
-                <button onclick="deleteRowWithDialog(this.parentElement, '${rowId}')">Supprimer</button>
-                <button onclick="closeDialog(this.parentElement)">Annuler</button>
-            `;
-            document.body.appendChild(dialog);
-        }
-
-        function editRow(dialog, rowId) {
+        function editRow(index) {
             if (activeRow) {
                 alert('Veuillez valider ou supprimer la ligne en cours avant de modifier une autre.');
-                closeDialog(dialog);
                 return;
             }
-            const row = document.getElementById(rowId);
+            const row = document.getElementById(`row-${index}`);
             const inputs = row.querySelectorAll('input');
             inputs.forEach(input => input.readOnly = false);
             activeRow = row;
-            const actionDiv = document.getElementById('actionButtons');
+            const actionDiv = document.createElement('div');
+            actionDiv.className = 'action-buttons';
             actionDiv.innerHTML = `
-                <button class="validate-btn" onclick="validateRow('${rowId}')" title="Valider"><i class="fas fa-check-circle"></i></button>
-                <button class="delete-btn" onclick="deleteRow('${rowId}')" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                <button class="validate-btn" onclick="validateRow(this.parentElement.parentElement, this.parentElement)" title="Valider"><i class="fas fa-check-circle"></i></button>
+                <button class="delete-btn" onclick="this.parentElement.parentElement.remove(); savePrestations()" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
             `;
+            row.appendChild(actionDiv);
             actionDiv.style.display = 'block';
             row.classList.remove('active');
-            closeDialog(dialog);
         }
 
-        function deleteRowWithDialog(dialog, rowId) {
-            const row = document.getElementById(rowId);
-            row.remove();
-            activeRow = null;
-            updateTotals();
-            closeDialog(dialog);
-        }
-
-        function closeDialog(dialog) {
-            dialog.previousElementSibling.remove();
-            dialog.remove();
-        }
-
-        function updateTotals() {
-            let totalHT = 0;
-            document.querySelectorAll('#facturationBody tr').forEach(row => {
-                const qty = parseFloat(row.querySelector('.qty').value) || 0;
-                const pu = parseFloat(row.querySelector('.pu').value) || 0;
-                const total = qty * pu;
-                row.querySelector('.total').textContent = total.toFixed(2);
-                totalHT += total;
+        function savePrestations() {
+            const prestationsData = [];
+            document.querySelectorAll('#prestationsBody tr').forEach(row => {
+                const prestation = {
+                    prestation: row.querySelector('.prestation').value,
+                    quantity: row.querySelector('.quantity').value,
+                    unitPrice: row.querySelector('.unitPrice').value,
+                    total: row.querySelector('.total').value
+                };
+                prestationsData.push(prestation);
             });
-            const tva = 0.2; // 20% TVA
-            const totalTVA = totalHT * tva;
-            const totalTTC = totalHT + totalTVA;
-            document.getElementById('totalHT').textContent = totalHT.toFixed(2);
-            document.getElementById('totalTVA').textContent = totalTVA.toFixed(2);
-            document.getElementById('totalTTC').textContent = totalTTC.toFixed(2);
-        }
-
-        function setupCanvas(canvasId) {
-            const canvas = document.getElementById(canvasId);
-            const ctx = canvas.getContext('2d');
-            let drawing = false;
-
-            ctx.lineWidth = 2;
-            ctx.lineCap = 'round';
-            ctx.strokeStyle = '#000';
-
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', stopDrawing);
-            canvas.addEventListener('mouseout', stopDrawing);
-
-            canvas.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                const touch = e.touches[0];
-                const mouseEvent = new MouseEvent('mousedown', {
-                    clientX: touch.clientX,
-                    clientY: touch.clientY
-                });
-                canvas.dispatchEvent(mouseEvent);
-            });
-
-            canvas.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                const touch = e.touches[0];
-                const mouseEvent = new MouseEvent('mousemove', {
-                    clientX: touch.clientX,
-                    clientY: touch.clientY
-                });
-                canvas.dispatchEvent(mouseEvent);
-            });
-
-            canvas.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                const mouseEvent = new MouseEvent('mouseup', {});
-                canvas.dispatchEvent(mouseEvent);
-            });
-
-            function startDrawing(e) {
-                if (validatedSignatures[canvasId]) return;
-                drawing = true;
-                const rect = canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                ctx.beginPath();
-                ctx.moveTo(x, y);
-            }
-
-            function draw(e) {
-                if (!drawing || validatedSignatures[canvasId]) return;
-                const rect = canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                ctx.lineTo(x, y);
-                ctx.stroke();
-            }
-
-            function stopDrawing() {
-                drawing = false;
-                ctx.closePath();
-            }
-        }
-
-        function clearCanvas(canvasId) {
-            if (validatedSignatures[canvasId]) return;
-            const canvas = document.getElementById(canvasId);
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-
-        function validateSignature(canvasId) {
-            validatedSignatures[canvasId] = true;
-            const canvas = document.getElementById(canvasId);
-            canvas.style.backgroundColor = '#f0f0f0';
-            alert(`Signature ${canvasId === 'canvasClient' ? 'client' : 'technicien'} validée.`);
-        }
-
-        function validateBon() {
-            const client = document.getElementById('clientName').value;
-            const signatureClient = document.getElementById('signatureClient').value;
-            const signatureTech = document.getElementById('signatureTech').value;
-            const prestations = document.querySelectorAll('#facturationBody tr');
-            const paymentMode = document.getElementById('paymentMode').value;
-            const paymentDelay = document.getElementById('paymentDelay').value;
-            const observations = document.getElementById('observations').value;
-
-            if (!client) { alert("Nom client obligatoire."); return; }
-            if (!prestations.length) { alert("Ajoutez une prestation."); return; }
-            if (!paymentMode) { alert("Mode de paiement requis."); return; }
-            if (!paymentDelay) { alert("Délai de paiement requis."); return; }
-            if (!signatureClient || !signatureTech) { alert("Noms des signataires obligatoires."); return; }
-            if (!validatedSignatures['canvasClient'] || !validatedSignatures['canvasTech']) {
-                alert("Veuillez valider les deux signatures.");
-                return;
-            }
-
-            const canvasClient = document.getElementById('canvasClient');
-            const canvasTech = document.getElementById('canvasTech');
-            const signatureClientData = canvasClient.toDataURL();
-            const signatureTechData = canvasTech.toDataURL();
-
-            const bonData = {
-                client: client,
-                lieu: document.getElementById('lieu').value,
-                prestations: Array.from(prestations).map(row => ({
-                    code: row.querySelector('.code').value,
-                    designation: row.querySelector('.designation').value,
-                    qty: row.querySelector('.qty').value,
-                    pu: row.querySelector('.pu').value,
-                    total: row.querySelector('.total').textContent
-                })),
-                paymentMode: paymentMode,
-                paymentDelay: paymentDelay,
-                observations: observations,
-                signatureClient: signatureClient,
-                signatureClientData: signatureClientData,
-                signatureTech: signatureTech,
-                signatureTechData: signatureTechData,
-                date: document.getElementById('signatureDate').value
-            };
-
-            let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
-            drafts['bon_intervention'] = bonData;
-            localStorage.setItem('drafts', JSON.stringify(drafts));
-
-            alert('Bon validé et sauvegardé !');
+            localStorage.setItem('prestationsData', JSON.stringify(prestationsData));
         }
 
         function generatePDF() {
-            const element = document.querySelector('.container');
-            element.classList.add('pdf-mode');
-
-            const opt = {
-                margin: [0.2, 0.2],
-                filename: 'bon_intervention.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            };
-            html2pdf().set(opt).from(element).save().finally(() => {
-                element.classList.remove('pdf-mode');
-            });
+            alert('Fonctionnalité de génération de PDF à implémenter.');
         }
 
         function sendEmail() {
-            const bonData = JSON.parse(localStorage.getItem('drafts'))?.bon_intervention;
-            if (!bonData) { alert('Validez le bon d’abord.'); return; }
-            alert('Envoi email non disponible sans serveur. Données prêtes : ' + JSON.stringify(bonData));
+            alert('Fonctionnalité d’envoi par email à implémenter.');
         }
     </script>
 </body>
