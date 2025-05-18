@@ -49,11 +49,14 @@
         }
         /* Styles pour le tableau des prestations */
         #prestationsTable th, #prestationsTable td {
-            padding: 10px; 
+            padding: 8px; /* Même padding que le tableau des totaux */
             min-width: 80px; 
             text-align: left;
             border: 1px solid #ddd;
-            font-size: 16px;
+            font-size: 14px; /* Même taille de police que le tableau des totaux */
+        }
+        #prestationsTable th {
+            background-color: #f5f5f5; /* Même fond que le tableau des totaux */
         }
         #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { /* Désignation */
             min-width: 200px;
@@ -75,9 +78,10 @@
             border-collapse: collapse;
         }
         #totalsTable th, #totalsTable td {
-            padding: 10px;
+            padding: 8px;
             border: 1px solid #ddd;
             text-align: left;
+            font-size: 14px;
         }
         #totalsTable th {
             background-color: #f5f5f5;
@@ -133,9 +137,9 @@
                 width: 100%; /* Prendre toute la largeur de l'écran */
             }
             #prestationsTable th, #prestationsTable td {
-                padding: 12px; /* Augmenter le padding pour plus de lisibilité */
+                padding: 8px; /* Même padding que le tableau des totaux */
                 min-width: 70px; /* Réduction pour mobile */
-                font-size: 14px; /* Taille de police plus grande */
+                font-size: 14px; /* Même taille de police que le tableau des totaux */
             }
             #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) {
                 min-width: 120px;
