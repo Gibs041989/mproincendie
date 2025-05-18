@@ -32,6 +32,11 @@
             margin-bottom: 40px; /* Plus d'espace sous les tableaux */
             width: 100%; /* S'assurer que le tableau prend toute la largeur */
         }
+        /* Conteneur pour permettre le défilement horizontal sur mobile */
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
         /* Élargir les colonnes du tableau */
         table th, table td {
             padding: 10px; /* Padding pour plus d'espace */
@@ -94,26 +99,28 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             margin-top: 10px;
+            width: 400px;
+            height: 200px;
         }
         @media (max-width: 600px) {
             table th, table td {
                 padding: 8px;
-                min-width: 60px; /* Ajustement pour mobile */
+                min-width: 60px; /* Réduction pour mobile */
             }
             table th:nth-child(1), table td:nth-child(1) {
-                min-width: 100px;
+                min-width: 80px;
             }
             table th:nth-child(2), table td:nth-child(2) {
-                min-width: 120px;
+                min-width: 100px;
             }
             table th:nth-child(3), table td:nth-child(3) {
-                min-width: 80px;
+                min-width: 70px;
             }
             table th:nth-child(4), table td:nth-child(4) {
-                min-width: 80px;
+                min-width: 70px;
             }
             table th:nth-child(5), table td:nth-child(5) {
-                min-width: 80px;
+                min-width: 70px;
             }
             .nav-buttons a, .nav-buttons button {
                 flex: 1 1 100%;
@@ -123,6 +130,10 @@
             .footer-nav a {
                 font-size: 24px;
                 padding: 10px;
+            }
+            .signature-pad {
+                width: 100%; /* Prend toute la largeur disponible */
+                height: 150px; /* Réduction de la hauteur pour mobile */
             }
         }
     </style>
@@ -148,31 +159,33 @@
 
         <section class="section">
             <h2>📋 Prestations & Matériel</h2>
-            <table id="prestationsTable">
-                <thead>
-                    <tr>
-                        <th>Type</th>
-                        <th>Prestation</th>
-                        <th>Qté</th>
-                        <th>Prix unitaire</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody id="prestationsBody"></tbody>
-            </table>
+            <div class="table-container">
+                <table id="prestationsTable">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Prestation</th>
+                            <th>Qté</th>
+                            <th>Prix unitaire</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prestationsBody"></tbody>
+                </table>
+            </div>
             <button class="action" onclick="addPrestation()">➕ Ajouter une prestation</button>
         </section>
 
         <section class="section">
             <h2>📅 Détails de l’intervention</h2>
-            <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-16" required></label>
+            <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-18" required></label>
             <label>Technicien intervenant: <input type="text" id="technician" placeholder="Nom du technicien"></label>
             <label>Durée (heures): <input type="number" id="duration" placeholder="Durée en heures"></label>
         </section>
 
         <section class="section">
             <h2>✍️ Signature du client</h2>
-            <canvas id="signature-pad" class="signature-pad" width="400" height="200"></canvas>
+            <canvas id="signature-pad" class="signature-pad"></canvas>
             <div>
                 <button class="secondary" onclick="clearSignature()">Effacer</button>
                 <button class="action" onclick="validateSignature()">Valider la signature</button>
