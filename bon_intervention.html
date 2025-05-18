@@ -14,16 +14,17 @@
         .facturation-section input, select, textarea { 
             width: 100%; padding: 8px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; 
         }
-        .facturation-section th:nth-child(1) { width: 15%; } /* Code article */
-        .facturation-section th:nth-child(2) { width: 35%; } /* Désignation */
+        .facturation-section th:nth-child(1) { width: 16%; } /* Code article */
+        .facturation-section th:nth-child(2) { width: 38%; } /* Désignation */
         .facturation-section th:nth-child(3) { width: 10%; } /* Qté */
-        .facturation-section th:nth-child(4) { width: 15%; } /* PU HT */
-        .facturation-section th:nth-child(5) { width: 15%; } /* Total HT */
-        .facturation-section th:nth-child(6) { width: 10%; } /* Action */
-        .action-btn { background: none; border: none; font-size: 18px; cursor: pointer; padding: 5px; }
-        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .validate-btn { color: #00ff00 !important; } /* Vert vif */
-        .delete-btn { color: #ff0000 !important; } /* Rouge vif */
+        .facturation-section th:nth-child(4) { width: 18%; } /* PU HT */
+        .facturation-section th:nth-child(5) { width: 18%; } /* Total HT */
+        .facturation-section tr { cursor: pointer; }
+        .facturation-section tr.active { background: #f0f0f0; }
+        .action-buttons { display: none; text-align: right; margin: 5px 0; }
+        .action-buttons button { font-size: 16px; padding: 5px 10px; margin-left: 10px; }
+        .validate-btn { color: #00ff00; }
+        .delete-btn { color: #ff0000; }
         .totals-table { 
             width: 80px; border-collapse: collapse; 
             float: right; margin-left: 10px; 
@@ -37,24 +38,34 @@
         textarea { resize: vertical; }
         canvas { border: 1px solid #ddd; display: block; margin-top: 5px; }
         .clear-btn { margin-top: 5px; padding: 5px; font-size: 14px; }
+        .action-dialog { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+            background: #fff; border: 1px solid #ddd; padding: 20px; z-index: 1000; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; 
+        }
+        .action-dialog button { margin: 0 10px; padding: 5px 10px; }
+        .overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.5); z-index: 999; 
+        }
         @media (max-width: 600px) {
             .facturation-section { flex-direction: column; }
             .totals-table { 
                 float: right; 
-                width: 200px !important; /* Environ 50% sur un écran de 400-600px */
-                margin: 10px 10px 10px 0; /* Aligné à droite */
+                width: 200px !important; 
+                margin: 10px 10px 10px 0; 
             }
             .totals-table th, .totals-table td { width: auto; }
             .facturation-section table { font-size: 14px; }
             .facturation-section input, select, textarea { font-size: 14px; padding: 6px; }
             .facturation-section th, td { padding: 6px; }
             .facturation-section th:nth-child(1) { width: 15%; } /* Code article */
-            .facturation-section th:nth-child(2) { width: 37%; } /* Désignation (augmentée pour compenser) */
-            .facturation-section th:nth-child(3) { width: 8%; } /* Qté (réduite) */
-            .facturation-section th:nth-child(4) { width: 18%; } /* PU HT (élargie) */
-            .facturation-section th:nth-child(5) { width: 14%; } /* Total HT (légèrement réduite) */
-            .facturation-section th:nth-child(6) { width: 8%; } /* Action (réduite) */
+            .facturation-section th:nth-child(2) { width: 37%; } /* Désignation */
+            .facturation-section th:nth-child(3) { width: 8%; } /* Qté */
+            .facturation-section th:nth-child(4) { width: 18%; } /* PU HT */
+            .facturation-section th:nth-child(5) { width: 14%; } /* Total HT */
             canvas { width: 100%; height: 150px; }
+            .action-dialog { width: 80%; }
         }
     </style>
 </head>
@@ -79,7 +90,6 @@
                             <th>Qté</th>
                             <th>PU HT €</th>
                             <th>Total HT €</th>
-                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody id="facturationBody"></tbody>
@@ -170,6 +180,8 @@
             setupCanvas('canvasTech');
         };
 
+        let activeRow = null;
+
         function addPrestation() {
             const tbody = document.getElementById('facturationBody');
             const row = document.createElement('tr');
@@ -179,12 +191,23 @@
                 <td><input type="number" class="qty" value="1" min="1" onchange="updateTotals()"></td>
                 <td><input type="number" class="pu" value="0" min="0" step="0.01" onchange="updateTotals()"></td>
                 <td class="total">0</td>
-                <td>
-                    <button class="action-btn validate-btn" onclick="validateRow(this)" title="Valider"><i class="fas fa-check-circle"></i></button>
-                    <button class="action-btn delete-btn" onclick="this.parentElement.parentElement.remove(); updateTotals()" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
-                </td>
             `;
-            tbody.appendChild(row);
+            const actionDiv = document.createElement('div');
+            actionDiv.className = 'action-buttons';
+            actionDiv.innerHTML = `
+                <button class="validate-btn" onclick="validateRow(this.parentElement.parentElement, this.parentElement)">Valider <i class="fas fa-check-circle"></i></button>
+                <button class="delete-btn" onclick="deleteRow(this.parentElement.parentElement, this.parentElement)">Supprimer <i class="fas fa-trash-alt"></i></button>
+            `;
+            const wrapper = document.createElement('tr');
+            wrapper.appendChild(row);
+            wrapper.appendChild(document.createElement('td')); // Cellule vide pour alignement
+            const actionTd = document.createElement('td');
+            actionTd.colSpan = 5;
+            actionTd.appendChild(actionDiv);
+            wrapper.appendChild(actionTd);
+            tbody.appendChild(wrapper);
+            activeRow = row;
+            actionDiv.style.display = 'block';
             updateTotals();
         }
 
@@ -197,31 +220,92 @@
                 <td><input type="number" class="qty" value="1" min="1" onchange="updateTotals()"></td>
                 <td><input type="number" class="pu" value="${item.prix || 0}" min="0" step="0.01" onchange="updateTotals()"></td>
                 <td class="total">0</td>
-                <td>
-                    <button class="action-btn validate-btn" onclick="validateRow(this)" title="Valider"><i class="fas fa-check-circle"></i></button>
-                    <button class="action-btn delete-btn" onclick="this.parentElement.parentElement.remove(); updateTotals()" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
-                </td>
             `;
-            tbody.appendChild(row);
+            const actionDiv = document.createElement('div');
+            actionDiv.className = 'action-buttons';
+            actionDiv.innerHTML = `
+                <button class="validate-btn" onclick="validateRow(this.parentElement.parentElement, this.parentElement)">Valider <i class="fas fa-check-circle"></i></button>
+                <button class="delete-btn" onclick="deleteRow(this.parentElement.parentElement, this.parentElement)">Supprimer <i class="fas fa-trash-alt"></i></button>
+            `;
+            const wrapper = document.createElement('tr');
+            wrapper.appendChild(row);
+            wrapper.appendChild(document.createElement('td')); // Cellule vide pour alignement
+            const actionTd = document.createElement('td');
+            actionTd.colSpan = 5;
+            actionTd.appendChild(actionDiv);
+            wrapper.appendChild(actionTd);
+            tbody.appendChild(wrapper);
+            activeRow = row;
+            actionDiv.style.display = 'block';
             updateTotals();
         }
 
-        function validateRow(button) {
-            const row = button.parentElement.parentElement;
+        function validateRow(row, actionDiv) {
             const inputs = row.querySelectorAll('input');
             inputs.forEach(input => input.readOnly = true);
-            button.disabled = true;
+            row.classList.add('active');
+            actionDiv.style.display = 'none';
+            activeRow = null;
+            row.onclick = () => showActionDialog(row, actionDiv);
             updateTotals();
+        }
+
+        function deleteRow(row, actionDiv) {
+            row.parentElement.remove();
+            activeRow = null;
+            updateTotals();
+        }
+
+        function showActionDialog(row, actionDiv) {
+            const overlay = document.createElement('div');
+            overlay.className = 'overlay';
+            document.body.appendChild(overlay);
+
+            const dialog = document.createElement('div');
+            dialog.className = 'action-dialog';
+            dialog.innerHTML = `
+                <p>Que voulez-vous faire ?</p>
+                <button onclick="editRow(this.parentElement, '${row.id}')">Modifier</button>
+                <button onclick="deleteRowWithDialog(this.parentElement, '${row.id}')">Supprimer</button>
+                <button onclick="closeDialog(this.parentElement)">Annuler</button>
+            `;
+            document.body.appendChild(dialog);
+        }
+
+        function editRow(dialog, rowId) {
+            const row = document.getElementById(rowId);
+            const inputs = row.querySelectorAll('input');
+            inputs.forEach(input => input.readOnly = false);
+            const actionDiv = row.nextElementSibling.nextElementSibling.querySelector('.action-buttons');
+            actionDiv.style.display = 'block';
+            activeRow = row;
+            row.classList.remove('active');
+            closeDialog(dialog);
+        }
+
+        function deleteRowWithDialog(dialog, rowId) {
+            const row = document.getElementById(rowId);
+            row.parentElement.remove();
+            activeRow = null;
+            updateTotals();
+            closeDialog(dialog);
+        }
+
+        function closeDialog(dialog) {
+            dialog.previousElementSibling.remove();
+            dialog.remove();
         }
 
         function updateTotals() {
             let totalHT = 0;
-            document.querySelectorAll('#facturationBody tr').forEach(row => {
-                const qty = parseFloat(row.querySelector('.qty').value) || 0;
-                const pu = parseFloat(row.querySelector('.pu').value) || 0;
-                const total = qty * pu;
-                row.querySelector('.total').textContent = total.toFixed(2);
-                totalHT += total;
+            document.querySelectorAll('#facturationBody tr:not(.action-buttons)').forEach(row => {
+                if (!row.querySelector('.action-buttons')) {
+                    const qty = parseFloat(row.querySelector('.qty').value) || 0;
+                    const pu = parseFloat(row.querySelector('.pu').value) || 0;
+                    const total = qty * pu;
+                    row.querySelector('.total').textContent = total.toFixed(2);
+                    totalHT += total;
+                }
             });
             const tva = 0.2; // 20% TVA
             const totalTVA = totalHT * tva;
@@ -305,7 +389,7 @@
             const client = document.getElementById('clientName').value;
             const signatureClient = document.getElementById('signatureClient').value;
             const signatureTech = document.getElementById('signatureTech').value;
-            const prestations = document.querySelectorAll('#facturationBody tr');
+            const prestations = document.querySelectorAll('#facturationBody tr:not(.action-buttons)');
             const paymentMode = document.getElementById('paymentMode').value;
             const paymentDelay = document.getElementById('paymentDelay').value;
             const observations = document.getElementById('observations').value;
