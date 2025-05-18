@@ -98,7 +98,7 @@ th, td {
 }
 
 th {
-    background-color: #6b7280; /* Gris moyen plus léger */
+    background-color: #9ca3af; /* Gris plus clair */
     color: #ffffff;
     font-weight: 500;
 }
@@ -138,14 +138,24 @@ button.primary:hover {
     background-color: #d00000;
 }
 
+/* Boutons d'action (ex. "Ajouter une ligne") */
+button.action {
+    background-color: #10b981; /* Vert émeraude */
+    color: #ffffff;
+}
+
+button.action:hover {
+    background-color: #059669;
+}
+
 /* Boutons secondaires (ex. "Générer le PDF", "Envoyer par email") */
 button.secondary {
-    background-color: #6b7280; /* Gris moyen au lieu de noir */
+    background-color: #9ca3af; /* Gris plus clair */
     color: #ffffff;
 }
 
 button.secondary:hover {
-    background-color: #5a6268;
+    background-color: #8b929e;
 }
 
 /* Boutons neutres (ex. "Retour", raccourcis en bas) */
@@ -198,12 +208,14 @@ button.neutral:hover {
 }
 
 .navigation.nav-buttons a {
-    background-color: #6b7280; /* Gris moyen au lieu de noir */
+    background-color: #9ca3af; /* Gris plus clair */
     color: #ffffff;
+    padding: 10px 15px;
+    font-size: 18px; /* Taille ajustée pour les icônes */
 }
 
 .navigation.nav-buttons a:hover {
-    background-color: #5a6268;
+    background-color: #8b929e;
 }
 
 /* Styles responsives */
