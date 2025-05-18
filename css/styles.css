@@ -1,3 +1,6 @@
+/* Importation d'une police moderne */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
 /* Reset des marges et paddings pour une base cohérente */
 * {
     margin: 0;
@@ -5,89 +8,189 @@
     box-sizing: border-box;
 }
 
-/* Styles généraux pour le conteneur principal */
+/* Styles généraux pour le corps */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Conteneur principal */
 .container {
     max-width: 1200px;
-    margin: 0 auto;
+    margin: 20px auto;
     padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* Styles pour les sections */
-.section {
+/* Titres */
+h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c3e50;
     margin-bottom: 20px;
+    text-align: center;
 }
 
-/* Styles pour les tableaux */
+h2 {
+    font-size: 22px;
+    font-weight: 500;
+    color: #34495e;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 5px;
+}
+
+h3 {
+    font-size: 18px;
+    font-weight: 500;
+    color: #34495e;
+    margin-bottom: 10px;
+}
+
+/* Labels */
+label {
+    font-weight: normal;
+    font-size: 14px;
+    color: #555;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Inputs, selects et textarea */
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    transition: border-color 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.2);
+}
+
+textarea {
+    resize: vertical;
+}
+
+/* Tableaux */
 table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 th, td {
-    padding: 10px;
-    border: 1px solid #ddd;
+    padding: 12px;
+    border: 1px solid #eee;
     text-align: left;
 }
 
-/* Styles pour les inputs et selects */
-input, select, textarea {
-    width: 100%;
-    padding: 8px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+th {
+    background-color: #3498db;
+    color: #fff;
+    font-weight: 500;
 }
 
-/* Styles pour les boutons */
+td {
+    background-color: #fafafa;
+}
+
+/* Boutons */
 button {
     font-size: 14px;
-    padding: 5px 10px;
+    padding: 8px 16px;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
 }
 
-/* Styles pour les liens de navigation */
+button:hover {
+    transform: translateY(-1px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
 .nav-buttons {
     display: flex;
     gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
     margin-top: 20px;
 }
 
 .nav-buttons a, .nav-buttons button {
     text-decoration: none;
-    color: #333;
-    padding: 5px 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    color: #fff;
+    background-color: #3498db;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
 }
 
-/* Styles pour les sous-titres (h3) */
-h3 {
-    font-size: 18px;
-    font-weight: bold;
+.nav-buttons a:hover, .nav-buttons button:hover {
+    background-color: #2980b9;
 }
 
-/* Styles pour les labels */
-label {
-    font-weight: normal;
-    font-size: 14px;
+/* Boutons spécifiques */
+.validate-btn { color: #008000; }
+.validate-btn i { font-size: 16px; }
+.delete-btn { color: #ff0000; }
+.delete-btn i { font-size: 14px; }
+.clear-btn, .validate-signature-btn {
+    background-color: #ecf0f1;
+    color: #555;
+    margin-top: 5px;
+}
+
+.clear-btn:hover, .validate-signature-btn:hover {
+    background-color: #dfe6e9;
 }
 
 /* Styles responsives */
 @media (max-width: 600px) {
     .container {
         padding: 10px;
+        margin: 10px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    h3 {
+        font-size: 16px;
     }
 
     button {
         font-size: 12px;
-        padding: 4px 8px;
+        padding: 6px 12px;
     }
 
     input, select, textarea {
         font-size: 14px;
-        padding: 6px;
+        padding: 8px;
+    }
+
+    th, td {
+        padding: 8px;
     }
 }
