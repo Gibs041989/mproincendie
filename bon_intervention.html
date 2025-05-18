@@ -491,17 +491,17 @@
 
         function generatePDF() {
             const element = document.querySelector('.container');
-            element.classList.add('pdf-mode'); // Ajoute une classe pour styles PDF
+            element.classList.add('pdf-mode');
 
             const opt = {
                 margin: 0.5,
                 filename: 'bon_intervention.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 3, useCORS: true }, // Augmente l’échelle pour meilleure qualité
+                html2canvas: { scale: 3, useCORS: true },
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
             };
             html2pdf().set(opt).from(element).save().finally(() => {
-                element.classList.remove('pdf-mode'); // Retire la classe après génération
+                element.classList.remove('pdf-mode');
             });
         }
 
