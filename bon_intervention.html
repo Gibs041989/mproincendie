@@ -35,17 +35,20 @@
         .totals-table th { width: 55px; background: #f4f4f4; }
         .totals-table td { width: 25px; }
         textarea { resize: vertical; }
+        canvas { border: 1px solid #ddd; display: block; margin-top: 5px; }
+        .clear-btn { margin-top: 5px; padding: 5px; font-size: 14px; }
         @media (max-width: 600px) {
             .facturation-section { flex-direction: column; }
             .totals-table { 
                 float: none; 
-                width: 200px; /* Environ 50% sur un écran de 400-600px */
+                width: 200px !important; /* Environ 50% sur un écran de 400-600px */
                 margin: 10px auto; /* Centré */
             }
             .totals-table th, .totals-table td { width: auto; }
             .facturation-section table { font-size: 14px; }
             .facturation-section input, select, textarea { font-size: 14px; padding: 6px; }
             .facturation-section th, td { padding: 6px; }
+            canvas { width: 100%; height: 150px; }
         }
     </style>
 </head>
@@ -109,9 +112,17 @@
         <section class="section">
             <h2>✍️ Signatures</h2>
             <label>Nom du client signataire: <input type="text" id="signatureClient"></label>
+            <label>Signature client: 
+                <canvas id="canvasClient" width="300" height="150"></canvas>
+                <button class="clear-btn" onclick="clearCanvas('canvasClient')">Effacer</button>
+            </label>
             <label>Fait à: <input type="text" id="signatureLieu" value="Paris"></label>
             <label>Le: <input type="date" id="signatureDate" value="2025-05-17"></label>
             <label>Nom du technicien: <input type="text" id="signatureTech"></label>
+            <label>Signature technicien: 
+                <canvas id="canvasTech" width="300" height="150"></canvas>
+                <button class="clear-btn" onclick="clearCanvas('canvasTech')">Effacer</button>
+            </label>
         </section>
 
         <section class="section">
@@ -149,6 +160,8 @@
                 interventionData.crm_extincteurs.forEach(item => addPrestationFromCRM(item));
                 document.getElementById('crmSummary').textContent = interventionData.crm_summary || 'Résumé des opérations CRM chargé.';
             }
+            setupCanvas('canvasClient');
+            setupCanvas('canvasTech');
         };
 
         function addPrestation() {
@@ -212,6 +225,76 @@
             document.getElementById('totalTTC').textContent = totalTTC.toFixed(2);
         }
 
+        function setupCanvas(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#000';
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent('mousedown', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                canvas.dispatchEvent(mouseEvent);
+            });
+
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent('mousemove', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                canvas.dispatchEvent(mouseEvent);
+            });
+
+            canvas.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                const mouseEvent = new MouseEvent('mouseup', {});
+                canvas.dispatchEvent(mouseEvent);
+            });
+
+            function startDrawing(e) {
+                drawing = true;
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+            }
+
+            function draw(e) {
+                if (!drawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            }
+
+            function stopDrawing() {
+                drawing = false;
+                ctx.closePath();
+            }
+        }
+
+        function clearCanvas(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
         function validateBon() {
             const client = document.getElementById('clientName').value;
             const signatureClient = document.getElementById('signatureClient').value;
@@ -225,7 +308,12 @@
             if (!prestations.length) { alert("Ajoutez une prestation."); return; }
             if (!paymentMode) { alert("Mode de paiement requis."); return; }
             if (!paymentDelay) { alert("Délai de paiement requis."); return; }
-            if (!signatureClient || !signatureTech) { alert("Signatures obligatoires."); return; }
+            if (!signatureClient || !signatureTech) { alert("Noms des signataires obligatoires."); return; }
+
+            const canvasClient = document.getElementById('canvasClient');
+            const canvasTech = document.getElementById('canvasTech');
+            const signatureClientData = canvasClient.toDataURL();
+            const signatureTechData = canvasTech.toDataURL();
 
             const bonData = {
                 client: client,
@@ -241,7 +329,9 @@
                 paymentDelay: paymentDelay,
                 observations: observations,
                 signatureClient: signatureClient,
+                signatureClientData: signatureClientData,
                 signatureTech: signatureTech,
+                signatureTechData: signatureTechData,
                 date: document.getElementById('signatureDate').value
             };
 
