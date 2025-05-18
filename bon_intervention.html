@@ -12,70 +12,59 @@
         .container { padding-bottom: 70px; }
         table tr { cursor: pointer; }
         table tr.active { background: #f5f5f5; }
-        .action-buttons { display: none; text-align: right; margin-top: 5px; }
-        .action-buttons button { font-size: 21px; padding: 8px; margin: 0 5px; border: none; background: none; }
+        .action-buttons { text-align: right; margin-top: 5px; }
+        .action-buttons button { font-size: 18px; padding: 6px; margin: 0 3px; border: none; background: none; }
         .action-buttons button:disabled { opacity: 0.5; cursor: not-allowed; }
-        .section { margin-bottom: 40px; }
-        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
-        #prestationsTable { width: 100%; border-collapse: collapse; box-sizing: border-box; }
-        #prestationsTable th, #prestationsTable td { padding: 12px; text-align: left; border: 1px solid #ddd; font-size: 16px; }
-        #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { min-width: 40%; }
-        #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { min-width: 15%; }
-        #prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) { min-width: 20%; }
-        #prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) { min-width: 20%; }
-        #totalsTable { width: 100%; max-width: 300px; margin: 20px 0; border-collapse: collapse; }
-        #totalsTable th, #totalsTable td { padding: 8px; border: 1px solid #ddd; text-align: left; font-size: 14px; }
+        .section { margin-bottom: 30px; }
+        .table-container { width: 100%; }
+        #prestationsTable { width: 100%; border-collapse: collapse; }
+        #prestationsTable th, #prestationsTable td { padding: 10px; text-align: left; border: 1px solid #ddd; font-size: 15px; }
+        #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { width: 40%; }
+        #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { width: 15%; }
+        #prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) { width: 20%; }
+        #prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) { width: 25%; }
+        #totalsTable { width: 100%; max-width: 250px; margin: 15px 0; border-collapse: collapse; }
+        #totalsTable th, #totalsTable td { padding: 6px; border: 1px solid #ddd; text-align: left; font-size: 13px; }
         #totalsTable th { background-color: #f5f5f5; width: 50%; }
-        .nav-buttons { margin-top: 40px; padding-bottom: 60px; }
-        .footer-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: #f5f5f5; padding: 10px 0; box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); z-index: 1000; }
-        .footer-nav .navigation { margin: 0; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-around; align-items: center; gap: 20px; }
-        .footer-nav a { flex: 1; text-align: center; padding: 10px; font-size: 22px; background-color: transparent; border-radius: 8px; transition: background-color 0.3s ease; }
+        .nav-buttons { margin-top: 30px; padding-bottom: 50px; }
+        .footer-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: #f5f5f5; padding: 8px 0; box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.1); z-index: 1000; }
+        .footer-nav .navigation { margin: 0; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-around; align-items: center; gap: 15px; }
+        .footer-nav a { flex: 1; text-align: center; padding: 8px; font-size: 20px; background-color: transparent; border-radius: 6px; transition: background-color 0.3s ease; }
         .footer-nav a:hover { background-color: #ffebee; }
-        .signature-pad { border: 1px solid #ddd; border-radius: 8px; margin-top: 10px; width: 400px; height: 200px; }
-        .floating-btn { position: fixed; bottom: 80px; right: 20px; background-color: #10b981; color: white; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1001; }
+        .signature-pad { border: 1px solid #ddd; border-radius: 6px; margin-top: 8px; width: 350px; height: 180px; }
+        .floating-btn { position: fixed; bottom: 70px; right: 15px; background-color: #10b981; color: white; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1001; }
         /* Optimisation mobile pour le tableau */
         @media (max-width: 600px) {
-            .section { margin-bottom: 20px; }
+            .section { margin-bottom: 15px; }
             #prestationsTable th { display: none; }
-            #prestationsTable tr { display: block; margin-bottom: 15px; border: 1px solid #ddd; padding: 10px; border-radius: 8px; background: #fafafa; }
-            #prestationsTable td { display: block; width: 100%; border: none; padding: 5px 0; }
+            #prestationsTable tr { display: block; margin-bottom: 10px; border: 1px solid #ddd; padding: 8px; border-radius: 6px; background: #fff; }
+            #prestationsTable td { display: block; border: none; padding: 4px 0; }
             #prestationsTable td:nth-child(1) { /* Désignation */
-                margin-bottom: 10px;
+                width: 100%; margin-bottom: 8px;
             }
-            #prestationsTable td:nth-child(1) input, #prestationsTable td:nth-child(1) select { width: 100%; font-size: 14px; }
+            #prestationsTable td:nth-child(1) select, #prestationsTable td:nth-child(1) input { width: 100%; font-size: 13px; padding: 5px; }
+            .prestations-row { display: flex; gap: 2%; align-items: flex-start; }
             #prestationsTable td:nth-child(2) { /* Qté */
-                display: inline-block;
-                width: 20%;
-                margin-right: 2%;
+                flex: 0 0 18%; /* Réduit */
             }
             #prestationsTable td:nth-child(3) { /* PU HT */
-                display: inline-block;
-                width: 35%;
-                margin-right: 2%;
+                flex: 0 0 35%;
             }
             #prestationsTable td:nth-child(4) { /* Prix Total HT */
-                display: inline-block;
-                width: 40%;
+                flex: 0 0 45%;
             }
-            #prestationsTable td input { width: 100%; padding: 6px; font-size: 13px; }
-            #prestationsTable td:before { /* Libellés */
-                content: attr(data-label);
-                display: block;
-                font-size: 12px;
-                font-weight: bold;
-                color: #555;
-                margin-bottom: 3px;
-            }
+            #prestationsTable td input, #prestationsTable td select { width: 100%; padding: 5px; font-size: 12px; border-radius: 4px; }
+            #prestationsTable td:before { content: attr(data-label); display: block; font-size: 11px; font-weight: bold; color: #666; margin-bottom: 2px; }
             #prestationsTable td:nth-child(1):before { content: "Désignation"; }
             #prestationsTable td:nth-child(2):before { content: "Qté"; }
             #prestationsTable td:nth-child(3):before { content: "PU HT (€)"; }
             #prestationsTable td:nth-child(4):before { content: "Total HT (€)"; }
-            #prestationsTable td .action-buttons { display: flex; justify-content: flex-end; margin-top: 5px; }
-            #totalsTable { max-width: 200px; margin-left: auto; margin-right: 0; }
-            #totalsTable th, #totalsTable td { padding: 6px; font-size: 12px; }
-            .signature-pad { width: 100%; height: 120px; }
-            .floating-btn { bottom: 90px; width: 50px; height: 50px; font-size: 20px; }
-            .action-buttons button { font-size: 18px; padding: 6px; }
+            #prestationsTable td .action-buttons { display: flex; justify-content: flex-end; margin-top: 4px; }
+            #totalsTable { max-width: 180px; margin-left: auto; margin-right: 0; }
+            #totalsTable th, #totalsTable td { padding: 5px; font-size: 12px; }
+            .signature-pad { width: 100%; height: 100px; }
+            .floating-btn { bottom: 80px; width: 45px; height: 45px; font-size: 18px; }
+            .action-buttons button { font-size: 16px; padding: 4px; }
         }
     </style>
 </head>
@@ -201,12 +190,13 @@
                 </td>
                 <td><input type="number" class="quantity" placeholder="Qté" oninput="updateRow(${index})"></td>
                 <td><input type="number" class="unitPrice" placeholder="PU HT" oninput="updateRow(${index})"></td>
-                <td><input type="number" class="total" readonly><div class="action-buttons">
-                    <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" title="Valider" disabled><i class="fas fa-check-circle"></i></button>
+                <td class="prestations-row"><input type="number" class="total" readonly><div class="action-buttons">
+                    <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" title="Valider"><i class="fas fa-check-circle"></i></button>
                     <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
                 </div></td>`;
             tbody.appendChild(row);
-            row.querySelector('.action-buttons').style.display = 'block';
+            row.querySelector('.action-buttons').style.display = 'flex';
+            updateTotals();
         }
         function updateDesignation(index) {
             const row = document.getElementById(`row-${index}`);
@@ -231,12 +221,12 @@
             const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
             const unitPrice = parseFloat(row.querySelector('.unitPrice').value) || 0;
             const totalInput = row.querySelector('.total');
-            if (quantity <= 0) {
+            if (quantity <= 0 && quantity !== '') {
                 row.querySelector('.quantity').style.border = '1px solid red';
                 alert('La quantité doit être > 0.');
                 return;
             } else row.querySelector('.quantity').style.border = '';
-            if (!designation) {
+            if (!designation && select.value !== '') {
                 (select.value === 'custom' ? customDesignation : select).style.border = '1px solid red';
                 alert('Désignation requise.');
                 return;
@@ -248,16 +238,24 @@
         }
         function validateRow(index) {
             const row = document.getElementById(`row-${index}`);
+            const select = row.querySelector('.designation');
+            const customDesignation = row.querySelector('.custom-designation');
+            const designation = select.value === 'custom' ? customDesignation.value.trim() : select.value;
+            const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
+            const unitPrice = parseFloat(row.querySelector('.unitPrice').value) || 0;
+            if (!designation || quantity <= 0 || unitPrice <= 0) {
+                alert('Veuillez remplir tous les champs correctement.');
+                return;
+            }
             row.querySelectorAll('input, select').forEach(input => input.disabled = true);
             row.classList.add('active');
-            row.querySelector('.action-buttons').style.display = 'none';
-            row.onclick = () => editRow(index);
             savePrestations();
+            updateTotals();
         }
         function editRow(index) {
             const row = document.getElementById(`row-${index}`);
             row.querySelectorAll('input, select').forEach(input => input.disabled = false);
-            row.querySelector('.action-buttons').style.display = 'block';
+            row.querySelector('.action-buttons').style.display = 'flex';
             row.classList.remove('active');
         }
         function removeRow(index) {
@@ -284,12 +282,12 @@
             const prestationsData = JSON.parse(localStorage.getItem('prestationsData')) || [];
             const tbody = document.getElementById('prestationsBody');
             prestationsData.forEach((item, index) => {
+                const isCustom = !articlesDB.some(article => article.name === item.designation);
                 const row = document.createElement('tr');
                 row.id = `row-${index}`;
-                const isCustom = !articlesDB.some(article => article.name === item.designation);
                 row.innerHTML = `
                     <td>
-                        <select class="designation" disabled>
+                        <select class="designation" onchange="updateDesignation(${index})" disabled>
                             <option value="">Choisir un article</option>
                             ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}" ${article.name === item.designation ? 'selected' : ''}>${article.name}</option>`).join('')}
                             <option value="custom" ${isCustom ? 'selected' : ''}>Saisie manuelle</option>
@@ -298,9 +296,9 @@
                     </td>
                     <td><input type="number" class="quantity" value="${item.quantity || ''}" disabled></td>
                     <td><input type="number" class="unitPrice" value="${item.unitPrice || ''}" disabled></td>
-                    <td><input type="number" class="total" value="${item.total || ''}" readonly>
+                    <td class="prestations-row"><input type="number" class="total" value="${item.total || ''}" readonly>
                     <div class="action-buttons" style="display:none;">
-                        <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" title="Valider" disabled><i class="fas fa-check-circle"></i></button>
+                        <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" title="Valider"><i class="fas fa-check-circle"></i></button>
                         <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
                     </div></td>`;
                 row.classList.add('active');
@@ -312,7 +310,8 @@
         function updateTotals() {
             let totalHT = 0;
             document.querySelectorAll('#prestationsBody tr').forEach(row => {
-                totalHT += parseFloat(row.querySelector('.total').value) || 0;
+                const total = parseFloat(row.querySelector('.total').value) || 0;
+                totalHT += total;
             });
             const tva = totalHT * 0.2;
             const totalTTC = totalHT + tva;
