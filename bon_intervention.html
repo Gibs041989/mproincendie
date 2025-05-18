@@ -11,8 +11,8 @@
             display: flex; 
             gap: 20px; 
             margin-bottom: 20px; 
-            flex-wrap: wrap; /* Permet au contenu de s’adapter */
-            justify-content: space-between; /* Aligner les éléments */
+            flex-wrap: wrap; 
+            justify-content: space-between; 
         }
         .prestations { flex: 1; }
         .facturation-section table { width: 100%; border-collapse: collapse; }
@@ -53,13 +53,11 @@
             display: block; 
             margin-top: 5px; 
             margin-right: auto; 
-            width: 200px; 
-            height: 200px; 
+            width: 250px; 
+            height: 250px; 
         }
         .clear-btn { margin-top: 5px; padding: 5px; font-size: 14px; }
         .validate-signature-btn { margin-top: 5px; padding: 5px; font-size: 14px; }
-        h3 { font-size: 18px; font-weight: bold; }
-        label { font-weight: normal; font-size: 14px; }
         button { font-size: 14px; padding: 5px 10px; }
         .action-dialog { 
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
@@ -70,6 +68,11 @@
         .overlay { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.5); z-index: 999; 
+        }
+        /* Styles pour le PDF */
+        .pdf-mode canvas { 
+            border: 1px solid #000; 
+            margin: 5px auto; 
         }
         @media (max-width: 600px) {
             .facturation-section { 
@@ -93,7 +96,7 @@
             .facturation-section th:nth-child(3) { width: 8%; } /* Qté */
             .facturation-section th:nth-child(4) { width: 18%; } /* PU HT */
             .facturation-section th:nth-child(5) { width: 14%; } /* Total HT */
-            canvas { width: 200px; height: 200px; }
+            canvas { width: 250px; height: 250px; }
             .action-dialog { width: 80%; }
         }
     </style>
@@ -431,7 +434,7 @@
         function validateSignature(canvasId) {
             validatedSignatures[canvasId] = true;
             const canvas = document.getElementById(canvasId);
-            canvas.style.backgroundColor = '#f0f0f0'; // Indicateur visuel de validation
+            canvas.style.backgroundColor = '#f0f0f0';
             alert(`Signature ${canvasId === 'canvasClient' ? 'client' : 'technicien'} validée.`);
         }
 
@@ -488,14 +491,18 @@
 
         function generatePDF() {
             const element = document.querySelector('.container');
+            element.classList.add('pdf-mode'); // Ajoute une classe pour styles PDF
+
             const opt = {
-                margin: 1,
+                margin: 0.5,
                 filename: 'bon_intervention.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                html2canvas: { scale: 3, useCORS: true }, // Augmente l’échelle pour meilleure qualité
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
             };
-            html2pdf().set(opt).from(element).save();
+            html2pdf().set(opt).from(element).save().finally(() => {
+                element.classList.remove('pdf-mode'); // Retire la classe après génération
+            });
         }
 
         function sendEmail() {
