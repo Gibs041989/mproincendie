@@ -15,7 +15,7 @@
         .action-buttons { text-align: right; margin-top: 4px; display: flex; justify-content: flex-end; }
         .action-buttons button { font-size: 16px; padding: 5px; margin: 0 3px; border: none; background: none; cursor: pointer; }
         .action-buttons button:disabled { opacity: 0.5; cursor: not-allowed; }
-        .section { margin-bottom: 40px; padding: 15px; } /* Espacement accru + padding */
+        .section { margin-bottom: 40px; padding: 15px; } /* Uniformisé à 40px */
         .table-container { width: 100%; }
         #prestationsTable { width: 100%; border-collapse: collapse; }
         #prestationsTable th, #prestationsTable td { padding: 8px; text-align: left; border: 1px solid #ddd; font-size: 14px; }
@@ -33,7 +33,7 @@
         .footer-nav a { flex: 1; text-align: center; padding: 6px; font-size: 18px; background-color: transparent; border-radius: 5px; transition: background-color 0.3s ease; }
         .footer-nav a:hover { background-color: #ffebee; }
         .signature-pad { border: 1px solid #ddd; border-radius: 5px; margin-top: 6px; width: 100%; height: 90px; pointer-events: none; }
-        .signature-block { margin-bottom: 30px; }
+        .signature-block { margin-bottom: 45px; } /* Augmenté à 45px */
         .floating-btn { position: fixed; bottom: 70px; right: 10px; background-color: #10b981; color: white; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1001; }
         .floating-btn:hover::after { content: "Ajouter une prestation"; position: absolute; right: 60px; background: #333; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1002; }
@@ -41,7 +41,7 @@
         .modal-content canvas { width: 100%; height: 200px; border: 1px solid #ddd; border-radius: 5px; }
         .modal-buttons { display: flex; justify-content: space-between; margin-top: 10px; }
         @media (max-width: 600px) {
-            .section { margin-bottom: 30px; padding: 10px; }
+            .section { margin-bottom: 40px; padding: 10px; } /* Uniformisé à 40px */
             #prestationsTable th { display: none; }
             #prestationsTable tr { display: block; margin-bottom: 8px; border: 1px solid #ddd; padding: 6px; border-radius: 5px; background: #fff; }
             #prestationsTable td:nth-child(1) { display: block; width: 100%; padding: 4px 0; }
@@ -79,7 +79,7 @@
         </section>
         <section class="section" id="crmSummary">
             <h2>📄 Résumé des CRM</h2>
-            <p id="crmSummaryText">Aucun CRM enregistré.</p>
+            <ul id="crmSummaryList"></ul>
         </section>
         <section class="section">
             <h2>📋 Prestations & Matériel</h2>
@@ -146,6 +146,7 @@
             </div>
         </section>
         <section class="section nav-buttons">
+            <button class="primary" onclick="validateBonIntervention()">✅ Valider bon d’intervention</button>
             <button class="secondary" onclick="saveDraft()">💾 Enregistrer brouillon</button>
             <button class="secondary" onclick="generatePDF()">📄 Générer le PDF</button>
             <button class="secondary" onclick="sendEmail()">📧 Envoyer par email</button>
@@ -243,8 +244,7 @@
             document.getElementById('ville').textContent = interventionData.ville || 'Non sélectionnée';
             document.getElementById('telephone').textContent = interventionData.telephone || 'Non sélectionné';
             document.getElementById('email').textContent = interventionData.email || 'Non sélectionné';
-            const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
-            document.getElementById('crmSummaryText').textContent = drafts['crm_extincteurs']?.summary || 'Aucun CRM enregistré.';
+            loadCRMSummary();
             loadPrestations();
             loadSignatures();
             loadDraft();
@@ -255,6 +255,21 @@
             { name: "Maintenance RIA", unitPrice: 80.00 },
             { name: "BAES Type 1", unitPrice: 120.00 }
         ];
+        function loadCRMSummary() {
+            const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
+            const crmList = document.getElementById('crmSummaryList');
+            crmList.innerHTML = '';
+            const crmKeys = Object.keys(drafts).filter(key => key.startsWith('crm_') && drafts[key].summary);
+            if (crmKeys.length === 0) {
+                crmList.innerHTML = '<li>Aucun CRM enregistré.</li>';
+            } else {
+                crmKeys.forEach(key => {
+                    const li = document.createElement('li');
+                    li.textContent = drafts[key].summary;
+                    crmList.appendChild(li);
+                });
+            }
+        }
         function addPrestation() {
             const tbody = document.getElementById('prestationsBody');
             const index = tbody.children.length;
@@ -447,6 +462,51 @@
                 toggleMoyenInput();
             }
         }
+        function validateBonIntervention() {
+            const prestations = JSON.parse(localStorage.getItem('prestationsData') || '[]');
+            if (prestations.length === 0) {
+                alert('Veuillez ajouter au moins une prestation.');
+                return;
+            }
+            if (clientSignaturePad.isEmpty() || technicianSignaturePad.isEmpty()) {
+                alert('Les signatures client et technicien sont requises.');
+                return;
+            }
+            if (!document.getElementById('interventionDate').value || !document.getElementById('technician').value) {
+                alert('Veuillez remplir la date d’intervention et le nom du technicien.');
+                return;
+            }
+            const clients = JSON.parse(localStorage.getItem('clients') || '[]');
+            const clientName = document.getElementById('clientName').textContent;
+            const client = clients.find(c => c.name === clientName);
+            if (client) {
+                if (!client.interventions) client.interventions = [];
+                const bon = {
+                    id: `bon_${Date.now()}`,
+                    date: document.getElementById('interventionDate').value,
+                    technician: document.getElementById('technician').value,
+                    duration: document.getElementById('duration').value,
+                    prestations: prestations,
+                    totalHT: document.getElementById('totalHT').textContent,
+                    tva: document.getElementById('tva').textContent,
+                    totalTTC: document.getElementById('totalTTC').textContent,
+                    delaiReglement: document.getElementById('delaiReglement').value === 'custom' ? document.getElementById('delaiCustom').value : document.getElementById('delaiReglement').value,
+                    moyenReglement: document.getElementById('moyenReglement').value === 'custom' ? document.getElementById('moyenCustom').value : document.getElementById('moyenReglement').value,
+                    observations: document.getElementById('observations').value,
+                    signatures: JSON.parse(localStorage.getItem('signatures') || '{}'),
+                    summary: `Bon d'intervention du ${document.getElementById('interventionDate').value}`
+                };
+                client.interventions.push(bon);
+                localStorage.setItem('clients', JSON.stringify(clients));
+            }
+            const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
+            delete drafts['bon_intervention'];
+            localStorage.setItem('drafts', JSON.stringify(drafts));
+            localStorage.removeItem('prestationsData');
+            localStorage.removeItem('signatures');
+            alert('Bon d’intervention validé et enregistré.');
+            window.location.href = 'intervention.html';
+        }
         function updateTotals() {
             let totalHT = 0;
             document.querySelectorAll('#prestationsBody tr').forEach(row => {
@@ -462,13 +522,11 @@
         function generatePDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            // En-tête
             doc.setFontSize(20);
             doc.setFont("helvetica", "bold");
             doc.text("Bon d'Intervention - MPro Incendie", 20, 20);
             doc.setLineWidth(0.5);
             doc.line(20, 25, 190, 25);
-            // Section Client
             doc.setFontSize(14);
             doc.setFont("helvetica", "bold");
             doc.text("Client", 20, 35);
@@ -480,7 +538,6 @@
             doc.text(`Ville: ${document.getElementById('ville').textContent}`, 20, 60);
             doc.text(`Téléphone: ${document.getElementById('telephone').textContent}`, 20, 65);
             doc.text(`Email: ${document.getElementById('email').textContent}`, 20, 70);
-            // Section Prestations
             doc.setFontSize(14);
             doc.setFont("helvetica", "bold");
             doc.text("Prestations & Matériel", 20, 85);
@@ -511,7 +568,6 @@
                 doc.text("Aucune prestation enregistrée.", 20, y);
                 y += 10;
             }
-            // Section Totaux
             doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
             doc.text("Totaux", 20, y);
@@ -527,7 +583,6 @@
                 margin: { left: 20, right: 20 }
             });
             y = doc.lastAutoTable.finalY + 10;
-            // Section Modalités
             doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
             doc.text("Modalités de règlement", 20, y);
@@ -543,7 +598,6 @@
             } else {
                 y += 15;
             }
-            // Section Signatures
             doc.setFontSize(12);
             doc.setFont("helvetica", "bold");
             doc.text("Signatures", 20, y);
