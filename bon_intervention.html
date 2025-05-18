@@ -14,13 +14,13 @@
         .facturation-section input, select, textarea { 
             width: 100%; padding: 8px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; 
         }
+        .facturation-section tr { cursor: pointer; }
+        .facturation-section tr.active { background: #f0f0f0; }
         .facturation-section th:nth-child(1) { width: 16%; } /* Code article */
         .facturation-section th:nth-child(2) { width: 38%; } /* Désignation */
         .facturation-section th:nth-child(3) { width: 10%; } /* Qté */
         .facturation-section th:nth-child(4) { width: 18%; } /* PU HT */
         .facturation-section th:nth-child(5) { width: 18%; } /* Total HT */
-        .facturation-section tr { cursor: pointer; }
-        .facturation-section tr.active { background: #f0f0f0; }
         .action-buttons { display: none; text-align: right; margin: 5px 0; }
         .action-buttons button { font-size: 16px; padding: 5px 10px; margin-left: 10px; }
         .validate-btn { color: #00ff00; }
@@ -94,6 +94,7 @@
                     </thead>
                     <tbody id="facturationBody"></tbody>
                 </table>
+                <div id="actionButtons" class="action-buttons"></div>
                 <button onclick="addPrestation()">➕ Ajouter une ligne</button>
             </div>
             <table class="totals-table">
@@ -174,17 +175,22 @@
             document.getElementById('lieu').value = interventionData.lieu;
             if (interventionData.crm_extincteurs) {
                 interventionData.crm_extincteurs.forEach(item => addPrestationFromCRM(item));
-                document.getElementById('crmSummary').textContent = interventionData.crm_summary || 'Résumé des opérations CRM chargé.';
             }
             setupCanvas('canvasClient');
             setupCanvas('canvasTech');
         };
 
         let activeRow = null;
+        let rowCounter = 0;
 
         function addPrestation() {
+            if (activeRow) {
+                alert('Veuillez valider ou supprimer la ligne en cours avant d’ajouter une nouvelle.');
+                return;
+            }
             const tbody = document.getElementById('facturationBody');
             const row = document.createElement('tr');
+            row.id = `row-${rowCounter++}`;
             row.innerHTML = `
                 <td><input type="text" class="code" placeholder="Code"></td>
                 <td><input type="text" class="designation" placeholder="Désignation"></td>
@@ -192,28 +198,25 @@
                 <td><input type="number" class="pu" value="0" min="0" step="0.01" onchange="updateTotals()"></td>
                 <td class="total">0</td>
             `;
-            const actionDiv = document.createElement('div');
-            actionDiv.className = 'action-buttons';
-            actionDiv.innerHTML = `
-                <button class="validate-btn" onclick="validateRow(this.parentElement.parentElement, this.parentElement)">Valider <i class="fas fa-check-circle"></i></button>
-                <button class="delete-btn" onclick="deleteRow(this.parentElement.parentElement, this.parentElement)">Supprimer <i class="fas fa-trash-alt"></i></button>
-            `;
-            const wrapper = document.createElement('tr');
-            wrapper.appendChild(row);
-            wrapper.appendChild(document.createElement('td')); // Cellule vide pour alignement
-            const actionTd = document.createElement('td');
-            actionTd.colSpan = 5;
-            actionTd.appendChild(actionDiv);
-            wrapper.appendChild(actionTd);
-            tbody.appendChild(wrapper);
+            tbody.appendChild(row);
             activeRow = row;
+            const actionDiv = document.getElementById('actionButtons');
+            actionDiv.innerHTML = `
+                <button class="validate-btn" onclick="validateRow('${row.id}')">Valider <i class="fas fa-check-circle"></i></button>
+                <button class="delete-btn" onclick="deleteRow('${row.id}')">Supprimer <i class="fas fa-trash-alt"></i></button>
+            `;
             actionDiv.style.display = 'block';
             updateTotals();
         }
 
         function addPrestationFromCRM(item) {
+            if (activeRow) {
+                alert('Veuillez valider ou supprimer la ligne en cours avant d’ajouter une nouvelle.');
+                return;
+            }
             const tbody = document.getElementById('facturationBody');
             const row = document.createElement('tr');
+            row.id = `row-${rowCounter++}`;
             row.innerHTML = `
                 <td><input type="text" class="code" value="${item.code || ''}"></td>
                 <td><input type="text" class="designation" value="${item.designation || ''}"></td>
@@ -221,42 +224,39 @@
                 <td><input type="number" class="pu" value="${item.prix || 0}" min="0" step="0.01" onchange="updateTotals()"></td>
                 <td class="total">0</td>
             `;
-            const actionDiv = document.createElement('div');
-            actionDiv.className = 'action-buttons';
-            actionDiv.innerHTML = `
-                <button class="validate-btn" onclick="validateRow(this.parentElement.parentElement, this.parentElement)">Valider <i class="fas fa-check-circle"></i></button>
-                <button class="delete-btn" onclick="deleteRow(this.parentElement.parentElement, this.parentElement)">Supprimer <i class="fas fa-trash-alt"></i></button>
-            `;
-            const wrapper = document.createElement('tr');
-            wrapper.appendChild(row);
-            wrapper.appendChild(document.createElement('td')); // Cellule vide pour alignement
-            const actionTd = document.createElement('td');
-            actionTd.colSpan = 5;
-            actionTd.appendChild(actionDiv);
-            wrapper.appendChild(actionTd);
-            tbody.appendChild(wrapper);
+            tbody.appendChild(row);
             activeRow = row;
+            const actionDiv = document.getElementById('actionButtons');
+            actionDiv.innerHTML = `
+                <button class="validate-btn" onclick="validateRow('${row.id}')">Valider <i class="fas fa-check-circle"></i></button>
+                <button class="delete-btn" onclick="deleteRow('${row.id}')">Supprimer <i class="fas fa-trash-alt"></i></button>
+            `;
             actionDiv.style.display = 'block';
             updateTotals();
         }
 
-        function validateRow(row, actionDiv) {
+        function validateRow(rowId) {
+            const row = document.getElementById(rowId);
             const inputs = row.querySelectorAll('input');
             inputs.forEach(input => input.readOnly = true);
             row.classList.add('active');
+            const actionDiv = document.getElementById('actionButtons');
             actionDiv.style.display = 'none';
             activeRow = null;
-            row.onclick = () => showActionDialog(row, actionDiv);
+            row.onclick = () => showActionDialog(rowId);
             updateTotals();
         }
 
-        function deleteRow(row, actionDiv) {
-            row.parentElement.remove();
+        function deleteRow(rowId) {
+            const row = document.getElementById(rowId);
+            row.remove();
             activeRow = null;
+            const actionDiv = document.getElementById('actionButtons');
+            actionDiv.style.display = 'none';
             updateTotals();
         }
 
-        function showActionDialog(row, actionDiv) {
+        function showActionDialog(rowId) {
             const overlay = document.createElement('div');
             overlay.className = 'overlay';
             document.body.appendChild(overlay);
@@ -265,27 +265,36 @@
             dialog.className = 'action-dialog';
             dialog.innerHTML = `
                 <p>Que voulez-vous faire ?</p>
-                <button onclick="editRow(this.parentElement, '${row.id}')">Modifier</button>
-                <button onclick="deleteRowWithDialog(this.parentElement, '${row.id}')">Supprimer</button>
+                <button onclick="editRow(this.parentElement, '${rowId}')">Modifier</button>
+                <button onclick="deleteRowWithDialog(this.parentElement, '${rowId}')">Supprimer</button>
                 <button onclick="closeDialog(this.parentElement)">Annuler</button>
             `;
             document.body.appendChild(dialog);
         }
 
         function editRow(dialog, rowId) {
+            if (activeRow) {
+                alert('Veuillez valider ou supprimer la ligne en cours avant de modifier une autre.');
+                closeDialog(dialog);
+                return;
+            }
             const row = document.getElementById(rowId);
             const inputs = row.querySelectorAll('input');
             inputs.forEach(input => input.readOnly = false);
-            const actionDiv = row.nextElementSibling.nextElementSibling.querySelector('.action-buttons');
-            actionDiv.style.display = 'block';
             activeRow = row;
+            const actionDiv = document.getElementById('actionButtons');
+            actionDiv.innerHTML = `
+                <button class="validate-btn" onclick="validateRow('${rowId}')">Valider <i class="fas fa-check-circle"></i></button>
+                <button class="delete-btn" onclick="deleteRow('${rowId}')">Supprimer <i class="fas fa-trash-alt"></i></button>
+            `;
+            actionDiv.style.display = 'block';
             row.classList.remove('active');
             closeDialog(dialog);
         }
 
         function deleteRowWithDialog(dialog, rowId) {
             const row = document.getElementById(rowId);
-            row.parentElement.remove();
+            row.remove();
             activeRow = null;
             updateTotals();
             closeDialog(dialog);
@@ -298,14 +307,12 @@
 
         function updateTotals() {
             let totalHT = 0;
-            document.querySelectorAll('#facturationBody tr:not(.action-buttons)').forEach(row => {
-                if (!row.querySelector('.action-buttons')) {
-                    const qty = parseFloat(row.querySelector('.qty').value) || 0;
-                    const pu = parseFloat(row.querySelector('.pu').value) || 0;
-                    const total = qty * pu;
-                    row.querySelector('.total').textContent = total.toFixed(2);
-                    totalHT += total;
-                }
+            document.querySelectorAll('#facturationBody tr').forEach(row => {
+                const qty = parseFloat(row.querySelector('.qty').value) || 0;
+                const pu = parseFloat(row.querySelector('.pu').value) || 0;
+                const total = qty * pu;
+                row.querySelector('.total').textContent = total.toFixed(2);
+                totalHT += total;
             });
             const tva = 0.2; // 20% TVA
             const totalTVA = totalHT * tva;
@@ -389,7 +396,7 @@
             const client = document.getElementById('clientName').value;
             const signatureClient = document.getElementById('signatureClient').value;
             const signatureTech = document.getElementById('signatureTech').value;
-            const prestations = document.querySelectorAll('#facturationBody tr:not(.action-buttons)');
+            const prestations = document.querySelectorAll('#facturationBody tr');
             const paymentMode = document.getElementById('paymentMode').value;
             const paymentDelay = document.getElementById('paymentDelay').value;
             const observations = document.getElementById('observations').value;
