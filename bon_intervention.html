@@ -40,8 +40,8 @@
         textarea { resize: vertical; }
         canvas { border: 1px solid #ddd; display: block; margin-top: 5px; }
         .clear-btn { margin-top: 5px; padding: 5px; font-size: 14px; }
-        h3 { font-size: 18px; } /* Réduction taille sous-titres */
-        button { font-size: 14px; padding: 5px 10px; } /* Réduction taille bouton Ajouter une ligne */
+        h3 { font-size: 18px; }
+        button { font-size: 14px; padding: 5px 10px; }
         .action-dialog { 
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
             background: #fff; border: 1px solid #ddd; padding: 20px; z-index: 1000; 
@@ -55,9 +55,9 @@
         @media (max-width: 600px) {
             .facturation-section { flex-direction: column; }
             .totals-table { 
-                float: right; 
+                float: right !important; 
                 width: 200px !important; 
-                margin: 10px 10px 10px 0; 
+                margin: 10px 10px 10px 0 !important; 
             }
             .totals-table th, .totals-table td { width: auto; }
             .facturation-section table { font-size: 14px; }
