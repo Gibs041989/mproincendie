@@ -32,28 +32,25 @@
         .footer-nav .navigation { margin: 0; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-around; align-items: center; gap: 10px; }
         .footer-nav a { flex: 1; text-align: center; padding: 6px; font-size: 18px; background-color: transparent; border-radius: 5px; transition: background-color 0.3s ease; }
         .footer-nav a:hover { background-color: #ffebee; }
-        .signature-pad { border: 1px solid #ddd; border-radius: 5px; margin-top: 6px; width: 300px; height: 150px; }
+        .signature-pad { border: 1px solid #ddd; border-radius: 5px; margin-top: 6px; width: 100%; height: 150px; }
         .floating-btn { position: fixed; bottom: 70px; right: 10px; background-color: #10b981; color: white; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1001; }
         .floating-btn:hover::after { content: "Ajouter une prestation"; position: absolute; right: 60px; background: #333; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; }
+        /* Modal for signatures */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1002; }
+        .modal-content { background: #fff; margin: 10% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px; }
+        .modal-content canvas { width: 100%; height: 200px; border: 1px solid #ddd; border-radius: 5px; }
+        .modal-buttons { display: flex; justify-content: space-between; margin-top: 10px; }
         /* Optimisation mobile pour le tableau */
         @media (max-width: 600px) {
             .section { margin-bottom: 10px; }
             #prestationsTable th { display: none; }
             #prestationsTable tr { display: block; margin-bottom: 8px; border: 1px solid #ddd; padding: 6px; border-radius: 5px; background: #fff; }
-            #prestationsTable td:nth-child(1) { /* Désignation */
-                display: block; width: 100%; padding: 4px 0;
-            }
+            #prestationsTable td:nth-child(1) { display: block; width: 100%; padding: 4px 0; }
             #prestationsTable td:nth-child(1) select, #prestationsTable td:nth-child(1) input { width: 100%; font-size: 13px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; }
             .prestations-row { display: flex; gap: 2%; align-items: center; }
-            #prestationsTable td:nth-child(2) { /* Qté */
-                flex: 0 0 18%; padding: 4px 0;
-            }
-            #prestationsTable td:nth-child(3) { /* PU HT */
-                flex: 0 0 35%; padding: 4px 0;
-            }
-            #prestationsTable td:nth-child(4) { /* Prix Total HT */
-                flex: 0 0 45%; padding: 4px 0;
-            }
+            #prestationsTable td:nth-child(2) { flex: 0 0 18%; padding: 4px 0; }
+            #prestationsTable td:nth-child(3) { flex: 0 0 35%; padding: 4px 0; }
+            #prestationsTable td:nth-child(4) { flex: 0 0 45%; padding: 4px 0; }
             #prestationsTable td input, #prestationsTable td select { width: 100%; padding: 5px; font-size: 12px; border: 1px solid #ccc; border-radius: 3px; }
             #prestationsTable td:before { content: attr(data-label); display: block; font-size: 11px; font-weight: bold; color: #555; margin-bottom: 2px; }
             #prestationsTable td:nth-child(1):before { content: "Désignation"; }
@@ -63,11 +60,10 @@
             #prestationsTable td .action-buttons { margin-top: 4px; }
             #totalsTable { max-width: 160px; margin-left: auto; margin-right: 0; }
             #totalsTable th, #totalsTable td { padding: 4px; font-size: 12px; color: #222; font-weight: 500; }
-            #totalsTable th { background-color: #e8e8e8; }
-            #totalsTable td { background-color: #fff; }
             .signature-pad { width: 100%; height: 90px; }
             .floating-btn { bottom: 75px; width: 45px; height: 45px; font-size: 20px; }
             .action-buttons button { font-size: 14px; padding: 4px; }
+            .modal-content { margin: 20% auto; width: 95%; }
         }
     </style>
 </head>
@@ -109,17 +105,46 @@
             </table>
         </section>
         <section class="section">
+            <h2>💳 Modalités de règlement</h2>
+            <label>Délais de règlement:
+                <select id="delaiReglement" onchange="toggleDelaiInput()">
+                    <option value="Immédiat à l’intervention">Immédiat à l’intervention</option>
+                    <option value="À réception de facture">À réception de facture</option>
+                    <option value="Sous 30 jours à réception de facture">Sous 30 jours à réception de facture</option>
+                    <option value="custom">Saisie libre</option>
+                </select>
+                <input type="text" id="delaiCustom" style="display:none;" placeholder="Délais personnalisé">
+            </label>
+            <label>Moyen de règlement:
+                <select id="moyenReglement" onchange="toggleMoyenInput()">
+                    <option value="Chèque">Chèque</option>
+                    <option value="Virement">Virement</option>
+                    <option value="Espèces">Espèces</option>
+                    <option value="custom">Saisie libre</option>
+                </select>
+                <input type="text" id="moyenCustom" style="display:none;" placeholder="Moyen personnalisé">
+            </label>
+            <label>Observations:
+                <textarea id="observations" rows="3" placeholder="Notes supplémentaires"></textarea>
+            </label>
+        </section>
+        <section class="section">
             <h2>📅 Détails de l’intervention</h2>
             <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-18" required></label>
             <label>Technicien intervenant: <input type="text" id="technician" placeholder="Nom du technicien"></label>
             <label>Durée (heures): <input type="number" id="duration" placeholder="Durée en heures"></label>
         </section>
         <section class="section">
-            <h2>✍️ Signature du client</h2>
-            <canvas id="signature-pad" class="signature-pad"></canvas>
-            <div class="signature-pad-buttons">
-                <button class="secondary" onclick="clearSignature()"><i class="fas fa-eraser"></i></button>
-                <button class="action" onclick="validateSignature()"><i class="fas fa-check"></i></button>
+            <h2>✍️ Signatures</h2>
+            <div>
+                <h3>Client</h3>
+                <button class="action" onclick="openSignatureModal('client')">Signer</button>
+                <canvas id="client-signature-pad" class="signature-pad"></canvas>
+            </div>
+            <div>
+                <h3>Technicien</h3>
+                <button class="action" onclick="openSignatureModal('technician')">Signer</button>
+                <canvas id="technician-signature-pad" class="signature-pad"></canvas>
             </div>
         </section>
         <section class="section nav-buttons">
@@ -137,22 +162,70 @@
         </div>
     </div>
     <div class="floating-btn" onclick="addPrestation()">➕</div>
+    <!-- Modal for signatures -->
+    <div id="signature-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Signature</h3>
+            <canvas id="modal-signature-pad"></canvas>
+            <div class="modal-buttons">
+                <button class="secondary" onclick="clearModalSignature()">Effacer</button>
+                <button class="action" onclick="validateModalSignature()">Valider</button>
+            </div>
+        </div>
+    </div>
     <script>
-        const canvas = document.getElementById('signature-pad');
-        const signaturePad = new SignaturePad(canvas);
-        function resizeCanvas() {
+        let currentSignatureType = '';
+        const clientCanvas = document.getElementById('client-signature-pad');
+        const technicianCanvas = document.getElementById('technician-signature-pad');
+        const modalCanvas = document.getElementById('modal-signature-pad');
+        const clientSignaturePad = new SignaturePad(clientCanvas);
+        const technicianSignaturePad = new SignaturePad(technicianCanvas);
+        let modalSignaturePad;
+        function resizeCanvas(canvas) {
             const ratio = Math.max(window.devicePixelRatio || 1, 1);
             canvas.width = canvas.offsetWidth * ratio;
             canvas.height = canvas.offsetHeight * ratio;
             canvas.getContext('2d').scale(ratio, ratio);
-            signaturePad.clear();
         }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-        function clearSignature() { signaturePad.clear(); }
-        function validateSignature() {
-            if (signaturePad.isEmpty()) alert('Veuillez apposer une signature.');
-            else alert('Signature validée !');
+        window.addEventListener('resize', () => {
+            resizeCanvas(clientCanvas);
+            resizeCanvas(technicianCanvas);
+            clientSignaturePad.clear();
+            technicianSignaturePad.clear();
+            if (modalSignaturePad) resizeCanvas(modalCanvas);
+        });
+        resizeCanvas(clientCanvas);
+        resizeCanvas(technicianCanvas);
+        function openSignatureModal(type) {
+            currentSignatureType = type;
+            document.getElementById('signature-modal').style.display = 'block';
+            document.getElementById('modal-title').textContent = type === 'client' ? 'Signature Client' : 'Signature Technicien';
+            modalSignaturePad = new SignaturePad(modalCanvas);
+            resizeCanvas(modalCanvas);
+        }
+        function closeSignatureModal() {
+            document.getElementById('signature-modal').style.display = 'none';
+            modalSignaturePad = null;
+        }
+        function clearModalSignature() {
+            modalSignaturePad.clear();
+        }
+        function validateModalSignature() {
+            if (modalSignaturePad.isEmpty()) {
+                alert('Veuillez apposer une signature.');
+                return;
+            }
+            const dataURL = modalSignaturePad.toDataURL();
+            if (currentSignatureType === 'client') {
+                clientSignaturePad.fromDataURL(dataURL);
+            } else {
+                technicianSignaturePad.fromDataURL(dataURL);
+            }
+            closeSignatureModal();
+        }
+        function clearSignature(type) {
+            if (type === 'client') clientSignaturePad.clear();
+            else technicianSignaturePad.clear();
         }
         window.onload = () => {
             const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
@@ -187,7 +260,7 @@
                     <select class="designation" onchange="updateDesignation(${index})">
                         <option value="">Choisir un article</option>
                         ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}">${article.name}</option>`).join('')}
-                        <option value="custom">Saisie manuelle</option>
+                        <option value="custom">Saisie libre</option>
                     </select>
                     <input type="text" class="custom-designation" style="display:none;" placeholder="Désignation manuelle" oninput="updateRow(${index})">
                 </td>
@@ -293,15 +366,15 @@
                 row.id = `row-${index}`;
                 row.innerHTML = `
                     <td data-label="Désignation">
-                        <select class="designation" onchange="updateDesignation(${index})" disabled>
+                        <select class="designation" onchange="updateDesignation(${index})">
                             <option value="">Choisir un article</option>
                             ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}" ${article.name === item.designation ? 'selected' : ''}>${article.name}</option>`).join('')}
-                            <option value="custom" ${isCustom ? 'selected' : ''}>Saisie manuelle</option>
+                            <option value="custom" ${isCustom ? 'selected' : ''}>Saisie libre</option>
                         </select>
-                        <input type="text" class="custom-designation" value="${isCustom ? item.designation : ''}" style="display:${isCustom ? 'block' : 'none'};" disabled>
+                        <input type="text" class="custom-designation" value="${isCustom ? item.designation : ''}" style="display:${isCustom ? 'block' : 'none'};" oninput="updateRow(${index})">
                     </td>
-                    <td data-label="Qté"><input type="number" class="quantity" value="${item.quantity || ''}" disabled min="1"></td>
-                    <td data-label="PU HT"><input type="number" class="unitPrice" value="${item.unitPrice || ''}" disabled step="0.01"></td>
+                    <td data-label="Qté"><input type="number" class="quantity" value="${item.quantity || ''}" min="1" oninput="updateRow(${index})"></td>
+                    <td data-label="PU HT"><input type="number" class="unitPrice" value="${item.unitPrice || ''}" step="0.01" oninput="updateRow(${index})"></td>
                     <td data-label="Prix Total HT">
                         <div class="prestations-row">
                             <input type="number" class="total" value="${item.total || ''}" readonly>
@@ -317,6 +390,16 @@
                 row.querySelector('.action-buttons').style.display = 'flex';
             });
             updateTotals();
+        }
+        function toggleDelaiInput() {
+            const select = document.getElementById('delaiReglement');
+            const input = document.getElementById('delaiCustom');
+            input.style.display = select.value === 'custom' ? 'block' : 'none';
+        }
+        function toggleMoyenInput() {
+            const select = document.getElementById('moyenReglement');
+            const input = document.getElementById('moyenCustom');
+            input.style.display = select.value === 'custom' ? 'block' : 'none';
         }
         function updateTotals() {
             let totalHT = 0;
@@ -353,14 +436,23 @@
             doc.text(`Total HT: ${document.getElementById('totalHT').textContent}`, 20, y + 10);
             doc.text(`TVA 20%: ${document.getElementById('tva').textContent}`, 20, y + 20);
             doc.text(`Total TTC: ${document.getElementById('totalTTC').textContent}`, 20, y + 30);
-            const signatureData = signaturePad.toDataURL();
-            doc.addImage(signatureData, 'PNG', 20, y + 40, 80, 40);
+            doc.text(`Délais de règlement: ${document.getElementById('delaiReglement').value === 'custom' ? document.getElementById('delaiCustom').value : document.getElementById('delaiReglement').value}`, 20, y + 40);
+            doc.text(`Moyen de règlement: ${document.getElementById('moyenReglement').value === 'custom' ? document.getElementById('moyenCustom').value : document.getElementById('moyenReglement').value}`, 20, y + 50);
+            doc.text(`Observations: ${document.getElementById('observations').value}`, 20, y + 60);
+            if (!clientSignaturePad.isEmpty()) {
+                doc.text('Signature Client:', 20, y + 70);
+                doc.addImage(clientSignaturePad.toDataURL(), 'PNG', 20, y + 80, 80, 40);
+            }
+            if (!technicianSignaturePad.isEmpty()) {
+                doc.text('Signature Technicien:', 20, y + 130);
+                doc.addImage(technicianSignaturePad.toDataURL(), 'PNG', 20, y + 140, 80, 40);
+            }
             doc.save(`bon_intervention_${new Date().toISOString().slice(0,10)}.pdf`);
         }
         function sendEmail() {
             const clientEmail = document.getElementById('email').textContent;
             const subject = 'Bon d’intervention MPro Incendie';
-            const body = 'Veuillez trouver ci-joint le bon d’intervention.';
+            const body = `Veuillez trouver ci-joint le bon d’intervention.\n\nDélais de règlement: ${document.getElementById('delaiReglement').value === 'custom' ? document.getElementById('delaiCustom').value : document.getElementById('delaiReglement').value}\nMoyen de règlement: ${document.getElementById('moyenReglement').value === 'custom' ? document.getElementById('moyenCustom').value : document.getElementById('moyenReglement').value}\nObservations: ${document.getElementById('observations').value}`;
             window.location.href = `mailto:${clientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         }
     </script>
