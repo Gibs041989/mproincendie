@@ -22,12 +22,12 @@
         .facturation-section th:nth-child(4) { width: 18%; } /* PU HT */
         .facturation-section th:nth-child(5) { width: 18%; } /* Total HT */
         .action-buttons { display: none; text-align: right; margin: 5px 0; }
-        .action-buttons button { font-size: 16px; padding: 5px 10px; margin-left: 10px; }
+        .action-buttons button { font-size: 14px; padding: 5px; margin-left: 10px; border: none; background: none; }
         .validate-btn { color: #00ff00; }
         .delete-btn { color: #ff0000; }
         .totals-table { 
             width: 80px; border-collapse: collapse; 
-            float: right; margin-left: 10px; 
+            float: left; margin-right: 10px; 
         }
         .totals-table th, .totals-table td { 
             border: 1px solid #ddd; padding: 4px 4px; font-size: 13px; text-align: right; 
@@ -51,9 +51,9 @@
         @media (max-width: 600px) {
             .facturation-section { flex-direction: column; }
             .totals-table { 
-                float: right; 
+                float: left; 
                 width: 200px !important; 
-                margin: 10px 10px 10px 0; 
+                margin: 10px 0 10px 10px; 
             }
             .totals-table th, .totals-table td { width: auto; }
             .facturation-section table { font-size: 14px; }
@@ -202,8 +202,8 @@
             activeRow = row;
             const actionDiv = document.getElementById('actionButtons');
             actionDiv.innerHTML = `
-                <button class="validate-btn" onclick="validateRow('${row.id}')">Valider <i class="fas fa-check-circle"></i></button>
-                <button class="delete-btn" onclick="deleteRow('${row.id}')">Supprimer <i class="fas fa-trash-alt"></i></button>
+                <button class="validate-btn" onclick="validateRow('${row.id}')" title="Valider"><i class="fas fa-check-circle"></i></button>
+                <button class="delete-btn" onclick="deleteRow('${row.id}')" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
             `;
             actionDiv.style.display = 'block';
             updateTotals();
@@ -228,8 +228,8 @@
             activeRow = row;
             const actionDiv = document.getElementById('actionButtons');
             actionDiv.innerHTML = `
-                <button class="validate-btn" onclick="validateRow('${row.id}')">Valider <i class="fas fa-check-circle"></i></button>
-                <button class="delete-btn" onclick="deleteRow('${row.id}')">Supprimer <i class="fas fa-trash-alt"></i></button>
+                <button class="validate-btn" onclick="validateRow('${row.id}')" title="Valider"><i class="fas fa-check-circle"></i></button>
+                <button class="delete-btn" onclick="deleteRow('${row.id}')" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
             `;
             actionDiv.style.display = 'block';
             updateTotals();
@@ -284,8 +284,8 @@
             activeRow = row;
             const actionDiv = document.getElementById('actionButtons');
             actionDiv.innerHTML = `
-                <button class="validate-btn" onclick="validateRow('${rowId}')">Valider <i class="fas fa-check-circle"></i></button>
-                <button class="delete-btn" onclick="deleteRow('${rowId}')">Supprimer <i class="fas fa-trash-alt"></i></button>
+                <button class="validate-btn" onclick="validateRow('${rowId}')" title="Valider"><i class="fas fa-check-circle"></i></button>
+                <button class="delete-btn" onclick="deleteRow('${rowId}')" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
             `;
             actionDiv.style.display = 'block';
             row.classList.remove('active');
