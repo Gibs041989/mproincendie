@@ -49,26 +49,23 @@
         }
         /* Styles pour le tableau des prestations */
         #prestationsTable th, #prestationsTable td {
-            padding: 8px; /* Même padding que le tableau des totaux */
-            min-width: 80px; 
+            padding: 12px; /* Padding plus généreux pour agrandir les cases */
+            min-width: 100px; /* Largeur minimale augmentée pour plus d'espace */
             text-align: left;
             border: 1px solid #ddd;
-            font-size: 14px; /* Même taille de police que le tableau des totaux */
-        }
-        #prestationsTable th {
-            background-color: #f5f5f5; /* Même fond que le tableau des totaux */
+            font-size: 16px; /* Taille de police augmentée pour une meilleure lisibilité */
         }
         #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { /* Désignation */
-            min-width: 200px;
+            min-width: 250px; /* Plus large pour la désignation */
         }
         #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { /* Qté */
-            min-width: 70px;
+            min-width: 80px;
         }
         #prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) { /* PU HT */
-            min-width: 100px;
+            min-width: 120px;
         }
         #prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) { /* Prix Total HT */
-            min-width: 100px;
+            min-width: 120px;
         }
         /* Styles pour le tableau des totaux */
         #totalsTable {
@@ -137,12 +134,12 @@
                 width: 100%; /* Prendre toute la largeur de l'écran */
             }
             #prestationsTable th, #prestationsTable td {
-                padding: 8px; /* Même padding que le tableau des totaux */
+                padding: 10px; /* Légère réduction pour mobile */
                 min-width: 70px; /* Réduction pour mobile */
-                font-size: 14px; /* Même taille de police que le tableau des totaux */
+                font-size: 14px; /* Légère réduction pour mobile */
             }
             #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) {
-                min-width: 120px;
+                min-width: 150px;
             }
             #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) {
                 min-width: 60px;
