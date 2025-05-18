@@ -2,40 +2,58 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Compte-rendu Extincteurs - MPro Incendie</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bon d'Intervention - MPro Incendie</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
-        .extincteur { 
-            border: 1px solid #ddd; 
-            padding: 15px; 
-            margin: 15px 0; 
-            border-radius: 8px; 
-            background-color: #f9f9f9; 
-        }
-        .extincteur h3 { 
-            margin-top: 0; 
-            color: #c62828; 
-        }
-        .summary { 
-            margin-top: 10px; 
-            padding: 10px; 
-            background-color: #e0f7fa; 
-            border-radius: 4px; 
+        table tr { 
             cursor: pointer; 
-            transition: background-color 0.3s ease; 
         }
-        .summary:hover { 
-            background-color: #b3e5fc; 
+        table tr.active { 
+            background: #f5f5f5; 
         }
-        .summary-content { 
-            display: flex; 
-            align-items: center; 
-            gap: 5px; 
+        .action-buttons { 
+            display: none; 
+            text-align: right; 
+            margin: 8px 0; 
         }
-        .summary-content::before { 
-            content: "🧯"; 
+        .action-buttons button { 
+            font-size: 14px; 
+            padding: 5px; 
+            margin-left: 10px; 
+            border: none; 
+            background: none; 
+        }
+        .section {
+            margin-bottom: 40px; /* Plus d'espace entre les sections */
+        }
+        table {
+            margin-bottom: 40px; /* Plus d'espace sous les tableaux */
+        }
+        /* Élargir les colonnes du tableau */
+        table th, table td {
+            padding: 15px; /* Padding existant */
+            min-width: 60px; /* Largeur minimale pour chaque cellule */
+            text-align: left;
+        }
+        /* Ajustement spécifique pour la colonne Qté */
+        table th:nth-child(2), table td:nth-child(2) { /* Colonne "Qté" */
+            min-width: 80px; /* Largeur plus importante pour Qté */
+        }
+        /* Ajustement pour les autres colonnes */
+        table th:nth-child(1), table td:nth-child(1) { /* Colonne "Prestation" */
+            min-width: 150px;
+        }
+        table th:nth-child(3), table td:nth-child(3) { /* Colonne "Prix unitaire" */
+            min-width: 100px;
+        }
+        table th:nth-child(4), table td:nth-child(4) { /* Colonne "Total" */
+            min-width: 100px;
+        }
+        .nav-buttons {
+            margin-top: 40px; /* Plus d'espace au-dessus des boutons */
+            padding-bottom: 60px; /* Espace pour éviter chevauchement avec footer-nav */
         }
         .footer-nav { 
             position: fixed; 
@@ -68,234 +86,134 @@
         .footer-nav a:hover { 
             background-color: #ffebee; 
         }
-        .checkbox-container { 
-            display: flex; 
-            align-items: center; 
-            padding: 8px; 
-            margin: 5px 0; 
-            border: 1px solid #ddd; 
-            border-radius: 4px; 
-            background-color: #fff; 
-            cursor: pointer; 
-            transition: background-color 0.3s ease; 
-        }
-        .checkbox-container:hover { 
-            background-color: #f0f0f0; 
-        }
-        .checkbox-container.checked { 
-            background-color: #e0f7fa; 
-        }
-        .checkbox-container label { 
-            margin: 0; 
-            font-weight: normal; 
-            white-space: nowrap; 
-        }
-        .checkbox-container input { 
-            margin-left: auto; 
-            width: 20px; 
-            height: 20px; 
-        }
-        .custom-input { 
-            display: none; 
-            margin-top: 5px; 
-        }
-        .extincteur-counter { 
-            font-style: italic; 
-            color: #666; 
-            margin-top: 5px; 
-        }
-        .error-message { 
-            color: #d32f2f; 
-            font-size: 0.9em; 
-            margin-top: 5px; 
-            display: none; 
-        }
-        .extincteur .form-content { 
-            display: block; 
-        }
-        .extincteur .form-content.hidden { 
-            display: none; 
-        }
-        .extincteur .form-content.read-only input,
-        .extincteur .form-content.read-only select,
-        .extincteur .form-content.read-only textarea,
-        .extincteur .form-content.read-only .checkbox-container input {
-            background-color: #e0e0e0;
-            pointer-events: none;
-        }
-        .extincteur .form-content.read-only button { 
-            display: none; 
-        }
-        /* Styles pour le dialogue d'action */
-        .action-dialog {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #fff;
+        .signature-pad {
             border: 1px solid #ddd;
-            padding: 20px;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
             border-radius: 8px;
-            min-width: 300px; /* Assure une largeur minimale pour mobile */
-        }
-        .action-dialog p {
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
-        .action-dialog button {
-            margin: 0 10px;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            display: inline-block; /* Assure que les boutons sont visibles */
-        }
-        .action-dialog button:first-child { /* Modifier */
-            background-color: #10b981; /* Vert */
-            color: #fff;
-        }
-        .action-dialog button:first-child:hover {
-            background-color: #059669;
-        }
-        .action-dialog button:nth-child(2) { /* Supprimer */
-            background-color: #e63946; /* Rouge */
-            color: #fff;
-        }
-        .action-dialog button:nth-child(2):hover {
-            background-color: #d00000;
-        }
-        .action-dialog button:last-child { /* Annuler */
-            background-color: #f1f1f1;
-            color: #555;
-        }
-        .action-dialog button:last-child:hover {
-            background-color: #e0e0e0;
-        }
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-        .section {
-            margin-bottom: 40px; /* Plus d'espace entre les sections */
-        }
-        .nav-buttons {
-            margin-top: 40px; /* Plus d'espace au-dessus des boutons */
-            padding-bottom: 60px; /* Espace pour éviter chevauchement avec footer-nav */
+            margin-top: 10px;
         }
         @media (max-width: 600px) {
-            .nav-buttons a, .nav-buttons button { 
-                flex: 1 1 100%; 
-                padding: 12px; 
-                font-size: 20px; 
+            table th, table td {
+                padding: 10px;
+                min-width: 50px; /* Ajustement pour mobile */
             }
-            .extincteur { 
-                padding: 12px; 
+            table th:nth-child(1), table td:nth-child(1) {
+                min-width: 120px;
             }
-            .footer-nav a { 
-                font-size: 24px; 
-                padding: 10px; 
+            table th:nth-child(2), table td:nth-child(2) {
+                min-width: 60px;
             }
-            .checkbox-container { 
-                padding: 8px; 
+            table th:nth-child(3), table td:nth-child(3) {
+                min-width: 80px;
             }
-            .checkbox-container label { 
-                font-size: 18px; 
+            table th:nth-child(4), table td:nth-child(4) {
+                min-width: 80px;
             }
-            .checkbox-container input { 
-                width: 28px; 
-                height: 28px; 
+            .nav-buttons a, .nav-buttons button {
+                flex: 1 1 100%;
+                padding: 12px;
+                font-size: 20px;
             }
-            .summary { 
-                padding: 10px; 
-                font-size: 18px; 
-            }
-            .action-dialog {
-                width: 90%;
-                min-width: 280px;
-            }
-            .action-dialog button {
-                margin: 5px;
-                padding: 6px 12px;
-                font-size: 12px;
+            .footer-nav a {
+                font-size: 24px;
+                padding: 10px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <h1>🔥 Bon d'Intervention</h1>
+
         <section class="section">
             <h2>🧾 Client</h2>
             <p><strong>Client:</strong> <span id="clientName">Non sélectionné</span></p>
-            <p><strong>Lieu d’intervention:</strong> <span id="lieu">Non sélectionné</span></p>
+            <p><strong>Adresse:</strong> <span id="adresse">Non sélectionnée</span></p>
+            <p><strong>Code postal:</strong> <span id="codePostal">Non sélectionné</span></p>
+            <p><strong>Ville:</strong> <span id="ville">Non sélectionnée</span></p>
+            <p><strong>Téléphone:</strong> <span id="telephone">Non sélectionné</span></p>
+            <p><strong>Email:</strong> <span id="email">Non sélectionné</span></p>
+        </section>
+
+        <section class="section" id="crmSummary">
+            <h2>📄 Résumé des CRM</h2>
+            <p id="crmSummaryText">Aucun CRM enregistré.</p>
+        </section>
+
+        <section class="section">
+            <h2>📋 Prestations & Matériel</h2>
+            <table id="prestationsTable">
+                <thead>
+                    <tr>
+                        <th>Prestation</th>
+                        <th>Qté</th>
+                        <th>Prix unitaire</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="prestationsBody"></tbody>
+            </table>
+            <button class="action" onclick="addPrestation()">➕ Ajouter une ligne</button>
         </section>
 
         <section class="section">
             <h2>📅 Détails de l’intervention</h2>
             <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-16" required></label>
             <label>Technicien intervenant: <input type="text" id="technician" placeholder="Nom du technicien"></label>
+            <label>Durée (heures): <input type="number" id="duration" placeholder="Durée en heures"></label>
         </section>
 
         <section class="section">
-            <h2>🧯 Extincteurs</h2>
-            <div id="extincteursList"></div>
-            <p class="extincteur-counter" id="extincteurCounter">Extincteurs validés : 0</p>
-            <button class="action" onclick="addExtincteur()">➕ Ajouter un extincteur</button>
-            <p id="extincteurError" class="error-message" style="display: none;">Veuillez ajouter au moins un extincteur.</p>
-        </section>
-
-        <section class="section">
-            <h2>✅ Devoir de conseil</h2>
-            <div class="checkbox-container">
-                <label for="registre">Registre présent et à jour</label>
-                <input type="checkbox" id="registre" onchange="updateCheckboxStyle(this)">
+            <h2>✍️ Signature du client</h2>
+            <canvas id="signature-pad" class="signature-pad" width="400" height="200"></canvas>
+            <div>
+                <button class="clear-btn" onclick="clearSignature()">Effacer</button>
+                <button class="validate-signature-btn" onclick="validateSignature()">Valider la signature</button>
             </div>
-            <div class="checkbox-container">
-                <label for="signaletique">Signalétique à jour</label>
-                <input type="checkbox" id="signaletique" onchange="updateCheckboxStyle(this)">
-            </div>
-            <div class="checkbox-container">
-                <label for="baes">BAES présents</label>
-                <input type="checkbox" id="baes" onchange="updateCheckboxStyle(this)">
-            </div>
-            <div class="checkbox-container">
-                <label for="plans">Plans de sécurité présents et à jour</label>
-                <input type="checkbox" id="plans" onchange="updateCheckboxStyle(this)">
-            </div>
-        </section>
-
-        <section class="section">
-            <h2>📝 Observations générales</h2>
-            <textarea id="observations" rows="4" placeholder="Notes sur l'intervention..."></textarea>
         </section>
 
         <section class="section nav-buttons">
-            <button class="primary" onclick="validateCRM()">✅ Valider le compte rendu</button>
-            <a href="bon_intervention.html"><button class="action">➡️ Passer au bon d’intervention</button></a>
+            <button class="secondary" onclick="generatePDF()">📄 Générer le PDF</button>
+            <button class="secondary" onclick="sendEmail()">📧 Envoyer par email</button>
+            <a href="intervention.html"><button class="neutral">⬅️ Retour</button></a>
         </section>
-    </div>
 
-    <div class="footer-nav">
-        <div class="navigation nav-buttons">
-            <a href="index.html">🏠</a>
-            <a href="crm_extincteurs.html">🧯</a>
-            <a href="crm_ria.html">🚿</a>
-            <a href="crm_baes.html">💡</a>
-            <a href="crm_desenfumage.html">💨</a>
+        <div class="footer-nav">
+            <div class="navigation nav-buttons">
+                <a href="index.html">🏠</a>
+                <a href="client.html">📁</a>
+                <a href="intervention.html">🛠️</a>
+                <a href="parametres.html">⚙️</a>
+            </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <script>
-        let extincteurCount = 0;
-        let extincteursValides = [];
+        const canvas = document.getElementById('signature-pad');
+        const signaturePad = new SignaturePad(canvas);
+
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext('2d').scale(ratio, ratio);
+            signaturePad.clear();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function clearSignature() {
+            signaturePad.clear();
+        }
+
+        function validateSignature() {
+            if (signaturePad.isEmpty()) {
+                alert('Veuillez apposer une signature avant de valider.');
+                return;
+            }
+            alert('Signature validée avec succès !');
+        }
 
         window.onload = () => {
             const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
@@ -305,483 +223,122 @@
                 return;
             }
             document.getElementById('clientName').textContent = interventionData.client || 'Non sélectionné';
-            document.getElementById('lieu').textContent = interventionData.lieu || 'Non sélectionné';
-            loadDraft();
+            document.getElementById('adresse').textContent = interventionData.adresse || 'Non sélectionnée';
+            document.getElementById('codePostal').textContent = interventionData.codePostal || 'Non sélectionné';
+            document.getElementById('ville').textContent = interventionData.ville || 'Non sélectionnée';
+            document.getElementById('telephone').textContent = interventionData.telephone || 'Non sélectionné';
+            document.getElementById('email').textContent = interventionData.email || 'Non sélectionné';
+
+            const drafts = JSON.parse(localStorage.getItem('drafts')) || {};
+            if (drafts['crm_extincteurs']) {
+                document.getElementById('crmSummaryText').textContent = drafts['crm_extincteurs'].summary || 'Aucun CRM enregistré.';
+            }
+
+            const prestationsData = JSON.parse(localStorage.getItem('prestationsData')) || [];
+            const tbody = document.getElementById('prestationsBody');
+            prestationsData.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.id = `row-${index}`;
+                row.innerHTML = `
+                    <td><input type="text" class="prestation" value="${item.prestation || ''}" readonly></td>
+                    <td><input type="number" class="quantity" value="${item.quantity || ''}" readonly></td>
+                    <td><input type="number" class="unitPrice" value="${item.unitPrice || ''}" readonly></td>
+                    <td><input type="number" class="total" value="${item.total || ''}" readonly></td>
+                `;
+                row.classList.add('active');
+                row.onclick = () => editRow(index);
+                tbody.appendChild(row);
+            });
         };
 
-        function addExtincteur() {
-            console.log("Ajout d'un nouvel extincteur...");
-            extincteurCount++;
-            const div = document.createElement('div');
-            div.className = 'extincteur';
-            div.id = `extincteur-${extincteurCount}`;
-            div.innerHTML = `
-                <div class="form-content">
-                    <h3>🧯 Nouvel extincteur #${extincteurCount}</h3>
-                    <label>N° extincteur: <input type="text" class="num" value="EXT-${extincteurCount}"></label>
-                    <label>Type d'extincteur: 
-                        <select class="type" onchange="toggleCustomInput(this, 'customType-${extincteurCount}')">
-                            <option value="">-- Sélectionner --</option>
-                            <option value="Eau 6L">Eau 6L</option>
-                            <option value="CO2 2kg">CO2 2kg</option>
-                            <option value="Poudre 5kg">Poudre 5kg</option>
-                            <option value="Autre">Autre</option>
-                        </select>
-                        <input type="text" class="custom-input customType-${extincteurCount}" placeholder="Type personnalisé">
-                    </label>
-                    <label>Ext. PP ? <input type="checkbox" id="pp-${extincteurCount}" class="pp" onchange="updateCheckboxStyle(this)"></label>
-                    <label>Fabricant: 
-                        <select class="fabricant" onchange="toggleCustomInput(this, 'customFabricant-${extincteurCount}')">
-                            <option value="">-- Sélectionner --</option>
-                            <option value="Desautel">Desautel</option>
-                            <option value="Kidde">Kidde</option>
-                            <option value="Sicli">Sicli</option>
-                            <option value="Autre">Autre</option>
-                        </select>
-                        <input type="text" class="custom-input customFabricant-${extincteurCount}" placeholder="Fabricant personnalisé">
-                    </label>
-                    <label>Millésime: 
-                        <select class="millesime" onchange="toggleCustomInput(this, 'customMillesime-${extincteurCount}')">
-                            <option value="">-- Sélectionner --</option>
-                            ${Array.from({length: 11}, (_, i) => 2015 + i).map(year => `<option value="${year}">${year}</option>`).join('')}
-                            <option value="Autre">Autre</option>
-                        </select>
-                        <input type="text" class="custom-input customMillesime-${extincteurCount}" placeholder="Année personnalisée">
-                    </label>
-                    <label>Étage: <input type="text" class="etage" placeholder="Ex. Rez-de-chaussée, 1er étage"></label>
-                    <label>Emplacement: <input type="text" class="emplacement" placeholder="Ex. Hall principal"></label>
-                    <h4 class="operations-title">Opérations effectuées</h4>
-                    <div class="checkbox-container">
-                        <label for="op-verif-${extincteurCount}">Vérification OK</label>
-                        <input type="checkbox" id="op-verif-${extincteurCount}" class="op-verif" onchange="updateCheckboxStyle(this)">
-                    </div>
-                    <div class="checkbox-container">
-                        <label for="op-quinquennale-${extincteurCount}">Révision quinquennale</label>
-                        <input type="checkbox" id="op-quinquennale-${extincteurCount}" class="op-quinquennale" onchange="updateCheckboxStyle(this)">
-                    </div>
-                    <div class="checkbox-container">
-                        <label for="op-recharge-${extincteurCount}">Rechargé</label>
-                        <input type="checkbox" id="op-recharge-${extincteurCount}" class="op-recharge" onchange="updateCheckboxStyle(this)">
-                    </div>
-                    <div class="checkbox-container">
-                        <label for="op-mise-service-${extincteurCount}">Mise en service</label>
-                        <input type="checkbox" id="op-mise-service-${extincteurCount}" class="op-mise-service" onchange="updateCheckboxStyle(this)">
-                    </div>
-                    <div class="checkbox-container">
-                        <label for="op-echange-${extincteurCount}">Échange standard</label>
-                        <input type="checkbox" id="op-echange-${extincteurCount}" class="op-echange" onchange="updateCheckboxStyle(this)">
-                    </div>
-                    <label>Observation: <textarea class="observation" rows="2"></textarea></label>
-                    <button class="action" onclick="validateExtincteur(${extincteurCount})">✅ Valider extincteur</button>
-                    <button class="secondary" onclick="removeExtincteur(${extincteurCount})">🗑️ Supprimer</button>
-                    <p class="error-message" id="error-${extincteurCount}"></p>
-                </div>
-                <div class="summary" id="summary-${extincteurCount}" onclick="showActionDialog(${extincteurCount})">
-                    <div class="summary-content"></div>
-                </div>
+        let activeRow = null;
+
+        function addPrestation() {
+            if (activeRow) {
+                alert('Veuillez valider ou supprimer la ligne en cours avant d’ajouter une nouvelle.');
+                return;
+            }
+            const tbody = document.getElementById('prestationsBody');
+            const row = document.createElement('tr');
+            const index = tbody.children.length;
+            row.id = `row-${index}`;
+            row.innerHTML = `
+                <td><input type="text" class="prestation" placeholder="Prestation"></td>
+                <td><input type="number" class="quantity" placeholder="Qté" oninput="calculateTotal(this)"></td>
+                <td><input type="number" class="unitPrice" placeholder="Prix unitaire" oninput="calculateTotal(this)"></td>
+                <td><input type="number" class="total" readonly></td>
             `;
-            const extincteursList = document.getElementById('extincteursList');
-            extincteursList.appendChild(div);
-            div.querySelectorAll('.checkbox-container').forEach(container => {
-                container.addEventListener('click', (e) => {
-                    const checkbox = container.querySelector('input[type="checkbox"]');
-                    if (e.target !== checkbox && !container.closest('.form-content').classList.contains('read-only')) {
-                        checkbox.click();
-                    }
-                });
-            });
-            console.log(`Extincteur ${extincteurCount} ajouté avec succès.`);
-        }
-
-        function toggleCustomInput(select, inputId) {
-            console.log(`toggleCustomInput appelé pour ${inputId}, valeur sélectionnée : ${select.value}`);
-            const input = document.querySelector(`.${inputId}`);
-            if (!input) {
-                console.error(`Champ personnalisé ${inputId} non trouvé.`);
-                return;
-            }
-            if (select.value === 'Autre') {
-                input.style.display = 'block';
-                input.classList.add('visible');
-            } else {
-                input.style.display = 'none';
-                input.classList.remove('visible');
-                input.value = '';
-            }
-        }
-
-        function updateCheckboxStyle(checkbox) {
-            console.log(`updateCheckboxStyle appelé pour checkbox ${checkbox.id}, état : ${checkbox.checked}`);
-            const container = checkbox.closest('.checkbox-container');
-            if (checkbox.checked) {
-                container.classList.add('checked');
-            } else {
-                container.classList.remove('checked');
-            }
-        }
-
-        function showActionDialog(id) {
-            console.log(`Affichage du dialogue pour l'extincteur ${id}`);
-            const overlay = document.createElement('div');
-            overlay.className = 'overlay';
-            document.body.appendChild(overlay);
-
-            const dialog = document.createElement('div');
-            dialog.className = 'action-dialog';
-            dialog.innerHTML = `
-                <p>Que voulez-vous faire ?</p>
-                <button onclick="openExtincteurForm(${id})">✏️ Modifier</button>
-                <button onclick="removeExtincteurWithDialog(${id})">🗑️ Supprimer</button>
-                <button onclick="closeDialog(this.parentElement)">Annuler</button>
+            const actionDiv = document.createElement('div');
+            actionDiv.className = 'action-buttons';
+            actionDiv.innerHTML = `
+                <button class="validate-btn" onclick="validateRow(this.parentElement.parentElement, this.parentElement)" title="Valider"><i class="fas fa-check-circle"></i></button>
+                <button class="delete-btn" onclick="this.parentElement.parentElement.remove()" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
             `;
-            document.body.appendChild(dialog);
+            tbody.appendChild(row);
+            row.appendChild(actionDiv);
+            activeRow = row;
+            actionDiv.style.display = 'block';
         }
 
-        function openExtincteurForm(id) {
-            console.log(`Ouverture du formulaire pour l'extincteur ${id}`);
-            const dialog = document.querySelector('.action-dialog');
-            if (dialog) {
-                closeDialog(dialog);
-            } else {
-                console.warn('Dialogue non trouvé pour la fermeture.');
-            }
-
-            const extincteur = document.getElementById(`extincteur-${id}`);
-            if (!extincteur) {
-                console.error(`Extincteur ${id} non trouvé.`);
-                return;
-            }
-            const formContent = extincteur.querySelector('.form-content');
-            if (!formContent) {
-                console.error(`Formulaire pour l'extincteur ${id} non trouvé.`);
-                return;
-            }
-            formContent.classList.remove('hidden');
-            formContent.classList.remove('read-only');
-            const inputs = extincteur.querySelectorAll('input');
-            const selects = extincteur.querySelectorAll('select');
-            const textareas = extincteur.querySelectorAll('textarea');
-            inputs.forEach(elem => {
-                elem.removeAttribute('readonly');
-                elem.style.pointerEvents = 'auto';
-            });
-            selects.forEach(elem => {
-                elem.removeAttribute('disabled');
-                elem.style.pointerEvents = 'auto';
-            });
-            textareas.forEach(elem => {
-                elem.removeAttribute('readonly');
-                elem.style.pointerEvents = 'auto';
-            });
-            extincteur.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-                cb.removeAttribute('disabled');
-                cb.style.pointerEvents = 'auto';
-                updateCheckboxStyle(cb);
-            });
-            const validateButtonForm = extincteur.querySelector('button[onclick^="validateExtincteur"]') || extincteur.querySelector('button[onclick^="updateExtincteur"]');
-            const removeButton = extincteur.querySelector('button[onclick^="removeExtincteur"]');
-            if (validateButtonForm) {
-                validateButtonForm.textContent = '✅ Valider modification';
-                validateButtonForm.setAttribute('onclick', `updateExtincteur(${id})`);
-                validateButtonForm.style.display = 'inline';
-            }
-            if (removeButton) {
-                removeButton.style.display = 'inline';
-            }
+        function calculateTotal(input) {
+            const row = input.closest('tr');
+            const quantity = row.querySelector('.quantity').value;
+            const unitPrice = row.querySelector('.unitPrice').value;
+            const totalInput = row.querySelector('.total');
+            totalInput.value = quantity && unitPrice ? (quantity * unitPrice).toFixed(2) : '';
         }
 
-        function validateExtincteur(id) {
-            console.log(`Validation de l'extincteur ${id}`);
-            const extincteur = document.getElementById(`extincteur-${id}`);
-            if (!extincteur) {
-                console.error(`Extincteur ${id} non trouvé.`);
+        function validateRow(row, actionDiv) {
+            const inputs = row.querySelectorAll('input');
+            inputs.forEach(input => input.readOnly = true);
+            row.classList.add('active');
+            actionDiv.style.display = 'none';
+            activeRow = null;
+            row.onclick = () => editRow(row.id.split('-')[1]);
+            savePrestations();
+        }
+
+        function editRow(index) {
+            if (activeRow) {
+                alert('Veuillez valider ou supprimer la ligne en cours avant de modifier une autre.');
                 return;
             }
-            const formContent = extincteur.querySelector('.form-content');
-            const summaryDiv = document.getElementById(`summary-${id}`);
-            const errorDiv = document.getElementById(`error-${id}`);
-            if (!formContent || !summaryDiv || !errorDiv) {
-                console.error(`Éléments manquants pour l'extincteur ${id}.`);
-                return;
-            }
-            errorDiv.style.display = 'none';
-            errorDiv.textContent = '';
+            const row = document.getElementById(`row-${index}`);
+            const inputs = row.querySelectorAll('input');
+            inputs.forEach(input => input.readOnly = false);
+            activeRow = row;
+            const actionDiv = document.createElement('div');
+            actionDiv.className = 'action-buttons';
+            actionDiv.innerHTML = `
+                <button class="validate-btn" onclick="validateRow(this.parentElement.parentElement, this.parentElement)" title="Valider"><i class="fas fa-check-circle"></i></button>
+                <button class="delete-btn" onclick="this.parentElement.parentElement.remove(); savePrestations()" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+            `;
+            row.appendChild(actionDiv);
+            actionDiv.style.display = 'block';
+            row.classList.remove('active');
+        }
 
-            try {
-                const num = extincteur.querySelector('.num').value;
-                const typeSelect = extincteur.querySelector('.type');
-                const type = typeSelect.value === 'Autre' ? (extincteur.querySelector(`.customType-${id}`).value || '') : typeSelect.value;
-                const fabricantSelect = extincteur.querySelector('.fabricant');
-                const fabricant = fabricantSelect.value === 'Autre' ? (extincteur.querySelector(`.customFabricant-${id}`).value || '') : fabricantSelect.value;
-                const millesimeSelect = extincteur.querySelector('.millesime');
-                const millesime = millesimeSelect.value === 'Autre' ? (extincteur.querySelector(`.customMillesime-${id}`).value || '') : millesimeSelect.value;
-                const etage = extincteur.querySelector('.etage').value;
-                const emplacement = extincteur.querySelector('.emplacement').value;
-                const observation = extincteur.querySelector('.observation').value.trim();
-
-                console.log(`Validation des champs : num=${num}, type=${type}, fabricant=${fabricant}, millesime=${millesime}, etage=${etage}, emplacement=${emplacement}`);
-
-                if (!num || !type || !millesime || !etage || !emplacement) {
-                    errorDiv.textContent = 'Veuillez remplir tous les champs obligatoires : N° Extincteur, Type, Millésime, Étage, Emplacement.';
-                    errorDiv.style.display = 'block';
-                    console.log('Erreur de validation : champs obligatoires manquants');
-                    return;
-                }
-
-                const operations = Array.from(extincteur.querySelectorAll('input[type="checkbox"]'))
-                    .filter(cb => cb.checked && cb.className !== 'pp');
-                if (operations.length === 0 && observation === '') {
-                    errorDiv.textContent = 'Veuillez cocher au moins une opération ou ajouter une observation.';
-                    errorDiv.style.display = 'block';
-                    console.log('Erreur de validation : opération ou observation requise');
-                    return;
-                }
-
-                const pp = extincteur.querySelector('.pp').checked ? 'PP' : '';
-                const ops = operations.map(cb => {
-                    if (cb.className.includes('verif')) return '[VF]';
-                    if (cb.className.includes('recharge')) return '[RE]';
-                    if (cb.className.includes('quinquennale')) return '[RQ]';
-                    if (cb.className.includes('echange')) return '[ES]';
-                    if (cb.className.includes('mise-service')) return '[MES]';
-                    return '';
-                }).join('');
-
-                const summary = `${num} - ${type} (${emplacement}) ${ops}${pp ? `[${pp}]` : ''}`;
-                const summaryContent = summaryDiv.querySelector('.summary-content');
-                summaryContent.textContent = summary;
-                summaryDiv.style.display = 'block';
-
-                extincteursValides[id] = {
-                    num: num,
-                    type: type,
-                    pp: pp,
-                    fabricant: fabricant,
-                    millesime: millesime,
-                    etage: etage,
-                    emplacement: emplacement,
-                    operations: ops,
-                    observation: observation
+        function savePrestations() {
+            const prestationsData = [];
+            document.querySelectorAll('#prestationsBody tr').forEach(row => {
+                const prestation = {
+                    prestation: row.querySelector('.prestation').value,
+                    quantity: row.querySelector('.quantity').value,
+                    unitPrice: row.querySelector('.unitPrice').value,
+                    total: row.querySelector('.total').value
                 };
-
-                formContent.classList.add('hidden');
-                updateExtincteurCounter();
-                console.log(`Extincteur ${id} validé avec succès.`);
-            } catch (error) {
-                console.error(`Erreur lors de la validation de l'extincteur ${id} :`, error);
-                errorDiv.textContent = 'Une erreur est survenue lors de la validation. Veuillez réessayer.';
-                errorDiv.style.display = 'block';
-            }
-        }
-
-        function updateExtincteur(id) {
-            console.log(`Mise à jour de l'extincteur ${id}`);
-            const extincteur = document.getElementById(`extincteur-${id}`);
-            if (!extincteur) {
-                console.error(`Extincteur ${id} non trouvé.`);
-                return;
-            }
-            const formContent = extincteur.querySelector('.form-content');
-            const summaryDiv = document.getElementById(`summary-${id}`);
-            const errorDiv = document.getElementById(`error-${id}`);
-            if (!formContent || !summaryDiv || !errorDiv) {
-                console.error(`Éléments manquants pour l'extincteur ${id}.`);
-                return;
-            }
-            errorDiv.style.display = 'none';
-            errorDiv.textContent = '';
-
-            try {
-                const num = extincteur.querySelector('.num').value;
-                const typeSelect = extincteur.querySelector('.type');
-                const type = typeSelect.value === 'Autre' ? (extincteur.querySelector(`.customType-${id}`).value || '') : typeSelect.value;
-                const fabricantSelect = extincteur.querySelector('.fabricant');
-                const fabricant = fabricantSelect.value === 'Autre' ? (extincteur.querySelector(`.customFabricant-${id}`).value || '') : fabricantSelect.value;
-                const millesimeSelect = extincteur.querySelector('.millesime');
-                const millesime = millesimeSelect.value === 'Autre' ? (extincteur.querySelector(`.customMillesime-${id}`).value || '') : millesimeSelect.value;
-                const etage = extincteur.querySelector('.etage').value;
-                const emplacement = extincteur.querySelector('.emplacement').value;
-                const observation = extincteur.querySelector('.observation').value.trim();
-
-                console.log(`Mise à jour des champs : num=${num}, type=${type}, fabricant=${fabricant}, millesime=${millesime}, etage=${etage}, emplacement=${emplacement}`);
-
-                if (!num || !type || !millesime || !etage || !emplacement) {
-                    errorDiv.textContent = 'Veuillez remplir tous les champs obligatoires : N° Extincteur, Type, Millésime, Étage, Emplacement.';
-                    errorDiv.style.display = 'block';
-                    console.log('Erreur de validation : champs obligatoires manquants');
-                    return;
-                }
-
-                const operations = Array.from(extincteur.querySelectorAll('input[type="checkbox"]'))
-                    .filter(cb => cb.checked && cb.className !== 'pp');
-                if (operations.length === 0 && observation === '') {
-                    errorDiv.textContent = 'Veuillez cocher au moins une opération ou ajouter une observation.';
-                    errorDiv.style.display = 'block';
-                    console.log('Erreur de validation : opération ou observation requise');
-                    return;
-                }
-
-                const pp = extincteur.querySelector('.pp').checked ? 'PP' : '';
-                const ops = operations.map(cb => {
-                    if (cb.className.includes('verif')) return '[VF]';
-                    if (cb.className.includes('recharge')) return '[RE]';
-                    if (cb.className.includes('quinquennale')) return '[RQ]';
-                    if (cb.className.includes('echange')) return '[ES]';
-                    if (cb.className.includes('mise-service')) return '[MES]';
-                    return '';
-                }).join('');
-
-                const summary = `${num} - ${type} (${emplacement}) ${ops}${pp ? `[${pp}]` : ''}`;
-                const summaryContent = summaryDiv.querySelector('.summary-content');
-                summaryContent.textContent = summary;
-                summaryDiv.style.display = 'block';
-
-                extincteursValides[id] = {
-                    num: num,
-                    type: type,
-                    pp: pp,
-                    fabricant: fabricant,
-                    millesime: millesime,
-                    etage: etage,
-                    emplacement: emplacement,
-                    operations: ops,
-                    observation: observation
-                };
-
-                formContent.classList.add('hidden');
-                updateExtincteurCounter();
-                console.log(`Extincteur ${id} mis à jour avec succès.`);
-            } catch (error) {
-                console.error(`Erreur lors de la mise à jour de l'extincteur ${id} :`, error);
-                errorDiv.textContent = 'Une erreur est survenue lors de la mise à jour. Veuillez réessayer.';
-                errorDiv.style.display = 'block';
-            }
-        }
-
-        function removeExtincteurWithDialog(id) {
-            console.log(`Suppression de l'extincteur ${id} via dialogue`);
-            const extincteur = document.getElementById(`extincteur-${id}`);
-            if (extincteur) {
-                extincteur.remove();
-                delete extincteursValides[id];
-                updateExtincteurCounter();
-            }
-            closeDialog(document.querySelector('.action-dialog'));
-        }
-
-        function removeExtincteur(id) {
-            console.log(`Suppression de l'extincteur ${id}`);
-            const extincteur = document.getElementById(`extincteur-${id}`);
-            if (extincteur) {
-                extincteur.remove();
-                delete extincteursValides[id];
-                updateExtincteurCounter();
-            }
-        }
-
-        function closeDialog(dialog) {
-            console.log("Fermeture du dialogue");
-            if (dialog && dialog.parentElement) {
-                const overlay = dialog.previousElementSibling;
-                if (overlay && overlay.className === 'overlay') {
-                    overlay.remove();
-                }
-                dialog.remove();
-            } else {
-                console.warn("Dialogue ou overlay non trouvé pour la fermeture.");
-                const overlay = document.querySelector('.overlay');
-                const dialogToRemove = document.querySelector('.action-dialog');
-                if (overlay) overlay.remove();
-                if (dialogToRemove) dialogToRemove.remove();
-            }
-        }
-
-        function updateExtincteurCounter() {
-            const count = Object.keys(extincteursValides).length;
-            document.getElementById('extincteurCounter').textContent = `Extincteurs validés : ${count}`;
-        }
-
-        function loadDraft() {
-            const drafts = JSON.parse(localStorage.getItem('drafts')) || {};
-            const draft = drafts['crm_extincteurs'];
-            if (draft) {
-                document.getElementById('clientName').textContent = draft.client || 'Non sélectionné';
-                document.getElementById('lieu').textContent = draft.lieu || 'Non sélectionné';
-                document.getElementById('interventionDate').value = draft.date;
-                document.getElementById('technician').value = draft.technician;
-                document.getElementById('observations').value = draft.observations;
-                if (draft.devoirConseil) {
-                    document.getElementById('registre').checked = draft.devoirConseil.registre;
-                    document.getElementById('signaletique').checked = draft.devoirConseil.signaletique;
-                    document.getElementById('baes').checked = draft.devoirConseil.baes;
-                    document.getElementById('plans').checked = draft.devoirConseil.plans;
-                }
-            }
-        }
-
-        function validateCRM() {
-            const client = document.getElementById('clientName').textContent;
-            const lieu = document.getElementById('lieu').textContent;
-            const date = document.getElementById('interventionDate').value;
-            const extincteurs = Object.values(extincteursValides);
-
-            if (!client || client === 'Non sélectionné') {
-                alert('Le nom du client est obligatoire.');
-                return;
-            }
-            if (!date) {
-                alert('La date d’intervention est obligatoire.');
-                return;
-            }
-            if (extincteurs.length === 0) {
-                document.getElementById('extincteurError').textContent = 'Vous devez valider au moins un extincteur pour soumettre le compte-rendu.';
-                document.getElementById('extincteurError').style.display = 'block';
-                return;
-            }
-
-            const summary = Object.values(extincteursValides).map(ext => {
-                const ops = ext.operations || '';
-                return `${ext.num} - ${ext.type} (${ext.emplacement}) ${ops}${ext.pp ? `[${ext.pp}]` : ''}`;
-            }).join('\n');
-
-            const observations = document.getElementById('observations').value;
-            const devoirConseil = {
-                registre: document.getElementById('registre').checked,
-                signaletique: document.getElementById('signaletique').checked,
-                baes: document.getElementById('baes').checked,
-                plans: document.getElementById('plans').checked
-            };
-
-            const crmData = {
-                client: client,
-                lieu: lieu,
-                date: date,
-                technician: document.getElementById('technician').value,
-                extincteurs: extincteurs,
-                summary: summary,
-                observations: observations,
-                devoirConseil: devoirConseil
-            };
-
-            let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
-            drafts['crm_extincteurs'] = crmData;
-            localStorage.setItem('drafts', JSON.stringify(drafts));
-
-            let interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
-            interventionData.crm_extincteurs = crmData;
-            localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
-
-            alert(`Compte-rendu validé avec succès !\nClient: ${client}\nLieu: ${lieu}\nDate: ${date}\nNombre d’extincteurs: ${extincteurs.length}`);
-        }
-
-        document.querySelectorAll('.checkbox-container').forEach(container => {
-            container.addEventListener('click', (e) => {
-                const checkbox = container.querySelector('input[type="checkbox"]');
-                if (e.target !== checkbox && !container.closest('.form-content').classList.contains('read-only')) {
-                    checkbox.click();
-                }
+                prestationsData.push(prestation);
             });
-        });
+            localStorage.setItem('prestationsData', JSON.stringify(prestationsData));
+        }
+
+        function generatePDF() {
+            alert('Fonctionnalité de génération de PDF à implémenter.');
+        }
+
+        function sendEmail() {
+            alert('Fonctionnalité d’envoi par email à implémenter.');
+        }
     </script>
 </body>
 </html>
