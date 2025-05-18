@@ -30,25 +30,29 @@
         }
         table {
             margin-bottom: 40px; /* Plus d'espace sous les tableaux */
+            width: 100%; /* S'assurer que le tableau prend toute la largeur */
         }
         /* Élargir les colonnes du tableau */
         table th, table td {
-            padding: 15px; /* Padding existant */
-            min-width: 60px; /* Largeur minimale pour chaque cellule */
+            padding: 10px; /* Padding pour plus d'espace */
+            min-width: 80px; /* Largeur minimale pour chaque cellule */
             text-align: left;
         }
         /* Ajustement spécifique pour la colonne Qté */
-        table th:nth-child(2), table td:nth-child(2) { /* Colonne "Qté" */
-            min-width: 80px; /* Largeur plus importante pour Qté */
+        table th:nth-child(3), table td:nth-child(3) { /* Colonne "Qté" */
+            min-width: 100px; /* Largeur plus importante pour Qté */
         }
         /* Ajustement pour les autres colonnes */
-        table th:nth-child(1), table td:nth-child(1) { /* Colonne "Prestation" */
+        table th:nth-child(1), table td:nth-child(1) { /* Colonne "Type" */
+            min-width: 120px;
+        }
+        table th:nth-child(2), table td:nth-child(2) { /* Colonne "Prestation" */
             min-width: 150px;
         }
-        table th:nth-child(3), table td:nth-child(3) { /* Colonne "Prix unitaire" */
+        table th:nth-child(4), table td:nth-child(4) { /* Colonne "Prix unitaire" */
             min-width: 100px;
         }
-        table th:nth-child(4), table td:nth-child(4) { /* Colonne "Total" */
+        table th:nth-child(5), table td:nth-child(5) { /* Colonne "Total" */
             min-width: 100px;
         }
         .nav-buttons {
@@ -93,19 +97,22 @@
         }
         @media (max-width: 600px) {
             table th, table td {
-                padding: 10px;
-                min-width: 50px; /* Ajustement pour mobile */
+                padding: 8px;
+                min-width: 60px; /* Ajustement pour mobile */
             }
             table th:nth-child(1), table td:nth-child(1) {
-                min-width: 120px;
+                min-width: 100px;
             }
             table th:nth-child(2), table td:nth-child(2) {
-                min-width: 60px;
+                min-width: 120px;
             }
             table th:nth-child(3), table td:nth-child(3) {
                 min-width: 80px;
             }
             table th:nth-child(4), table td:nth-child(4) {
+                min-width: 80px;
+            }
+            table th:nth-child(5), table td:nth-child(5) {
                 min-width: 80px;
             }
             .nav-buttons a, .nav-buttons button {
@@ -144,6 +151,7 @@
             <table id="prestationsTable">
                 <thead>
                     <tr>
+                        <th>Type</th>
                         <th>Prestation</th>
                         <th>Qté</th>
                         <th>Prix unitaire</th>
@@ -152,7 +160,7 @@
                 </thead>
                 <tbody id="prestationsBody"></tbody>
             </table>
-            <button class="action" onclick="addPrestation()">➕ Ajouter une ligne</button>
+            <button class="action" onclick="addPrestation()">➕ Ajouter une prestation</button>
         </section>
 
         <section class="section">
@@ -166,8 +174,8 @@
             <h2>✍️ Signature du client</h2>
             <canvas id="signature-pad" class="signature-pad" width="400" height="200"></canvas>
             <div>
-                <button class="clear-btn" onclick="clearSignature()">Effacer</button>
-                <button class="validate-signature-btn" onclick="validateSignature()">Valider la signature</button>
+                <button class="secondary" onclick="clearSignature()">Effacer</button>
+                <button class="action" onclick="validateSignature()">Valider la signature</button>
             </div>
         </section>
 
@@ -176,14 +184,14 @@
             <button class="secondary" onclick="sendEmail()">📧 Envoyer par email</button>
             <a href="intervention.html"><button class="neutral">⬅️ Retour</button></a>
         </section>
+    </div>
 
-        <div class="footer-nav">
-            <div class="navigation nav-buttons">
-                <a href="index.html">🏠</a>
-                <a href="client.html">📁</a>
-                <a href="intervention.html">🛠️</a>
-                <a href="parametres.html">⚙️</a>
-            </div>
+    <div class="footer-nav">
+        <div class="navigation nav-buttons">
+            <a href="index.html">🏠</a>
+            <a href="client.html">📁</a>
+            <a href="intervention.html">🛠️</a>
+            <a href="parametres.html">⚙️</a>
         </div>
     </div>
 
@@ -240,6 +248,7 @@
                 const row = document.createElement('tr');
                 row.id = `row-${index}`;
                 row.innerHTML = `
+                    <td><input type="text" class="type" value="${item.type || ''}" readonly></td>
                     <td><input type="text" class="prestation" value="${item.prestation || ''}" readonly></td>
                     <td><input type="number" class="quantity" value="${item.quantity || ''}" readonly></td>
                     <td><input type="number" class="unitPrice" value="${item.unitPrice || ''}" readonly></td>
@@ -263,6 +272,7 @@
             const index = tbody.children.length;
             row.id = `row-${index}`;
             row.innerHTML = `
+                <td><input type="text" class="type" placeholder="Type"></td>
                 <td><input type="text" class="prestation" placeholder="Prestation"></td>
                 <td><input type="number" class="quantity" placeholder="Qté" oninput="calculateTotal(this)"></td>
                 <td><input type="number" class="unitPrice" placeholder="Prix unitaire" oninput="calculateTotal(this)"></td>
@@ -272,7 +282,7 @@
             actionDiv.className = 'action-buttons';
             actionDiv.innerHTML = `
                 <button class="validate-btn" onclick="validateRow(this.parentElement.parentElement, this.parentElement)" title="Valider"><i class="fas fa-check-circle"></i></button>
-                <button class="delete-btn" onclick="this.parentElement.parentElement.remove()" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                <button class="delete-btn" onclick="this.parentElement.parentElement.remove(); savePrestations()" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
             `;
             tbody.appendChild(row);
             row.appendChild(actionDiv);
@@ -322,6 +332,7 @@
             const prestationsData = [];
             document.querySelectorAll('#prestationsBody tr').forEach(row => {
                 const prestation = {
+                    type: row.querySelector('.type').value,
                     prestation: row.querySelector('.prestation').value,
                     quantity: row.querySelector('.quantity').value,
                     unitPrice: row.querySelector('.unitPrice').value,
