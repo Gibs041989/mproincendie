@@ -15,7 +15,7 @@
         .action-buttons { text-align: right; margin-top: 4px; display: flex; justify-content: flex-end; }
         .action-buttons button { font-size: 16px; padding: 5px; margin: 0 3px; border: none; background: none; cursor: pointer; }
         .action-buttons button:disabled { opacity: 0.5; cursor: not-allowed; }
-        .section { margin-bottom: 30px; }
+        .section { margin-bottom: 40px; padding: 15px; } /* Espacement accru + padding */
         .table-container { width: 100%; }
         #prestationsTable { width: 100%; border-collapse: collapse; }
         #prestationsTable th, #prestationsTable td { padding: 8px; text-align: left; border: 1px solid #ddd; font-size: 14px; }
@@ -33,7 +33,7 @@
         .footer-nav a { flex: 1; text-align: center; padding: 6px; font-size: 18px; background-color: transparent; border-radius: 5px; transition: background-color 0.3s ease; }
         .footer-nav a:hover { background-color: #ffebee; }
         .signature-pad { border: 1px solid #ddd; border-radius: 5px; margin-top: 6px; width: 100%; height: 90px; pointer-events: none; }
-        .signature-block { margin-bottom: 20px; }
+        .signature-block { margin-bottom: 30px; }
         .floating-btn { position: fixed; bottom: 70px; right: 10px; background-color: #10b981; color: white; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1001; }
         .floating-btn:hover::after { content: "Ajouter une prestation"; position: absolute; right: 60px; background: #333; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1002; }
@@ -41,7 +41,7 @@
         .modal-content canvas { width: 100%; height: 200px; border: 1px solid #ddd; border-radius: 5px; }
         .modal-buttons { display: flex; justify-content: space-between; margin-top: 10px; }
         @media (max-width: 600px) {
-            .section { margin-bottom: 20px; }
+            .section { margin-bottom: 30px; padding: 10px; }
             #prestationsTable th { display: none; }
             #prestationsTable tr { display: block; margin-bottom: 8px; border: 1px solid #ddd; padding: 6px; border-radius: 5px; background: #fff; }
             #prestationsTable td:nth-child(1) { display: block; width: 100%; padding: 4px 0; }
@@ -56,7 +56,6 @@
             #prestationsTable td:nth-child(2):before { content: "Qté"; }
             #prestationsTable td:nth-child(3):before { content: "PU HT (€)"; }
             #prestationsTable td:nth-child(4):before { content: "Total HT (€)"; }
-            #prestationsTable td .action-buttons { margin-top: 4px; }
             #totalsTable { max-width: 160px; margin-left: auto; margin-right: 0; }
             #totalsTable th, #totalsTable td { padding: 4px; font-size: 12px; color: #222; font-weight: 500; }
             .signature-pad { width: 100%; height: 90px; }
@@ -167,6 +166,7 @@
             <canvas id="modal-signature-pad"></canvas>
             <div class="modal-buttons">
                 <button class="secondary" onclick="clearModalSignature()">Effacer</button>
+                <button class="secondary" onclick="closeSignatureModal()">Annuler</button>
                 <button class="action" onclick="validateModalSignature()">Valider</button>
             </div>
         </div>
@@ -366,7 +366,7 @@
             saveDraft();
         }
         function loadPrestations() {
-            const prestationsData = JSON.parse(localStorage.getItem('prestationsData')) || [];
+            const prestationsData = JSON.parse(localStorage.getItem('prestationsData') || '[]');
             const tbody = document.getElementById('prestationsBody');
             prestationsData.forEach((item, index) => {
                 const isCustom = !articlesDB.some(article => article.name === item.designation);
@@ -462,36 +462,100 @@
         function generatePDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            doc.setFontSize(18);
-            doc.text('Bon d’Intervention - MPro Incendie', 20, 20);
+            // En-tête
+            doc.setFontSize(20);
+            doc.setFont("helvetica", "bold");
+            doc.text("Bon d'Intervention - MPro Incendie", 20, 20);
+            doc.setLineWidth(0.5);
+            doc.line(20, 25, 190, 25);
+            // Section Client
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text("Client", 20, 35);
             doc.setFontSize(12);
-            doc.text(`Client: ${document.getElementById('clientName').textContent}`, 20, 40);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Nom: ${document.getElementById('clientName').textContent}`, 20, 45);
             doc.text(`Adresse: ${document.getElementById('adresse').textContent}`, 20, 50);
+            doc.text(`Code postal: ${document.getElementById('codePostal').textContent}`, 20, 55);
+            doc.text(`Ville: ${document.getElementById('ville').textContent}`, 20, 60);
+            doc.text(`Téléphone: ${document.getElementById('telephone').textContent}`, 20, 65);
+            doc.text(`Email: ${document.getElementById('email').textContent}`, 20, 70);
+            // Section Prestations
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text("Prestations & Matériel", 20, 85);
             const rows = document.querySelectorAll('#prestationsBody tr');
-            let y = 70;
-            rows.forEach(row => {
-                const select = row.querySelector('.designation');
-                const customDesignation = row.querySelector('.custom-designation');
-                const designation = select.value === 'custom' ? customDesignation.value : select.value;
-                const quantity = row.querySelector('.quantity').value;
-                const unitPrice = row.querySelector('.unitPrice').value;
-                const total = row.querySelector('.total').value;
-                doc.text(`${designation} | Qté: ${quantity} | PU HT: ${unitPrice} | Total: ${total}`, 20, y);
+            let y = 95;
+            if (rows.length > 0) {
+                doc.autoTable({
+                    startY: y,
+                    head: [['Désignation', 'Qté', 'PU HT (€)', 'Total HT (€)']],
+                    body: Array.from(rows).map(row => {
+                        const select = row.querySelector('.designation');
+                        const customDesignation = row.querySelector('.custom-designation');
+                        const designation = select.value === 'custom' ? customDesignation.value : select.value;
+                        return [
+                            designation || '-',
+                            row.querySelector('.quantity').value || '0',
+                            row.querySelector('.unitPrice').value || '0.00',
+                            row.querySelector('.total').value || '0.00'
+                        ];
+                    }),
+                    styles: { fontSize: 10, cellPadding: 2 },
+                    headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0] },
+                    margin: { left: 20, right: 20 }
+                });
+                y = doc.lastAutoTable.finalY + 10;
+            } else {
+                doc.setFontSize(10);
+                doc.text("Aucune prestation enregistrée.", 20, y);
                 y += 10;
+            }
+            // Section Totaux
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text("Totaux", 20, y);
+            doc.autoTable({
+                startY: y + 5,
+                body: [
+                    ['Total HT', document.getElementById('totalHT').textContent],
+                    ['TVA 20%', document.getElementById('tva').textContent],
+                    ['Total TTC', document.getElementById('totalTTC').textContent]
+                ],
+                styles: { fontSize: 10, cellPadding: 2 },
+                columnStyles: { 0: { fontStyle: 'bold' } },
+                margin: { left: 20, right: 20 }
             });
-            doc.text(`Total HT: ${document.getElementById('totalHT').textContent}`, 20, y + 10);
-            doc.text(`TVA 20%: ${document.getElementById('tva').textContent}`, 20, y + 20);
-            doc.text(`Total TTC: ${document.getElementById('totalTTC').textContent}`, 20, y + 30);
-            doc.text(`Délais de règlement: ${document.getElementById('delaiReglement').value === 'custom' ? document.getElementById('delaiCustom').value : document.getElementById('delaiReglement').value}`, 20, y + 40);
-            doc.text(`Moyen de règlement: ${document.getElementById('moyenReglement').value === 'custom' ? document.getElementById('moyenCustom').value : document.getElementById('moyenReglement').value}`, 20, y + 50);
-            doc.text(`Observations: ${document.getElementById('observations').value}`, 20, y + 60);
+            y = doc.lastAutoTable.finalY + 10;
+            // Section Modalités
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text("Modalités de règlement", 20, y);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Délais: ${document.getElementById('delaiReglement').value === 'custom' ? document.getElementById('delaiCustom').value : document.getElementById('delaiReglement').value}`, 20, y + 5);
+            doc.text(`Moyen: ${document.getElementById('moyenReglement').value === 'custom' ? document.getElementById('moyenCustom').value : document.getElementById('moyenReglement').value}`, 20, y + 10);
+            const observations = document.getElementById('observations').value;
+            if (observations) {
+                doc.text("Observations:", 20, y + 15);
+                doc.text(doc.splitTextToSize(observations, 170), 20, y + 20);
+                y += 20 + (Math.ceil(observations.length / 85) * 5);
+            } else {
+                y += 15;
+            }
+            // Section Signatures
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text("Signatures", 20, y);
             if (!clientSignaturePad.isEmpty()) {
-                doc.text('Signature Client:', 20, y + 70);
-                doc.addImage(clientSignaturePad.toDataURL(), 'PNG', 20, y + 80, 80, 40);
+                doc.setFontSize(10);
+                doc.text('Client:', 20, y + 10);
+                doc.addImage(clientSignaturePad.toDataURL(), 'PNG', 20, y + 15, 80, 40);
             }
             if (!technicianSignaturePad.isEmpty()) {
-                doc.text('Signature Technicien:', 20, y + 130);
-                doc.addImage(technicianSignaturePad.toDataURL(), 'PNG', 20, y + 140, 80, 40);
+                doc.setFontSize(10);
+                doc.text('Technicien:', 110, y + 10);
+                doc.addImage(technicianSignaturePad.toDataURL(), 'PNG', 110, y + 15, 80, 40);
             }
             doc.save(`bon_intervention_${new Date().toISOString().slice(0,10)}.pdf`);
         }
