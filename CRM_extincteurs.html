@@ -189,6 +189,7 @@
         }
         .nav-buttons {
             margin-top: 40px; /* Plus d'espace au-dessus des boutons */
+            padding-bottom: 60px; /* Espace pour éviter chevauchement avec footer-nav */
         }
         @media (max-width: 600px) {
             .nav-buttons a, .nav-buttons button { 
@@ -278,7 +279,7 @@
 
         <section class="section nav-buttons">
             <button class="primary" onclick="validateCRM()">✅ Valider le compte rendu</button>
-            <a href="bon_intervention.html"><button class="secondary">➡️ Passer au bon d’intervention</button></a>
+            <a href="bon_intervention.html"><button class="action">➡️ Passer au bon d’intervention</button></a>
         </section>
     </div>
 
@@ -569,6 +570,90 @@
             } catch (error) {
                 console.error(`Erreur lors de la validation de l'extincteur ${id} :`, error);
                 errorDiv.textContent = 'Une erreur est survenue lors de la validation. Veuillez réessayer.';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function updateExtincteur(id) {
+            console.log(`Mise à jour de l'extincteur ${id}`);
+            const extincteur = document.getElementById(`extincteur-${id}`);
+            if (!extincteur) {
+                console.error(`Extincteur ${id} non trouvé.`);
+                return;
+            }
+            const formContent = extincteur.querySelector('.form-content');
+            const summaryDiv = document.getElementById(`summary-${id}`);
+            const errorDiv = document.getElementById(`error-${id}`);
+            if (!formContent || !summaryDiv || !errorDiv) {
+                console.error(`Éléments manquants pour l'extincteur ${id}.`);
+                return;
+            }
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
+
+            try {
+                const num = extincteur.querySelector('.num').value;
+                const typeSelect = extincteur.querySelector('.type');
+                const type = typeSelect.value === 'Autre' ? (extincteur.querySelector(`.customType-${id}`).value || '') : typeSelect.value;
+                const fabricantSelect = extincteur.querySelector('.fabricant');
+                const fabricant = fabricantSelect.value === 'Autre' ? (extincteur.querySelector(`.customFabricant-${id}`).value || '') : fabricantSelect.value;
+                const millesimeSelect = extincteur.querySelector('.millesime');
+                const millesime = millesimeSelect.value === 'Autre' ? (extincteur.querySelector(`.customMillesime-${id}`).value || '') : millesimeSelect.value;
+                const etage = extincteur.querySelector('.etage').value;
+                const emplacement = extincteur.querySelector('.emplacement').value;
+                const observation = extincteur.querySelector('.observation').value.trim();
+
+                console.log(`Mise à jour des champs : num=${num}, type=${type}, fabricant=${fabricant}, millesime=${millesime}, etage=${etage}, emplacement=${emplacement}`);
+
+                if (!num || !type || !millesime || !etage || !emplacement) {
+                    errorDiv.textContent = 'Veuillez remplir tous les champs obligatoires : N° Extincteur, Type, Millésime, Étage, Emplacement.';
+                    errorDiv.style.display = 'block';
+                    console.log('Erreur de validation : champs obligatoires manquants');
+                    return;
+                }
+
+                const operations = Array.from(extincteur.querySelectorAll('input[type="checkbox"]'))
+                    .filter(cb => cb.checked && cb.className !== 'pp');
+                if (operations.length === 0 && observation === '') {
+                    errorDiv.textContent = 'Veuillez cocher au moins une opération ou ajouter une observation.';
+                    errorDiv.style.display = 'block';
+                    console.log('Erreur de validation : opération ou observation requise');
+                    return;
+                }
+
+                const pp = extincteur.querySelector('.pp').checked ? 'PP' : '';
+                const ops = operations.map(cb => {
+                    if (cb.className.includes('verif')) return '[VF]';
+                    if (cb.className.includes('recharge')) return '[RE]';
+                    if (cb.className.includes('quinquennale')) return '[RQ]';
+                    if (cb.className.includes('echange')) return '[ES]';
+                    if (cb.className.includes('mise-service')) return '[MES]';
+                    return '';
+                }).join('');
+
+                const summary = `${num} - ${type} (${emplacement}) ${ops}${pp ? `[${pp}]` : ''}`;
+                const summaryContent = summaryDiv.querySelector('.summary-content');
+                summaryContent.textContent = summary;
+                summaryDiv.style.display = 'block';
+
+                extincteursValides[id] = {
+                    num: num,
+                    type: type,
+                    pp: pp,
+                    fabricant: fabricant,
+                    millesime: millesime,
+                    etage: etage,
+                    emplacement: emplacement,
+                    operations: ops,
+                    observation: observation
+                };
+
+                formContent.classList.add('hidden');
+                updateExtincteurCounter();
+                console.log(`Extincteur ${id} mis à jour avec succès.`);
+            } catch (error) {
+                console.error(`Erreur lors de la mise à jour de l'extincteur ${id} :`, error);
+                errorDiv.textContent = 'Une erreur est survenue lors de la mise à jour. Veuillez réessayer.';
                 errorDiv.style.display = 'block';
             }
         }
