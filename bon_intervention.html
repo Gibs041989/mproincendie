@@ -16,7 +16,7 @@
         }
         .facturation-section th:nth-child(1) { width: 15%; } /* Code article */
         .facturation-section th:nth-child(2) { width: 35%; } /* Désignation */
-        .facturation-section th:nth-child(3) { width: 10%; } /* Quantité */
+        .facturation-section th:nth-child(3) { width: 10%; } /* Qté */
         .facturation-section th:nth-child(4) { width: 15%; } /* PU HT */
         .facturation-section th:nth-child(5) { width: 15%; } /* Total HT */
         .facturation-section th:nth-child(6) { width: 10%; } /* Action */
@@ -40,14 +40,20 @@
         @media (max-width: 600px) {
             .facturation-section { flex-direction: column; }
             .totals-table { 
-                float: none; 
+                float: right; 
                 width: 200px !important; /* Environ 50% sur un écran de 400-600px */
-                margin: 10px auto; /* Centré */
+                margin: 10px 10px 10px 0; /* Aligné à droite */
             }
             .totals-table th, .totals-table td { width: auto; }
             .facturation-section table { font-size: 14px; }
             .facturation-section input, select, textarea { font-size: 14px; padding: 6px; }
             .facturation-section th, td { padding: 6px; }
+            .facturation-section th:nth-child(1) { width: 15%; } /* Code article */
+            .facturation-section th:nth-child(2) { width: 37%; } /* Désignation (augmentée pour compenser) */
+            .facturation-section th:nth-child(3) { width: 8%; } /* Qté (réduite) */
+            .facturation-section th:nth-child(4) { width: 18%; } /* PU HT (élargie) */
+            .facturation-section th:nth-child(5) { width: 14%; } /* Total HT (légèrement réduite) */
+            .facturation-section th:nth-child(6) { width: 8%; } /* Action (réduite) */
             canvas { width: 100%; height: 150px; }
         }
     </style>
@@ -70,7 +76,7 @@
                         <tr>
                             <th>Code article</th>
                             <th>Désignation</th>
-                            <th>Quantité</th>
+                            <th>Qté</th>
                             <th>PU HT €</th>
                             <th>Total HT €</th>
                             <th>Action</th>
