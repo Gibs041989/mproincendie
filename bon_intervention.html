@@ -18,15 +18,19 @@
         }
         .action-buttons { 
             display: none; 
-            text-align: right; 
-            margin: 8px 0; 
+            text-align: center; /* Centrer les boutons */
+            padding: 5px 0; 
         }
         .action-buttons button { 
             font-size: 14px; 
             padding: 5px; 
-            margin-left: 10px; 
+            margin: 0 10px; 
             border: none; 
             background: none; 
+        }
+        .action-buttons-row td {
+            border: none; /* Pas de bordure pour la ligne des boutons */
+            padding: 0;
         }
         .section {
             margin-bottom: 40px; /* Plus d'espace entre les sections */
@@ -336,8 +340,9 @@
                 return;
             }
             const tbody = document.getElementById('prestationsBody');
-            const index = tbody.children.length;
+            const index = tbody.children.length / 2; // Chaque prestation prend 2 lignes (données + boutons)
 
+            // Ligne pour les données
             const row = document.createElement('tr');
             row.id = `row-${index}`;
             row.innerHTML = `
@@ -346,16 +351,23 @@
                 <td><input type="number" class="unitPrice" placeholder="PU HT" oninput="calculateTotal(this)"></td>
                 <td><input type="number" class="total" readonly></td>
             `;
-            const actionDiv = document.createElement('div');
-            actionDiv.className = 'action-buttons';
-            actionDiv.innerHTML = `
-                <button class="validate-btn" onclick="validateRow(this.parentElement.parentElement, this.parentElement, ${index})" title="Valider"><i class="fas fa-check-circle"></i></button>
-                <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
-            `;
             tbody.appendChild(row);
-            row.appendChild(actionDiv);
+
+            // Ligne pour les boutons
+            const actionRow = document.createElement('tr');
+            actionRow.className = 'action-buttons-row';
+            actionRow.id = `action-row-${index}`;
+            actionRow.innerHTML = `
+                <td colspan="4">
+                    <div class="action-buttons">
+                        <button class="validate-btn" onclick="validateRow(${index})" title="Valider"><i class="fas fa-check-circle"></i></button>
+                        <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(actionRow);
             activeRow = row;
-            actionDiv.style.display = 'block';
+            actionRow.querySelector('.action-buttons').style.display = 'block';
         }
 
         function calculateTotal(input) {
@@ -367,11 +379,13 @@
             updateTotals();
         }
 
-        function validateRow(row, actionDiv, index) {
+        function validateRow(index) {
+            const row = document.getElementById(`row-${index}`);
+            const actionRow = document.getElementById(`action-row-${index}`);
             const inputs = row.querySelectorAll('input');
             inputs.forEach(input => input.readOnly = true);
             row.classList.add('active');
-            actionDiv.style.display = 'none';
+            actionRow.querySelector('.action-buttons').style.display = 'none';
             activeRow = null;
             row.onclick = () => editRow(index);
             savePrestations();
@@ -383,23 +397,19 @@
                 return;
             }
             const row = document.getElementById(`row-${index}`);
+            const actionRow = document.getElementById(`action-row-${index}`);
             const inputs = row.querySelectorAll('input');
             inputs.forEach(input => input.readOnly = false);
             activeRow = row;
-            const actionDiv = document.createElement('div');
-            actionDiv.className = 'action-buttons';
-            actionDiv.innerHTML = `
-                <button class="validate-btn" onclick="validateRow(this.parentElement.parentElement, this.parentElement, ${index})" title="Valider"><i class="fas fa-check-circle"></i></button>
-                <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
-            `;
-            row.appendChild(actionDiv);
-            actionDiv.style.display = 'block';
+            actionRow.querySelector('.action-buttons').style.display = 'block';
             row.classList.remove('active');
         }
 
         function removeRow(index) {
             const row = document.getElementById(`row-${index}`);
+            const actionRow = document.getElementById(`action-row-${index}`);
             if (row) row.remove();
+            if (actionRow) actionRow.remove();
             activeRow = null;
             savePrestations();
             updateTotals();
@@ -407,7 +417,7 @@
 
         function savePrestations() {
             const prestationsData = [];
-            document.querySelectorAll('#prestationsBody tr').forEach(row => {
+            document.querySelectorAll('#prestationsBody tr:not(.action-buttons-row)').forEach(row => {
                 const prestation = {
                     designation: row.querySelector('.designation').value,
                     quantity: row.querySelector('.quantity').value,
@@ -434,13 +444,26 @@
                 row.classList.add('active');
                 row.onclick = () => editRow(index);
                 tbody.appendChild(row);
+
+                const actionRow = document.createElement('tr');
+                actionRow.className = 'action-buttons-row';
+                actionRow.id = `action-row-${index}`;
+                actionRow.innerHTML = `
+                    <td colspan="4">
+                        <div class="action-buttons">
+                            <button class="validate-btn" onclick="validateRow(${index})" title="Valider"><i class="fas fa-check-circle"></i></button>
+                            <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(actionRow);
             });
             updateTotals();
         }
 
         function updateTotals() {
             let totalHT = 0;
-            document.querySelectorAll('#prestationsBody tr').forEach(row => {
+            document.querySelectorAll('#prestationsBody tr:not(.action-buttons-row)').forEach(row => {
                 const total = parseFloat(row.querySelector('.total').value) || 0;
                 totalHT += total;
             });
