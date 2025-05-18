@@ -7,7 +7,13 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
-        .facturation-section { display: flex; gap: 20px; margin-bottom: 20px; }
+        .facturation-section { 
+            display: flex; 
+            gap: 20px; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap; /* Permet au contenu de s’adapter */
+            justify-content: space-between; /* Aligner les éléments */
+        }
         .prestations { flex: 1; }
         .facturation-section table { width: 100%; border-collapse: collapse; }
         .facturation-section th, td { padding: 10px; border: 1px solid #ddd; }
@@ -29,7 +35,6 @@
         .delete-btn i { font-size: 14px; }
         .totals-table { 
             width: 80px; border-collapse: collapse; 
-            float: right; margin-left: 10px; 
         }
         .totals-table th, .totals-table td { 
             border: 1px solid #ddd; padding: 4px 4px; font-size: 13px; text-align: right; 
@@ -37,10 +42,24 @@
         }
         .totals-table th { width: 55px; background: #f4f4f4; }
         .totals-table td { width: 25px; }
+        .totals-table-wrapper { 
+            display: flex; 
+            justify-content: flex-end; 
+            margin-left: 10px; 
+        }
         textarea { resize: vertical; }
-        canvas { border: 1px solid #ddd; display: block; margin-top: 5px; }
+        canvas { 
+            border: 1px solid #ddd; 
+            display: block; 
+            margin-top: 5px; 
+            margin-right: auto; 
+            width: 200px; 
+            height: 200px; 
+        }
         .clear-btn { margin-top: 5px; padding: 5px; font-size: 14px; }
-        h3 { font-size: 18px; }
+        .validate-signature-btn { margin-top: 5px; padding: 5px; font-size: 14px; }
+        h3 { font-size: 18px; font-weight: bold; }
+        label { font-weight: normal; font-size: 14px; }
         button { font-size: 14px; padding: 5px 10px; }
         .action-dialog { 
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
@@ -53,11 +72,17 @@
             background: rgba(0,0,0,0.5); z-index: 999; 
         }
         @media (max-width: 600px) {
-            .facturation-section { flex-direction: column; }
+            .facturation-section { 
+                flex-direction: column; 
+                align-items: stretch; 
+            }
+            .totals-table-wrapper { 
+                display: flex; 
+                justify-content: flex-end !important; 
+                margin: 10px 0 !important; 
+            }
             .totals-table { 
-                float: right !important; 
                 width: 200px !important; 
-                margin: 10px 10px 10px 0 !important; 
             }
             .totals-table th, .totals-table td { width: auto; }
             .facturation-section table { font-size: 14px; }
@@ -68,7 +93,7 @@
             .facturation-section th:nth-child(3) { width: 8%; } /* Qté */
             .facturation-section th:nth-child(4) { width: 18%; } /* PU HT */
             .facturation-section th:nth-child(5) { width: 14%; } /* Total HT */
-            canvas { width: 100%; height: 150px; }
+            canvas { width: 200px; height: 200px; }
             .action-dialog { width: 80%; }
         }
     </style>
@@ -101,11 +126,13 @@
                 <div id="actionButtons" class="action-buttons"></div>
                 <button onclick="addPrestation()">➕ Ajouter une ligne</button>
             </div>
-            <table class="totals-table">
-                <tr><th>Total HT</th><td><span id="totalHT">0</span> €</td></tr>
-                <tr><th>Total TVA (20%)</th><td><span id="totalTVA">0</span> €</td></tr>
-                <tr><th>Total TTC</th><td><span id="totalTTC">0</span> €</td></tr>
-            </table>
+            <div class="totals-table-wrapper">
+                <table class="totals-table">
+                    <tr><th>Total HT</th><td><span id="totalHT">0</span> €</td></tr>
+                    <tr><th>Total TVA (20%)</th><td><span id="totalTVA">0</span> €</td></tr>
+                    <tr><th>Total TTC</th><td><span id="totalTTC">0</span> €</td></tr>
+                </table>
+            </div>
             <div>
                 <h3>Modalités de règlement</h3>
                 <label>Mode de paiement:
@@ -134,15 +161,17 @@
             <h2>✍️ Signatures</h2>
             <label>Nom du client signataire: <input type="text" id="signatureClient"></label>
             <label>Signature client: 
-                <canvas id="canvasClient" width="300" height="150"></canvas>
+                <canvas id="canvasClient"></canvas>
                 <button class="clear-btn" onclick="clearCanvas('canvasClient')">Effacer</button>
+                <button class="validate-signature-btn" onclick="validateSignature('canvasClient')">Valider</button>
             </label>
             <label>Fait à: <input type="text" id="signatureLieu" value="Paris"></label>
             <label>Le: <input type="date" id="signatureDate" value="2025-05-17"></label>
             <label>Nom du technicien: <input type="text" id="signatureTech"></label>
             <label>Signature technicien: 
-                <canvas id="canvasTech" width="300" height="150"></canvas>
+                <canvas id="canvasTech"></canvas>
                 <button class="clear-btn" onclick="clearCanvas('canvasTech')">Effacer</button>
+                <button class="validate-signature-btn" onclick="validateSignature('canvasTech')">Valider</button>
             </label>
         </section>
 
@@ -186,6 +215,7 @@
 
         let activeRow = null;
         let rowCounter = 0;
+        let validatedSignatures = { 'canvasClient': false, 'canvasTech': false };
 
         function addPrestation() {
             if (activeRow) {
@@ -367,6 +397,7 @@
             });
 
             function startDrawing(e) {
+                if (validatedSignatures[canvasId]) return;
                 drawing = true;
                 const rect = canvas.getBoundingClientRect();
                 const x = e.clientX - rect.left;
@@ -376,7 +407,7 @@
             }
 
             function draw(e) {
-                if (!drawing) return;
+                if (!drawing || validatedSignatures[canvasId]) return;
                 const rect = canvas.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
@@ -391,9 +422,17 @@
         }
 
         function clearCanvas(canvasId) {
+            if (validatedSignatures[canvasId]) return;
             const canvas = document.getElementById(canvasId);
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function validateSignature(canvasId) {
+            validatedSignatures[canvasId] = true;
+            const canvas = document.getElementById(canvasId);
+            canvas.style.backgroundColor = '#f0f0f0'; // Indicateur visuel de validation
+            alert(`Signature ${canvasId === 'canvasClient' ? 'client' : 'technicien'} validée.`);
         }
 
         function validateBon() {
@@ -410,6 +449,10 @@
             if (!paymentMode) { alert("Mode de paiement requis."); return; }
             if (!paymentDelay) { alert("Délai de paiement requis."); return; }
             if (!signatureClient || !signatureTech) { alert("Noms des signataires obligatoires."); return; }
+            if (!validatedSignatures['canvasClient'] || !validatedSignatures['canvasTech']) {
+                alert("Veuillez valider les deux signatures.");
+                return;
+            }
 
             const canvasClient = document.getElementById('canvasClient');
             const canvasTech = document.getElementById('canvasTech');
