@@ -38,7 +38,7 @@ h1 {
 h2 {
     font-size: 24px;
     font-weight: 500;
-    color: #1d1d1d; /* Noir du logo */
+    color: #1d1d1d;
     margin-bottom: 20px;
     padding-bottom: 8px;
     border-bottom: 2px solid #e63946; /* Rouge pour cohérence */
@@ -98,8 +98,8 @@ th, td {
 }
 
 th {
-    background-color: #1d1d1d; /* Noir du logo */
-    color: #ffffff; /* Blanc du logo */
+    background-color: #4a4a4a; /* Gris anthracite au lieu de noir */
+    color: #ffffff;
     font-weight: 500;
 }
 
@@ -140,12 +140,12 @@ button.primary:hover {
 
 /* Boutons secondaires (ex. "Générer le PDF", "Envoyer par email") */
 button.secondary {
-    background-color: #1d1d1d; /* Noir du logo */
+    background-color: #4a4a4a; /* Gris anthracite au lieu de noir */
     color: #ffffff;
 }
 
 button.secondary:hover {
-    background-color: #333;
+    background-color: #5a5a5a;
 }
 
 /* Boutons neutres (ex. "Retour", raccourcis en bas) */
@@ -198,12 +198,12 @@ button.neutral:hover {
 }
 
 .navigation.nav-buttons a {
-    background-color: #1d1d1d; /* Noir pour les raccourcis */
+    background-color: #4a4a4a; /* Gris anthracite au lieu de noir */
     color: #ffffff;
 }
 
 .navigation.nav-buttons a:hover {
-    background-color: #333;
+    background-color: #5a5a5a;
 }
 
 /* Styles responsives */
