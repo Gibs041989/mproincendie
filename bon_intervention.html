@@ -70,9 +70,16 @@
             background: rgba(0,0,0,0.5); z-index: 999; 
         }
         /* Styles pour le PDF */
+        .pdf-mode .container {
+            margin: 0;
+            padding: 10px;
+        }
         .pdf-mode canvas { 
             border: 1px solid #000; 
-            margin: 5px auto; 
+            margin: 5px 0; 
+        }
+        .pdf-mode .section {
+            page-break-inside: avoid;
         }
         @media (max-width: 600px) {
             .facturation-section { 
@@ -494,10 +501,10 @@
             element.classList.add('pdf-mode');
 
             const opt = {
-                margin: 0.5,
+                margin: [0.2, 0.2], // Réduit les marges
                 filename: 'bon_intervention.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 3, useCORS: true },
+                html2canvas: { scale: 2, useCORS: true }, // Réduit l’échelle pour éviter un contenu trop grand
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
             };
             html2pdf().set(opt).from(element).save().finally(() => {
