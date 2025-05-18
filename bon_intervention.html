@@ -9,13 +9,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <style>
-        .container { padding-bottom: 70px; }
+        .container { padding-bottom: 80px; }
         table tr { cursor: pointer; }
-        table tr.active { background: #f5f5f5; }
-        .action-buttons { text-align: right; margin-top: 3px; }
-        .action-buttons button { font-size: 16px; padding: 4px; margin: 0 2px; border: none; background: none; }
+        table tr.active { background: #f0f0f0; }
+        .action-buttons { text-align: right; margin-top: 4px; display: flex; justify-content: flex-end; }
+        .action-buttons button { font-size: 16px; padding: 5px; margin: 0 3px; border: none; background: none; cursor: pointer; }
         .action-buttons button:disabled { opacity: 0.5; cursor: not-allowed; }
-        .section { margin-bottom: 25px; }
+        .section { margin-bottom: 20px; }
         .table-container { width: 100%; }
         #prestationsTable { width: 100%; border-collapse: collapse; }
         #prestationsTable th, #prestationsTable td { padding: 8px; text-align: left; border: 1px solid #ddd; font-size: 14px; }
@@ -24,46 +24,50 @@
         #prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) { width: 20%; }
         #prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) { width: 25%; }
         #totalsTable { width: 100%; max-width: 220px; margin: 10px 0; border-collapse: collapse; }
-        #totalsTable th, #totalsTable td { padding: 5px; border: 1px solid #ddd; text-align: left; font-size: 12px; }
-        #totalsTable th { background-color: #f5f5f5; width: 50%; }
-        .nav-buttons { margin-top: 25px; padding-bottom: 50px; }
+        #totalsTable th, #totalsTable td { padding: 5px; border: 1px solid #ddd; text-align: left; font-size: 13px; color: #222; font-weight: 500; }
+        #totalsTable th { background-color: #e8e8e8; }
+        #totalsTable td { background-color: #fff; }
+        .nav-buttons { margin-top: 20px; padding-bottom: 50px; }
         .footer-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: #f5f5f5; padding: 6px 0; box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); z-index: 1000; }
         .footer-nav .navigation { margin: 0; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-around; align-items: center; gap: 10px; }
         .footer-nav a { flex: 1; text-align: center; padding: 6px; font-size: 18px; background-color: transparent; border-radius: 5px; transition: background-color 0.3s ease; }
         .footer-nav a:hover { background-color: #ffebee; }
         .signature-pad { border: 1px solid #ddd; border-radius: 5px; margin-top: 6px; width: 300px; height: 150px; }
-        .floating-btn { position: fixed; bottom: 65px; right: 10px; background-color: #10b981; color: white; border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1001; }
+        .floating-btn { position: fixed; bottom: 70px; right: 10px; background-color: #10b981; color: white; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1001; }
+        .floating-btn:hover::after { content: "Ajouter une prestation"; position: absolute; right: 60px; background: #333; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; }
         /* Optimisation mobile pour le tableau */
         @media (max-width: 600px) {
             .section { margin-bottom: 10px; }
             #prestationsTable th { display: none; }
             #prestationsTable tr { display: block; margin-bottom: 8px; border: 1px solid #ddd; padding: 6px; border-radius: 5px; background: #fff; }
             #prestationsTable td:nth-child(1) { /* Désignation */
-                display: block; width: 100%; padding: 3px 0;
+                display: block; width: 100%; padding: 4px 0;
             }
-            #prestationsTable td:nth-child(1) select, #prestationsTable td:nth-child(1) input { width: 100%; font-size: 12px; padding: 4px; }
+            #prestationsTable td:nth-child(1) select, #prestationsTable td:nth-child(1) input { width: 100%; font-size: 13px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; }
             .prestations-row { display: flex; gap: 2%; align-items: center; }
             #prestationsTable td:nth-child(2) { /* Qté */
-                flex: 0 0 18%; padding: 3px 0;
+                flex: 0 0 18%; padding: 4px 0;
             }
             #prestationsTable td:nth-child(3) { /* PU HT */
-                flex: 0 0 35%; padding: 3px 0;
+                flex: 0 0 35%; padding: 4px 0;
             }
             #prestationsTable td:nth-child(4) { /* Prix Total HT */
-                flex: 0 0 45%; padding: 3px 0;
+                flex: 0 0 45%; padding: 4px 0;
             }
-            #prestationsTable td input, #prestationsTable td select { width: 100%; padding: 4px; font-size: 11px; border-radius: 3px; }
-            #prestationsTable td:before { content: attr(data-label); display: block; font-size: 10px; font-weight: bold; color: #666; margin-bottom: 1px; }
+            #prestationsTable td input, #prestationsTable td select { width: 100%; padding: 5px; font-size: 12px; border: 1px solid #ccc; border-radius: 3px; }
+            #prestationsTable td:before { content: attr(data-label); display: block; font-size: 11px; font-weight: bold; color: #555; margin-bottom: 2px; }
             #prestationsTable td:nth-child(1):before { content: "Désignation"; }
             #prestationsTable td:nth-child(2):before { content: "Qté"; }
             #prestationsTable td:nth-child(3):before { content: "PU HT (€)"; }
             #prestationsTable td:nth-child(4):before { content: "Total HT (€)"; }
-            #prestationsTable td .action-buttons { display: flex; justify-content: flex-end; margin-top: 3px; }
+            #prestationsTable td .action-buttons { margin-top: 4px; }
             #totalsTable { max-width: 160px; margin-left: auto; margin-right: 0; }
-            #totalsTable th, #totalsTable td { padding: 4px; font-size: 11px; }
+            #totalsTable th, #totalsTable td { padding: 4px; font-size: 12px; color: #222; font-weight: 500; }
+            #totalsTable th { background-color: #e8e8e8; }
+            #totalsTable td { background-color: #fff; }
             .signature-pad { width: 100%; height: 90px; }
-            .floating-btn { bottom: 75px; width: 40px; height: 40px; font-size: 16px; }
-            .action-buttons button { font-size: 14px; padding: 3px; }
+            .floating-btn { bottom: 75px; width: 45px; height: 45px; font-size: 20px; }
+            .action-buttons button { font-size: 14px; padding: 4px; }
         }
     </style>
 </head>
@@ -157,12 +161,12 @@
                 window.location.href = 'intervention.html';
                 return;
             }
-            document.getElementById('clientName').textContent = interventionData.client;
-            document.getElementById('adresse').textContent = interventionData.adresse;
-            document.getElementById('codePostal').textContent = interventionData.codePostal;
-            document.getElementById('ville').textContent = interventionData.ville;
-            document.getElementById('telephone').textContent = interventionData.telephone;
-            document.getElementById('email').textContent = interventionData.email;
+            document.getElementById('clientName').textContent = interventionData.client || 'Non sélectionné';
+            document.getElementById('adresse').textContent = interventionData.adresse || 'Non sélectionnée';
+            document.getElementById('codePostal').textContent = interventionData.codePostal || 'Non sélectionné';
+            document.getElementById('ville').textContent = interventionData.ville || 'Non sélectionnée';
+            document.getElementById('telephone').textContent = interventionData.telephone || 'Non sélectionné';
+            document.getElementById('email').textContent = interventionData.email || 'Non sélectionné';
             const drafts = JSON.parse(localStorage.getItem('drafts')) || {};
             document.getElementById('crmSummaryText').textContent = drafts['crm_extincteurs']?.summary || 'Aucun CRM enregistré.';
             loadPrestations();
@@ -179,7 +183,7 @@
             const row = document.createElement('tr');
             row.id = `row-${index}`;
             row.innerHTML = `
-                <td>
+                <td data-label="Désignation">
                     <select class="designation" onchange="updateDesignation(${index})">
                         <option value="">Choisir un article</option>
                         ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}">${article.name}</option>`).join('')}
@@ -187,15 +191,17 @@
                     </select>
                     <input type="text" class="custom-designation" style="display:none;" placeholder="Désignation manuelle" oninput="updateRow(${index})">
                 </td>
-                <td><input type="number" class="quantity" placeholder="Qté" oninput="updateRow(${index})" min="1"></td>
-                <td><input type="number" class="unitPrice" placeholder="PU HT" oninput="updateRow(${index})" step="0.01"></td>
-                <td><div class="prestations-row">
-                    <input type="number" class="total" readonly>
-                    <div class="action-buttons">
-                        <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" title="Valider"><i class="fas fa-check-circle"></i></button>
-                        <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                <td data-label="Qté"><input type="number" class="quantity" placeholder="Qté" oninput="updateRow(${index})" min="1"></td>
+                <td data-label="PU HT"><input type="number" class="unitPrice" placeholder="PU HT" oninput="updateRow(${index})" step="0.01"></td>
+                <td data-label="Prix Total HT">
+                    <div class="prestations-row">
+                        <input type="number" class="total" readonly>
+                        <div class="action-buttons">
+                            <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" title="Valider"><i class="fas fa-check-circle"></i></button>
+                            <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                        </div>
                     </div>
-                </div></td>`;
+                </td>`;
             tbody.appendChild(row);
             row.querySelector('.action-buttons').style.display = 'flex';
             updateTotals();
@@ -286,7 +292,7 @@
                 const row = document.createElement('tr');
                 row.id = `row-${index}`;
                 row.innerHTML = `
-                    <td>
+                    <td data-label="Désignation">
                         <select class="designation" onchange="updateDesignation(${index})" disabled>
                             <option value="">Choisir un article</option>
                             ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}" ${article.name === item.designation ? 'selected' : ''}>${article.name}</option>`).join('')}
@@ -294,18 +300,21 @@
                         </select>
                         <input type="text" class="custom-designation" value="${isCustom ? item.designation : ''}" style="display:${isCustom ? 'block' : 'none'};" disabled>
                     </td>
-                    <td><input type="number" class="quantity" value="${item.quantity || ''}" disabled min="1"></td>
-                    <td><input type="number" class="unitPrice" value="${item.unitPrice || ''}" disabled step="0.01"></td>
-                    <td><div class="prestations-row">
-                        <input type="number" class="total" value="${item.total || ''}" readonly>
-                        <div class="action-buttons" style="display:none;">
-                            <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" title="Valider"><i class="fas fa-check-circle"></i></button>
-                            <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                    <td data-label="Qté"><input type="number" class="quantity" value="${item.quantity || ''}" disabled min="1"></td>
+                    <td data-label="PU HT"><input type="number" class="unitPrice" value="${item.unitPrice || ''}" disabled step="0.01"></td>
+                    <td data-label="Prix Total HT">
+                        <div class="prestations-row">
+                            <input type="number" class="total" value="${item.total || ''}" readonly>
+                            <div class="action-buttons">
+                                <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" title="Valider"><i class="fas fa-check-circle"></i></button>
+                                <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                            </div>
                         </div>
-                    </div></td>`;
+                    </td>`;
                 row.classList.add('active');
                 row.onclick = () => editRow(index);
                 tbody.appendChild(row);
+                row.querySelector('.action-buttons').style.display = 'flex';
             });
             updateTotals();
         }
