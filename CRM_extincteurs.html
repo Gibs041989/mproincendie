@@ -37,18 +37,6 @@
         .summary-content::before { 
             content: "🧯"; 
         }
-        .edit-buttons { 
-            margin-top: 5px; 
-        }
-        .edit-buttons button { 
-            background-color: #f0ad4e; 
-            color: white; 
-            border: none; 
-            padding: 5px 10px; 
-            margin-right: 5px; 
-            cursor: pointer; 
-            border-radius: 4px; 
-        }
         .footer-nav { 
             position: fixed; 
             bottom: 0; 
@@ -137,12 +125,6 @@
         }
         .extincteur .form-content.read-only button { 
             display: none; 
-        }
-        .edit-buttons { 
-            display: none; 
-        }
-        .edit-buttons.visible { 
-            display: block; 
         }
         /* Styles pour le dialogue d'action */
         .action-dialog {
@@ -234,10 +216,6 @@
             .summary { 
                 padding: 10px; 
                 font-size: 18px; 
-            }
-            .edit-buttons button { 
-                font-size: 18px; 
-                padding: 8px 12px; 
             }
             .action-dialog {
                 width: 90%;
@@ -331,6 +309,7 @@
         };
 
         function addExtincteur() {
+            console.log("Ajout d'un nouvel extincteur...");
             extincteurCount++;
             const div = document.createElement('div');
             div.className = 'extincteur';
@@ -400,7 +379,8 @@
                     <div class="summary-content"></div>
                 </div>
             `;
-            document.getElementById('extincteursList').appendChild(div);
+            const extincteursList = document.getElementById('extincteursList');
+            extincteursList.appendChild(div);
             div.querySelectorAll('.checkbox-container').forEach(container => {
                 container.addEventListener('click', (e) => {
                     const checkbox = container.querySelector('input[type="checkbox"]');
@@ -409,6 +389,7 @@
                     }
                 });
             });
+            console.log(`Extincteur ${extincteurCount} ajouté avec succès.`);
         }
 
         function toggleCustomInput(select, inputId) {
@@ -433,6 +414,7 @@
         }
 
         function showActionDialog(id) {
+            console.log(`Affichage du dialogue pour l'extincteur ${id}`);
             const overlay = document.createElement('div');
             overlay.className = 'overlay';
             document.body.appendChild(overlay);
@@ -449,6 +431,7 @@
         }
 
         function openExtincteurForm(id) {
+            console.log(`Ouverture du formulaire pour l'extincteur ${id}`);
             const extincteur = document.getElementById(`extincteur-${id}`);
             const formContent = extincteur.querySelector('.form-content');
             formContent.classList.remove('hidden');
@@ -456,11 +439,21 @@
             const inputs = extincteur.querySelectorAll('input');
             const selects = extincteur.querySelectorAll('select');
             const textareas = extincteur.querySelectorAll('textarea');
-            inputs.forEach(elem => elem.removeAttribute('readonly'));
-            selects.forEach(elem => elem.removeAttribute('disabled'));
-            textareas.forEach(elem => elem.removeAttribute('readonly'));
+            inputs.forEach(elem => {
+                elem.removeAttribute('readonly');
+                elem.style.pointerEvents = 'auto';
+            });
+            selects.forEach(elem => {
+                elem.removeAttribute('disabled');
+                elem.style.pointerEvents = 'auto';
+            });
+            textareas.forEach(elem => {
+                elem.removeAttribute('readonly');
+                elem.style.pointerEvents = 'auto';
+            });
             extincteur.querySelectorAll('input[type="checkbox"]').forEach(cb => {
                 cb.removeAttribute('disabled');
+                cb.style.pointerEvents = 'auto';
                 updateCheckboxStyle(cb);
             });
             const validateButtonForm = extincteur.querySelector('button[onclick^="validateExtincteur"]');
@@ -473,6 +466,7 @@
         }
 
         function updateExtincteur(id) {
+            console.log(`Mise à jour de l'extincteur ${id}`);
             const extincteur = document.getElementById(`extincteur-${id}`);
             const formContent = extincteur.querySelector('.form-content');
             const summaryDiv = document.getElementById(`summary-${id}`);
@@ -527,7 +521,7 @@
                 fabricant: fabricant,
                 millesime: millesime,
                 etage: etage,
-                emplacement: emplacementರ:display: none;
+                emplacement: emplacement,
                 operations: ops,
                 observation: observation
             };
@@ -537,6 +531,7 @@
         }
 
         function removeExtincteurWithDialog(id) {
+            console.log(`Suppression de l'extincteur ${id} via dialogue`);
             const extincteur = document.getElementById(`extincteur-${id}`);
             if (extincteur) {
                 extincteur.remove();
@@ -546,7 +541,18 @@
             closeDialog(document.querySelector('.action-dialog'));
         }
 
+        function removeExtincteur(id) {
+            console.log(`Suppression de l'extincteur ${id}`);
+            const extincteur = document.getElementById(`extincteur-${id}`);
+            if (extincteur) {
+                extincteur.remove();
+                delete extincteursValides[id];
+                updateExtincteurCounter();
+            }
+        }
+
         function closeDialog(dialog) {
+            console.log("Fermeture du dialogue");
             dialog.previousElementSibling.remove();
             dialog.remove();
         }
