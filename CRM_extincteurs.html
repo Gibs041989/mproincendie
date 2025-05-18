@@ -57,6 +57,7 @@
             background-color: #f5f5f5; 
             padding: 10px 0; 
             box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
+            z-index: 1000; 
         }
         .footer-nav .navigation { 
             margin: 0; 
@@ -156,6 +157,7 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
             border-radius: 8px;
+            min-width: 300px; /* Assure une largeur minimale pour mobile */
         }
         .action-dialog p {
             margin-bottom: 15px;
@@ -168,8 +170,9 @@
             font-size: 14px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            display: inline-block; /* Assure que les boutons sont visibles */
         }
-        .action-dialog button:first-child { /* Valider modification */
+        .action-dialog button:first-child { /* Modifier */
             background-color: #10b981; /* Vert */
             color: #fff;
         }
@@ -237,7 +240,8 @@
                 padding: 8px 12px; 
             }
             .action-dialog {
-                width: 80%;
+                width: 90%;
+                min-width: 280px;
             }
             .action-dialog button {
                 margin: 5px;
@@ -392,12 +396,8 @@
                     <button class="secondary" onclick="removeExtincteur(${extincteurCount})">🗑️ Supprimer</button>
                     <p class="error-message" id="error-${extincteurCount}"></p>
                 </div>
-                <div class="summary" id="summary-${extincteurCount}" onclick="toggleExtincteurForm(${extincteurCount})">
+                <div class="summary" id="summary-${extincteurCount}" onclick="showActionDialog(${extincteurCount})">
                     <div class="summary-content"></div>
-                    <div class="edit-buttons" id="edit-buttons-${extincteurCount}">
-                        <button id="edit-button-${extincteurCount}" onclick="openExtincteurForm(${extincteurCount})">✏️ Modifier</button>
-                        <button id="validate-button-${extincteurCount}" style="display: none;" onclick="validateExtincteur(${extincteurCount})">✅ Valider modifications</button>
-                    </div>
                 </div>
             `;
             document.getElementById('extincteursList').appendChild(div);
@@ -432,32 +432,26 @@
             }
         }
 
-        function toggleExtincteurForm(id) {
-            const extincteur = document.getElementById(`extincteur-${id}`);
-            const formContent = extincteur.querySelector('.form-content');
-            const editButton = document.getElementById(`edit-button-${id}`);
-            const validateButton = document.getElementById(`validate-button-${id}`);
-            if (formContent.classList.contains('hidden')) {
-                formContent.classList.remove('hidden');
-                formContent.classList.add('read-only');
-                editButton.style.display = 'inline';
-                validateButton.style.display = 'none';
-            } else {
-                formContent.classList.add('hidden');
-                formContent.classList.remove('read-only');
-                editButton.style.display = 'none';
-                validateButton.style.display = 'none';
-            }
+        function showActionDialog(id) {
+            const overlay = document.createElement('div');
+            overlay.className = 'overlay';
+            document.body.appendChild(overlay);
+
+            const dialog = document.createElement('div');
+            dialog.className = 'action-dialog';
+            dialog.innerHTML = `
+                <p>Que voulez-vous faire ?</p>
+                <button onclick="openExtincteurForm(${id})">✏️ Modifier</button>
+                <button onclick="removeExtincteurWithDialog(${id})">🗑️ Supprimer</button>
+                <button onclick="closeDialog(this.parentElement)">Annuler</button>
+            `;
+            document.body.appendChild(dialog);
         }
 
         function openExtincteurForm(id) {
             const extincteur = document.getElementById(`extincteur-${id}`);
             const formContent = extincteur.querySelector('.form-content');
-            const editButton = document.getElementById(`edit-button-${id}`);
-            const validateButton = document.getElementById(`validate-button-${id}`);
             formContent.classList.remove('read-only');
-            editButton.style.display = 'none';
-            validateButton.style.display = 'inline';
             const inputs = extincteur.querySelectorAll('input');
             const selects = extincteur.querySelectorAll('select');
             const textareas = extincteur.querySelectorAll('textarea');
@@ -472,14 +466,28 @@
             const removeButton = extincteur.querySelector('button[onclick^="removeExtincteur"]');
             validateButtonForm.style.display = 'inline';
             removeButton.style.display = 'inline';
+            closeDialog(document.querySelector('.action-dialog'));
+        }
+
+        function removeExtincteurWithDialog(id) {
+            const extincteur = document.getElementById(`extincteur-${id}`);
+            if (extincteur) {
+                extincteur.remove();
+                delete extincteursValides[id];
+                updateExtincteurCounter();
+            }
+            closeDialog(document.querySelector('.action-dialog'));
+        }
+
+        function closeDialog(dialog) {
+            dialog.previousElementSibling.remove();
+            dialog.remove();
         }
 
         function validateExtincteur(id) {
             const extincteur = document.getElementById(`extincteur-${id}`);
             const formContent = extincteur.querySelector('.form-content');
             const summaryDiv = document.getElementById(`summary-${id}`);
-            const editButton = document.getElementById(`edit-button-${id}`);
-            const validateButton = document.getElementById(`validate-button-${id}`);
             const errorDiv = document.getElementById(`error-${id}`);
             errorDiv.style.display = 'none';
             errorDiv.textContent = '';
@@ -537,8 +545,6 @@
             };
 
             formContent.classList.add('hidden');
-            editButton.style.display = 'inline';
-            validateButton.style.display = 'none';
             updateExtincteurCounter();
         }
 
