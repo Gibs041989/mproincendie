@@ -12,7 +12,7 @@
 body {
     font-family: 'Roboto', sans-serif;
     background-color: #f8f8f8;
-    color: #1d1d1d;
+    color: #333;
     line-height: 1.6;
 }
 
@@ -38,7 +38,7 @@ h1 {
 h2 {
     font-size: 24px;
     font-weight: 500;
-    color: #1d1d1d;
+    color: #333;
     margin-bottom: 20px;
     padding-bottom: 8px;
     border-bottom: 2px solid #e63946; /* Rouge pour cohérence */
@@ -47,7 +47,7 @@ h2 {
 h3 {
     font-size: 18px;
     font-weight: 500;
-    color: #1d1d1d;
+    color: #333;
     margin-bottom: 15px;
 }
 
@@ -98,7 +98,7 @@ th, td {
 }
 
 th {
-    background-color: #4a4a4a; /* Gris anthracite au lieu de noir */
+    background-color: #6b7280; /* Gris moyen plus léger */
     color: #ffffff;
     font-weight: 500;
 }
@@ -140,12 +140,12 @@ button.primary:hover {
 
 /* Boutons secondaires (ex. "Générer le PDF", "Envoyer par email") */
 button.secondary {
-    background-color: #4a4a4a; /* Gris anthracite au lieu de noir */
+    background-color: #6b7280; /* Gris moyen au lieu de noir */
     color: #ffffff;
 }
 
 button.secondary:hover {
-    background-color: #5a5a5a;
+    background-color: #5a6268;
 }
 
 /* Boutons neutres (ex. "Retour", raccourcis en bas) */
@@ -198,12 +198,12 @@ button.neutral:hover {
 }
 
 .navigation.nav-buttons a {
-    background-color: #4a4a4a; /* Gris anthracite au lieu de noir */
+    background-color: #6b7280; /* Gris moyen au lieu de noir */
     color: #ffffff;
 }
 
 .navigation.nav-buttons a:hover {
-    background-color: #5a5a5a;
+    background-color: #5a6268;
 }
 
 /* Styles responsives */
