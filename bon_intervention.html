@@ -18,19 +18,19 @@
         }
         .action-buttons { 
             display: none; 
-            text-align: center; /* Centrer les boutons */
-            padding: 5px 0; 
+            text-align: right; /* Alignement à droite */
+            margin-top: 5px; 
         }
         .action-buttons button { 
-            font-size: 14px; 
-            padding: 5px; 
-            margin: 0 10px; 
+            font-size: 21px; /* 50% plus grand (14px → 21px) */
+            padding: 8px; /* Ajustement du padding pour la taille */
+            margin: 0 5px; 
             border: none; 
             background: none; 
         }
-        .action-buttons-row td {
-            border: none; /* Pas de bordure pour la ligne des boutons */
-            padding: 0;
+        .action-buttons button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         .section {
             margin-bottom: 40px; /* Plus d'espace entre les sections */
@@ -49,14 +49,14 @@
         }
         /* Styles pour le tableau des prestations */
         #prestationsTable th, #prestationsTable td {
-            padding: 12px; /* Padding plus généreux pour agrandir les cases */
-            min-width: 100px; /* Largeur minimale augmentée pour plus d'espace */
+            padding: 12px; /* Padding généreux */
+            min-width: 100px; 
             text-align: left;
             border: 1px solid #ddd;
-            font-size: 16px; /* Taille de police augmentée pour une meilleure lisibilité */
+            font-size: 16px; 
         }
         #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { /* Désignation */
-            min-width: 250px; /* Plus large pour la désignation */
+            min-width: 250px;
         }
         #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { /* Qté */
             min-width: 80px;
@@ -134,21 +134,21 @@
                 width: 100%; /* Prendre toute la largeur de l'écran */
             }
             #prestationsTable th, #prestationsTable td {
-                padding: 10px; /* Légère réduction pour mobile */
-                min-width: 70px; /* Réduction pour mobile */
-                font-size: 14px; /* Légère réduction pour mobile */
+                padding: 10px; 
+                min-width: 70px; 
+                font-size: 14px; 
             }
-            #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) {
-                min-width: 150px;
+            #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { /* Désignation */
+                min-width: 200px; /* Plus large sur mobile */
             }
-            #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) {
+            #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { /* Qté */
                 min-width: 60px;
             }
-            #prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) {
-                min-width: 80px;
+            #prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) { /* PU HT */
+                min-width: 100px; /* Plus large sur mobile */
             }
-            #prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) {
-                min-width: 80px;
+            #prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) { /* Prix Total HT */
+                min-width: 100px; /* Plus large sur mobile */
             }
             label {
                 display: block; /* Labels au-dessus des champs */
@@ -168,7 +168,7 @@
             }
             .signature-pad {
                 width: 100%; 
-                height: 120px; /* Hauteur encore plus petite */
+                height: 120px; 
             }
             .signature-pad::before {
                 content: 'Signez ici';
@@ -189,13 +189,13 @@
                 font-size: 14px;
             }
             #totalsTable {
-                max-width: 200px; /* Réduire la taille */
-                margin-left: auto; /* Aligner à droite */
+                max-width: 200px; 
+                margin-left: auto; 
                 margin-right: 0;
             }
             #totalsTable th, #totalsTable td {
-                padding: 8px; /* Réduire le padding */
-                font-size: 14px; /* Réduire la taille de la police */
+                padding: 8px; 
+                font-size: 14px; 
             }
         }
     </style>
@@ -341,52 +341,47 @@
                 return;
             }
             const tbody = document.getElementById('prestationsBody');
-            const index = tbody.children.length / 2; // Chaque prestation prend 2 lignes (données + boutons)
+            const index = tbody.children.length;
 
-            // Ligne pour les données
             const row = document.createElement('tr');
             row.id = `row-${index}`;
             row.innerHTML = `
-                <td><input type="text" class="designation" placeholder="Désignation"></td>
-                <td><input type="number" class="quantity" placeholder="Qté" oninput="calculateTotal(this)"></td>
-                <td><input type="number" class="unitPrice" placeholder="PU HT" oninput="calculateTotal(this)"></td>
-                <td><input type="number" class="total" readonly></td>
-            `;
-            tbody.appendChild(row);
-
-            // Ligne pour les boutons
-            const actionRow = document.createElement('tr');
-            actionRow.className = 'action-buttons-row';
-            actionRow.id = `action-row-${index}`;
-            actionRow.innerHTML = `
-                <td colspan="4">
+                <td><input type="text" class="designation" placeholder="Désignation" oninput="updateRow(${index})"></td>
+                <td><input type="number" class="quantity" placeholder="Qté" oninput="updateRow(${index})"></td>
+                <td><input type="number" class="unitPrice" placeholder="PU HT" oninput="updateRow(${index})"></td>
+                <td>
+                    <input type="number" class="total" readonly>
                     <div class="action-buttons">
-                        <button class="validate-btn" onclick="validateRow(${index})" title="Valider"><i class="fas fa-check-circle"></i></button>
+                        <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" title="Valider" disabled><i class="fas fa-check-circle"></i></button>
                         <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </td>
             `;
-            tbody.appendChild(actionRow);
+            tbody.appendChild(row);
             activeRow = row;
-            actionRow.querySelector('.action-buttons').style.display = 'block';
+            row.querySelector('.action-buttons').style.display = 'block';
         }
 
-        function calculateTotal(input) {
-            const row = input.closest('tr');
+        function updateRow(index) {
+            const row = document.getElementById(`row-${index}`);
+            const designation = row.querySelector('.designation').value;
             const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
             const unitPrice = parseFloat(row.querySelector('.unitPrice').value) || 0;
             const totalInput = row.querySelector('.total');
             totalInput.value = quantity && unitPrice ? (quantity * unitPrice).toFixed(2) : '';
+
+            const validateBtn = row.querySelector(`#validate-${index}`);
+            validateBtn.disabled = !(designation && quantity && unitPrice);
+
             updateTotals();
         }
 
         function validateRow(index) {
             const row = document.getElementById(`row-${index}`);
-            const actionRow = document.getElementById(`action-row-${index}`);
             const inputs = row.querySelectorAll('input');
             inputs.forEach(input => input.readOnly = true);
             row.classList.add('active');
-            actionRow.querySelector('.action-buttons').style.display = 'none';
+            row.querySelector('.action-buttons').style.display = 'none';
             activeRow = null;
             row.onclick = () => editRow(index);
             savePrestations();
@@ -398,19 +393,16 @@
                 return;
             }
             const row = document.getElementById(`row-${index}`);
-            const actionRow = document.getElementById(`action-row-${index}`);
             const inputs = row.querySelectorAll('input');
             inputs.forEach(input => input.readOnly = false);
             activeRow = row;
-            actionRow.querySelector('.action-buttons').style.display = 'block';
+            row.querySelector('.action-buttons').style.display = 'block';
             row.classList.remove('active');
         }
 
         function removeRow(index) {
             const row = document.getElementById(`row-${index}`);
-            const actionRow = document.getElementById(`action-row-${index}`);
             if (row) row.remove();
-            if (actionRow) actionRow.remove();
             activeRow = null;
             savePrestations();
             updateTotals();
@@ -418,7 +410,7 @@
 
         function savePrestations() {
             const prestationsData = [];
-            document.querySelectorAll('#prestationsBody tr:not(.action-buttons-row)').forEach(row => {
+            document.querySelectorAll('#prestationsBody tr').forEach(row => {
                 const prestation = {
                     designation: row.querySelector('.designation').value,
                     quantity: row.querySelector('.quantity').value,
@@ -440,31 +432,24 @@
                     <td><input type="text" class="designation" value="${item.designation || ''}" readonly></td>
                     <td><input type="number" class="quantity" value="${item.quantity || ''}" readonly></td>
                     <td><input type="number" class="unitPrice" value="${item.unitPrice || ''}" readonly></td>
-                    <td><input type="number" class="total" value="${item.total || ''}" readonly></td>
-                `;
-                row.classList.add('active');
-                row.onclick = () => editRow(index);
-                tbody.appendChild(row);
-
-                const actionRow = document.createElement('tr');
-                actionRow.className = 'action-buttons-row';
-                actionRow.id = `action-row-${index}`;
-                actionRow.innerHTML = `
-                    <td colspan="4">
+                    <td>
+                        <input type="number" class="total" value="${item.total || ''}" readonly>
                         <div class="action-buttons">
-                            <button class="validate-btn" onclick="validateRow(${index})" title="Valider"><i class="fas fa-check-circle"></i></button>
+                            <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" title="Valider" disabled><i class="fas fa-check-circle"></i></button>
                             <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
                         </div>
                     </td>
                 `;
-                tbody.appendChild(actionRow);
+                row.classList.add('active');
+                row.onclick = () => editRow(index);
+                tbody.appendChild(row);
             });
             updateTotals();
         }
 
         function updateTotals() {
             let totalHT = 0;
-            document.querySelectorAll('#prestationsBody tr:not(.action-buttons-row)').forEach(row => {
+            document.querySelectorAll('#prestationsBody tr').forEach(row => {
                 const total = parseFloat(row.querySelector('.total').value) || 0;
                 totalHT += total;
             });
