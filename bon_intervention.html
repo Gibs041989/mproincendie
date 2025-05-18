@@ -32,7 +32,7 @@
         .footer-nav .navigation { margin: 0; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-around; align-items: center; gap: 10px; }
         .footer-nav a { flex: 1; text-align: center; padding: 6px; font-size: 18px; background-color: transparent; border-radius: 5px; transition: background-color 0.3s ease; }
         .footer-nav a:hover { background-color: #ffebee; }
-        .signature-pad { border: 1px solid #ddd; border-radius: 5px; margin-top: 6px; width: 100%; height: 150px; }
+        .signature-pad { border: 1px solid #ddd; border-radius: 5px; margin-top: 6px; width: 100%; height: 90px; pointer-events: none; }
         .floating-btn { position: fixed; bottom: 70px; right: 10px; background-color: #10b981; color: white; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1001; }
         .floating-btn:hover::after { content: "Ajouter une prestation"; position: absolute; right: 60px; background: #333; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; }
         /* Modal for signatures */
@@ -40,7 +40,7 @@
         .modal-content { background: #fff; margin: 10% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px; }
         .modal-content canvas { width: 100%; height: 200px; border: 1px solid #ddd; border-radius: 5px; }
         .modal-buttons { display: flex; justify-content: space-between; margin-top: 10px; }
-        /* Optimisation mobile pour le tableau */
+        /* Optimisation mobile */
         @media (max-width: 600px) {
             .section { margin-bottom: 10px; }
             #prestationsTable th { display: none; }
@@ -148,6 +148,7 @@
             </div>
         </section>
         <section class="section nav-buttons">
+            <button class="secondary" onclick="saveDraft()">💾 Enregistrer brouillon</button>
             <button class="secondary" onclick="generatePDF()">📄 Générer le PDF</button>
             <button class="secondary" onclick="sendEmail()">📧 Envoyer par email</button>
             <a href="intervention.html"><button class="neutral">⬅️ Retour</button></a>
@@ -178,8 +179,8 @@
         const clientCanvas = document.getElementById('client-signature-pad');
         const technicianCanvas = document.getElementById('technician-signature-pad');
         const modalCanvas = document.getElementById('modal-signature-pad');
-        const clientSignaturePad = new SignaturePad(clientCanvas);
-        const technicianSignaturePad = new SignaturePad(technicianCanvas);
+        const clientSignaturePad = new SignaturePad(clientCanvas, { penColor: 'black' });
+        const technicianSignaturePad = new SignaturePad(technicianCanvas, { penColor: 'black' });
         let modalSignaturePad;
         function resizeCanvas(canvas) {
             const ratio = Math.max(window.devicePixelRatio || 1, 1);
@@ -187,11 +188,15 @@
             canvas.height = canvas.offsetHeight * ratio;
             canvas.getContext('2d').scale(ratio, ratio);
         }
+        function loadSignatures() {
+            const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
+            if (signatures.client) clientSignaturePad.fromDataURL(signatures.client);
+            if (signatures.technician) technicianSignaturePad.fromDataURL(signatures.technician);
+        }
         window.addEventListener('resize', () => {
             resizeCanvas(clientCanvas);
             resizeCanvas(technicianCanvas);
-            clientSignaturePad.clear();
-            technicianSignaturePad.clear();
+            loadSignatures();
             if (modalSignaturePad) resizeCanvas(modalCanvas);
         });
         resizeCanvas(clientCanvas);
@@ -200,7 +205,7 @@
             currentSignatureType = type;
             document.getElementById('signature-modal').style.display = 'block';
             document.getElementById('modal-title').textContent = type === 'client' ? 'Signature Client' : 'Signature Technicien';
-            modalSignaturePad = new SignaturePad(modalCanvas);
+            modalSignaturePad = new SignaturePad(modalCanvas, { penColor: 'black' });
             resizeCanvas(modalCanvas);
         }
         function closeSignatureModal() {
@@ -216,16 +221,16 @@
                 return;
             }
             const dataURL = modalSignaturePad.toDataURL();
+            const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
             if (currentSignatureType === 'client') {
                 clientSignaturePad.fromDataURL(dataURL);
+                signatures.client = dataURL;
             } else {
                 technicianSignaturePad.fromDataURL(dataURL);
+                signatures.technician = dataURL;
             }
+            localStorage.setItem('signatures', JSON.stringify(signatures));
             closeSignatureModal();
-        }
-        function clearSignature(type) {
-            if (type === 'client') clientSignaturePad.clear();
-            else technicianSignaturePad.clear();
         }
         window.onload = () => {
             const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
@@ -240,9 +245,11 @@
             document.getElementById('ville').textContent = interventionData.ville || 'Non sélectionnée';
             document.getElementById('telephone').textContent = interventionData.telephone || 'Non sélectionné';
             document.getElementById('email').textContent = interventionData.email || 'Non sélectionné';
-            const drafts = JSON.parse(localStorage.getItem('drafts')) || {};
+            const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
             document.getElementById('crmSummaryText').textContent = drafts['crm_extincteurs']?.summary || 'Aucun CRM enregistré.';
             loadPrestations();
+            loadSignatures();
+            loadDraft();
         };
         // Simulation base de données articles
         const articlesDB = [
@@ -277,6 +284,7 @@
                 </td>`;
             tbody.appendChild(row);
             row.querySelector('.action-buttons').style.display = 'flex';
+            savePrestations();
             updateTotals();
         }
         function updateDesignation(index) {
@@ -313,6 +321,7 @@
             totalInput.value = (quantity * unitPrice).toFixed(2);
             const validateBtn = row.querySelector(`#validate-${index}`);
             validateBtn.disabled = !(designation && quantity > 0 && unitPrice > 0);
+            savePrestations();
             updateTotals();
         }
         function validateRow(index) {
@@ -356,6 +365,7 @@
                 });
             });
             localStorage.setItem('prestationsData', JSON.stringify(prestationsData));
+            saveDraft();
         }
         function loadPrestations() {
             const prestationsData = JSON.parse(localStorage.getItem('prestationsData')) || [];
@@ -395,11 +405,49 @@
             const select = document.getElementById('delaiReglement');
             const input = document.getElementById('delaiCustom');
             input.style.display = select.value === 'custom' ? 'block' : 'none';
+            saveDraft();
         }
         function toggleMoyenInput() {
             const select = document.getElementById('moyenReglement');
             const input = document.getElementById('moyenCustom');
             input.style.display = select.value === 'custom' ? 'block' : 'none';
+            saveDraft();
+        }
+        function saveDraft() {
+            const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
+            drafts['bon_intervention'] = {
+                client: document.getElementById('clientName').textContent,
+                adresse: document.getElementById('adresse').textContent,
+                codePostal: document.getElementById('codePostal').textContent,
+                ville: document.getElementById('ville').textContent,
+                telephone: document.getElementById('telephone').textContent,
+                email: document.getElementById('email').textContent,
+                interventionDate: document.getElementById('interventionDate').value,
+                technician: document.getElementById('technician').value,
+                duration: document.getElementById('duration').value,
+                delaiReglement: document.getElementById('delaiReglement').value === 'custom' ? document.getElementById('delaiCustom').value : document.getElementById('delaiReglement').value,
+                moyenReglement: document.getElementById('moyenReglement').value === 'custom' ? document.getElementById('moyenCustom').value : document.getElementById('moyenReglement').value,
+                observations: document.getElementById('observations').value,
+                prestations: JSON.parse(localStorage.getItem('prestationsData') || '[]'),
+                summary: `Bon d'intervention pour ${document.getElementById('clientName').textContent}`
+            };
+            localStorage.setItem('drafts', JSON.stringify(drafts));
+        }
+        function loadDraft() {
+            const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
+            const draft = drafts['bon_intervention'];
+            if (draft) {
+                document.getElementById('interventionDate').value = draft.interventionDate || '2025-05-18';
+                document.getElementById('technician').value = draft.technician || '';
+                document.getElementById('duration').value = draft.duration || '';
+                document.getElementById('delaiReglement').value = draft.delaiReglement === draft.delaiCustom ? 'custom' : draft.delaiReglement || 'Immédiat à l’intervention';
+                document.getElementById('moyenReglement').value = draft.moyenReglement === draft.moyenCustom ? 'custom' : draft.moyenReglement || 'Chèque';
+                document.getElementById('delaiCustom').value = draft.delaiReglement === 'custom' ? draft.delaiCustom : '';
+                document.getElementById('moyenCustom').value = draft.moyenReglement === 'custom' ? draft.moyenCustom : '';
+                document.getElementById('observations').value = draft.observations || '';
+                toggleDelaiInput();
+                toggleMoyenInput();
+            }
         }
         function updateTotals() {
             let totalHT = 0;
