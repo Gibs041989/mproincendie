@@ -5,13 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interventions - MPro Incendie</title>
     <link rel="stylesheet" href="css/styles.css">
-    <style>
-        .nav-buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-        .nav-buttons a, .nav-buttons button { flex: 1 1 150px; text-align: center; padding: 12px; font-size: 16px; }
-        @media (max-width: 600px) {
-            .nav-buttons a, .nav-buttons button { flex: 1 1 100%; }
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -20,17 +14,17 @@
         <section class="section">
             <h2>👤 Client</h2>
             <label>Sélectionner un client existant: 
-                <select id="clientSelect" onchange="selectClient()">
+                <select id="clientSelect">
                     <option value="">-- Sélectionner --</option>
                 </select>
             </label>
-            <a href="nouveau_client.html"><button>➕ Nouveau client</button></a>
-            <label><input type="checkbox" id="lieuDifferent" onchange="toggleLieuForm()"> Lieu d’intervention différent</label>
-            <div id="lieuForm" style="display: none;">
-                <label>Adresse du lieu d’intervention: <input type="text" id="lieuAdresse"></label>
+            <p><a href="nouveau_client.html"><button class="action">➕ Nouveau client</button></a></p>
+            <label><input type="checkbox" id="differentLocation"> Lieu d’intervention différent</label>
+            <div id="locationInputs" style="display: none;">
+                <label>Adresse du lieu d’intervention: <input type="text" id="locationAddress"></label>
             </div>
             <label>Lieu d’intervention associé: 
-                <select id="lieuSelect">
+                <select id="locationSelect">
                     <option value="">-- Choisir un lieu --</option>
                 </select>
             </label>
@@ -38,7 +32,7 @@
 
         <section class="section">
             <h2>🔧 Type d’intervention</h2>
-            <select id="typeIntervention">
+            <select id="interventionType">
                 <option value="">-- Choisir --</option>
                 <option value="extincteurs">🧯 Extincteurs (CRM)</option>
                 <option value="baes">💡 BAES (CRM)</option>
@@ -46,16 +40,18 @@
                 <option value="desenfumage">💨 Désenfumage (CRM)</option>
                 <option value="bon_intervention">🧾 Bon d’intervention (direct)</option>
             </select>
-            <div class="nav-buttons">
-                <button onclick="startIntervention()">Démarrer l’intervention</button>
+            <p><button class="primary" onclick="startIntervention()">Démarrer l’intervention</button></p>
+        </section>
+
+        <section class="section" id="crmSummary">
+            <h2>📄 Brouillons en cours</h2>
+            <div id="draftsList">
+                <p id="noDrafts">Aucun brouillon en cours.</p>
             </div>
         </section>
+    </div>
 
-        <section class="section">
-            <h2>📄 Brouillons en cours</h2>
-            <div id="brouillonsList">Aucun brouillon en cours.</div>
-        </section>
-
+    <div class="footer-nav">
         <div class="navigation nav-buttons">
             <a href="index.html">🏠 Accueil</a>
             <a href="client.html">📁 Clients</a>
@@ -63,114 +59,107 @@
     </div>
 
     <script>
-        let clients = JSON.parse(localStorage.getItem('clients')) || [];
-
         window.onload = () => {
+            loadClients();
+            loadDrafts();
+        };
+
+        function loadClients() {
+            const clients = JSON.parse(localStorage.getItem('clients') || '[]');
             const clientSelect = document.getElementById('clientSelect');
+            clientSelect.innerHTML = '<option value="">-- Sélectionner --</option>';
             clients.forEach(client => {
                 const option = document.createElement('option');
                 option.value = client.name;
                 option.textContent = client.name;
                 clientSelect.appendChild(option);
             });
-            loadBrouillons();
-        };
 
-        function toggleLieuForm() {
-            const lieuForm = document.getElementById('lieuForm');
-            const lieuSelect = document.getElementById('lieuSelect');
-            if (document.getElementById('lieuDifferent').checked) {
-                lieuForm.style.display = 'block';
-                lieuSelect.style.display = 'none';
-            } else {
-                lieuForm.style.display = 'none';
-                lieuSelect.style.display = 'block';
-            }
+            clientSelect.addEventListener('change', () => {
+                const clientName = clientSelect.value;
+                const client = clients.find(c => c.name === clientName);
+                const locationSelect = document.getElementById('locationSelect');
+                locationSelect.innerHTML = '<option value="">-- Choisir un lieu --</option>';
+                if (client) {
+                    localStorage.setItem('currentIntervention', JSON.stringify({
+                        client: client.name,
+                        adresse: client.adresse,
+                        codePostal: client.codePostal,
+                        ville: client.ville,
+                        telephone: client.telephone,
+                        email: client.email
+                    }));
+
+                    if (client.locations) {
+                        client.locations.forEach(loc => {
+                            const option = document.createElement('option');
+                            option.value = loc;
+                            option.textContent = loc;
+                            locationSelect.appendChild(option);
+                        });
+                    }
+                }
+            });
         }
 
-        function selectClient() {
-            const client = document.getElementById('clientSelect').value;
-            const lieu = document.getElementById('lieuDifferent').checked 
-                ? document.getElementById('lieuAdresse').value 
-                : document.getElementById('lieuSelect').value;
-            const interventionData = { client, lieu };
-            localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
-
-            const lieuSelect = document.getElementById('lieuSelect');
-            lieuSelect.innerHTML = '<option value="">-- Choisir un lieu --</option>';
-            const clientData = clients.find(c => c.name === client);
-            if (clientData && clientData.lieux) {
-                clientData.lieux.forEach(lieu => {
-                    const option = document.createElement('option');
-                    option.value = lieu.adresse;
-                    option.textContent = `${lieu.adresse}, ${lieu.ville}`;
-                    lieuSelect.appendChild(option);
-                });
-            }
+        function toggleLocationInputs() {
+            const differentLocation = document.getElementById('differentLocation').checked;
+            document.getElementById('locationInputs').style.display = differentLocation ? 'block' : 'none';
         }
+
+        document.getElementById('differentLocation').addEventListener('change', toggleLocationInputs);
 
         function startIntervention() {
-            const type = document.getElementById('typeIntervention').value;
             const client = document.getElementById('clientSelect').value;
-            const lieu = document.getElementById('lieuDifferent').checked 
-                ? document.getElementById('lieuAdresse').value 
-                : document.getElementById('lieuSelect').value;
+            const interventionType = document.getElementById('interventionType').value;
+
             if (!client) {
                 alert('Veuillez sélectionner un client.');
                 return;
             }
-            if (!lieu) {
-                alert('Veuillez sélectionner ou entrer un lieu.');
-                return;
-            }
-            if (!type) {
+
+            if (!interventionType) {
                 alert('Veuillez sélectionner un type d’intervention.');
                 return;
             }
-            const interventionData = { client, lieu };
-            localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
-            if (type === 'bon_intervention') {
-                window.location.href = 'bon_intervention.html';
-            } else {
-                window.location.href = `CRM_${type}.html`;
+
+            let page;
+            switch (interventionType) {
+                case 'extincteurs':
+                    page = 'CRM_extincteurs.html';
+                    break;
+                case 'baes':
+                    page = 'CRM_baes.html';
+                    break;
+                case 'ria':
+                    page = 'CRM_ria.html';
+                    break;
+                case 'desenfumage':
+                    page = 'CRM_desenfumage.html';
+                    break;
+                case 'bon_intervention':
+                    page = 'bon_intervention.html';
+                    break;
             }
+
+            window.location.href = page;
         }
 
-        function loadBrouillons() {
-            const drafts = JSON.parse(localStorage.getItem('drafts')) || {};
-            const brouillonsList = document.getElementById('brouillonsList');
-            brouillonsList.innerHTML = '';
-            if (Object.keys(drafts).length === 0) {
-                brouillonsList.textContent = 'Aucun brouillon en cours.';
-                return;
+        function loadDrafts() {
+            const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
+            const draftsList = document.getElementById('draftsList');
+            const noDrafts = document.getElementById('noDrafts');
+            draftsList.innerHTML = '';
+            let hasDrafts = false;
+            for (const [key, draft] of Object.entries(drafts)) {
+                if (draft.summary) {
+                    hasDrafts = true;
+                    const draftItem = document.createElement('p');
+                    draftItem.innerHTML = `<a href="${key === 'bon_intervention' ? 'bon_intervention.html' : key + '.html'}">${draft.summary}</a>`;
+                    draftsList.appendChild(draftItem);
+                }
             }
-            for
-            (const [key, draft] of Object.entries(drafts)) {
-                const div = document.createElement('div');
-                div.className = 'brouillon';
-                div.innerHTML = `
-                    ${key}: Client ${draft.client || 'Inconnu'} - ${draft.date || 'Sans date'}
-                    <button onclick="loadDraft('${key}')">Charger</button>
-                    <button onclick="deleteDraft('${key}')">Supprimer</button>
-                `;
-                brouillonsList.appendChild(div);
-            }
-        }
-
-        function loadDraft(key) {
-            const drafts = JSON.parse(localStorage.getItem('drafts')) || {};
-            const draft = drafts[key];
-            if (draft) {
-                localStorage.setItem('currentIntervention', JSON.stringify(draft));
-                window.location.href = key === 'bon_intervention' ? 'bon_intervention.html' : `CRM_${key.split('_')[1]}.html`;
-            }
-        }
-
-        function deleteDraft(key) {
-            let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
-            delete drafts[key];
-            localStorage.setItem('drafts', JSON.stringify(drafts));
-            loadBrouillons();
+            noDrafts.style.display = hasDrafts ? 'none' : 'block';
         }
     </script>
 </body>
