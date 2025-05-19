@@ -18,17 +18,18 @@
         .table-container { width: 100%; }
         #prestationsTable, #crmExtincteursTable { width: 100%; border-collapse: collapse; }
         #prestationsTable th, #prestationsTable td { padding: 8px; font-size: 15px; border: 1px solid #ddd; line-height: 1.2; }
-        #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { width: 40%; }
-        #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { width: 15%; }
-        #prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) { width: 20%; }
-        #prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) { width: 25%; }
+        #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { width: 100%; }
+        #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { width: 20%; }
+        #prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) { width: 30%; }
+        #prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) { width: 30%; }
         #prestationsTable input, #prestationsTable select { padding: 8px; font-size: 15px; height: 32px; width: 100%; box-sizing: border-box; }
         #totalsTable { max-width: 220px; margin: 10px 0; }
         #totalsTable th, #totalsTable td { padding: 6px; font-size: 13px; }
         #crmExtincteursTable th, #crmExtincteursTable td { padding: 10px; font-size: 15px; border: 1px solid #ddd; }
-        .action-buttons { display: flex; justify-content: flex-end; }
-        .action-buttons button { font-size: 16px; padding: 8px; margin: 0 4px; border: none; }
+        .action-buttons { display: flex; justify-content: flex-start; margin-top: 8px; }
+        .action-buttons button { font-size: 16px; padding: 8px; margin: 0 8px 0 0; border: none; background: none; cursor: pointer; }
         .action-buttons button:disabled { opacity: 0.5; }
+        .add-btn { font-size: 16px; padding: 8px; margin: 8px 0; background: #10b981; color: white; border-radius: 5px; }
         .floating-btn { position: fixed; bottom: 70px; right: 10px; background: #10b981; color: white; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
         .floating-btn:hover::after { content: "Ajouter prestation"; position: absolute; right: 60px; background: #333; color: white; padding: 4px 8px; font-size: 12px; }
         .signature-pad { border: 1px solid #ddd; border-radius: 5px; margin-top: 6px; width: 100%; height: 100px; }
@@ -41,8 +42,9 @@
         .error-message { color: red; font-size: 12px; margin-top: 2px; display: none; }
         @media (max-width: 600px) {
             .section { padding: 10px; }
+            #prestationsTable { margin: 0; }
             #prestationsTable th { display: none; }
-            #prestationsTable tr { display: block; margin-bottom: 12px; border: 1px solid #ddd; padding: 8px; border-radius: 5px; background: #fff; }
+            #prestationsTable tr { display: block; margin-bottom: 12px; border: 1px solid #ddd; padding: 8px; border-radius: 5px; background: #fff; width: 100%; }
             #prestationsTable td { display: block; width: 100%; padding: 4px 0; }
             #prestationsTable td select, #prestationsTable td input { font-size: 15px; padding: 8px; height: 32px; }
             #prestationsTable td:before { content: attr(data-label); display: block; font-size: 14px; font-weight: bold; color: #555; margin-bottom: 4px; }
@@ -50,9 +52,13 @@
             #prestationsTable td:nth-child(2):before { content: "Qté"; }
             #prestationsTable td:nth-child(3):before { content: "PU HT (€)"; }
             #prestationsTable td:nth-child(4):before { content: "Total HT (€)"; }
-            .prestations-row { display: block; }
-            .action-buttons { justify-content: flex-start; margin-top: 8px; }
+            .prestations-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+            #prestationsTable td:nth-child(2) input { width: 60px; }
+            #prestationsTable td:nth-child(3) input { width: 80px; }
+            #prestationsTable td:nth-child(4) input { width: 80px; }
+            .action-buttons { margin-top: 8px; }
             .action-buttons button { font-size: 16px; padding: 8px; }
+            .add-btn { width: 40px; height: 40px; border-radius: 50%; text-align: center; line-height: 40px; }
             .select2-container { width: 100% !important; }
             .select2-selection { height: 32px !important; font-size: 15px !important; padding: 6px !important; }
             #crmExtincteursTable th { display: none; }
@@ -274,11 +280,13 @@
                 <td data-label="Prix Total HT">
                     <div class="prestations-row">
                         <input type="number" class="total" readonly>
-                        <div class="action-buttons">
-                            <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" disabled title="Valider"><i class="fas fa-check-circle"></i></button>
-                            <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
-                        </div>
                     </div>
+                </td>
+                <td class="action-buttons">
+                    <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" disabled title="Valider"><i class="fas fa-check-circle"></i></button>
+                    <button class="edit-btn" id="edit-${index}" onclick="editRow(${index})" disabled title="Modifier"><i class="fas fa-pencil-alt"></i></button>
+                    <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                    <button class="add-btn" onclick="addPrestation()" title="Nouvelle ligne"><i class="fas fa-plus"></i></button>
                 </td>`;
             tbody.appendChild(row);
             $(row.querySelector('.designation')).select2({ width: '100%' });
@@ -348,6 +356,7 @@
 
             totalInput.value = (quantity * unitPrice).toFixed(2);
             row.querySelector(`#validate-${index}`).disabled = !isValid;
+            row.querySelector(`#edit-${index}`).disabled = !isValid;
 
             savePrestations();
             updateTotals();
@@ -434,11 +443,13 @@
                     <td data-label="Prix Total HT">
                         <div class="prestations-row">
                             <input type="number" class="total" value="${item.total || ''}" readonly>
-                            <div class="action-buttons">
-                                <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" disabled title="Valider"><i class="fas fa-check-circle"></i></button>
-                                <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
-                            </div>
                         </div>
+                    </td>
+                    <td class="action-buttons">
+                        <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" disabled title="Valider"><i class="fas fa-check-circle"></i></button>
+                        <button class="edit-btn" id="edit-${index}" onclick="editRow(${index})" disabled title="Modifier"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                        <button class="add-btn" onclick="addPrestation()" title="Nouvelle ligne"><i class="fas fa-plus"></i></button>
                     </td>`;
                 row.classList.add('active');
                 row.onclick = () => editRow(index);
