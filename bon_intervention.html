@@ -128,7 +128,7 @@
         </section>
         <section class="section">
             <h2>📅 Détails de l’intervention</h2>
-            <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-18" required oninput="saveDraft()"></label>
+            <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-19" required oninput="saveDraft()"></label>
             <label>Technicien intervenant: <input type="text" id="technician" placeholder="Nom du technicien" oninput="saveDraft()"></label>
             <label>Durée (heures): <input type="number" id="duration" placeholder="Durée en heures" oninput="saveDraft()"></label>
         </section>
@@ -181,25 +181,30 @@
         const clientSignaturePad = new SignaturePad(clientCanvas, { penColor: 'black' });
         const technicianSignaturePad = new SignaturePad(technicianCanvas, { penColor: 'black' });
         let modalSignaturePad;
+
         function resizeCanvas(canvas) {
             const ratio = Math.max(window.devicePixelRatio || 1, 1);
             canvas.width = canvas.offsetWidth * ratio;
             canvas.height = canvas.offsetHeight * ratio;
             canvas.getContext('2d').scale(ratio, ratio);
         }
+
         function loadSignatures() {
             const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
             if (signatures.client) clientSignaturePad.fromDataURL(signatures.client);
             if (signatures.technician) technicianSignaturePad.fromDataURL(signatures.technician);
         }
+
         window.addEventListener('resize', () => {
             resizeCanvas(clientCanvas);
             resizeCanvas(technicianCanvas);
             loadSignatures();
             if (modalSignaturePad) resizeCanvas(modalCanvas);
         });
+
         resizeCanvas(clientCanvas);
         resizeCanvas(technicianCanvas);
+
         function openSignatureModal(type) {
             currentSignatureType = type;
             document.getElementById('signature-modal').style.display = 'block';
@@ -207,13 +212,16 @@
             modalSignaturePad = new SignaturePad(modalCanvas, { penColor: 'black' });
             resizeCanvas(modalCanvas);
         }
+
         function closeSignatureModal() {
             document.getElementById('signature-modal').style.display = 'none';
             modalSignaturePad = null;
         }
+
         function clearModalSignature() {
             modalSignaturePad.clear();
         }
+
         function validateModalSignature() {
             if (modalSignaturePad.isEmpty()) {
                 alert('Veuillez apposer une signature.');
@@ -232,6 +240,7 @@
             saveDraft();
             closeSignatureModal();
         }
+
         window.onload = () => {
             const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
             if (!interventionData.client) {
@@ -250,12 +259,16 @@
             loadSignatures();
             loadDraft();
             setInterval(saveDraft, 10000);
+            // Ajouter une ligne par défaut pour tester le rendu
+            addPrestation();
         };
+
         const articlesDB = [
             { name: "Extincteur CO2 5kg", unitPrice: 150.00 },
             { name: "Maintenance RIA", unitPrice: 80.00 },
             { name: "BAES Type 1", unitPrice: 120.00 }
         ];
+
         function loadCRMSummary() {
             const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
             const crmList = document.getElementById('crmSummaryList');
@@ -271,6 +284,7 @@
                 });
             }
         }
+
         function addPrestation() {
             const tbody = document.getElementById('prestationsBody');
             const index = tbody.children.length;
@@ -301,6 +315,7 @@
             savePrestations();
             updateTotals();
         }
+
         function updateDesignation(index) {
             const row = document.getElementById(`row-${index}`);
             const select = row.querySelector('.designation');
@@ -316,6 +331,7 @@
             }
             updateRow(index);
         }
+
         function updateRow(index) {
             const row = document.getElementById(`row-${index}`);
             const select = row.querySelector('.designation');
@@ -338,6 +354,7 @@
             savePrestations();
             updateTotals();
         }
+
         function validateRow(index) {
             const row = document.getElementById(`row-${index}`);
             const select = row.querySelector('.designation');
@@ -354,17 +371,20 @@
             savePrestations();
             updateTotals();
         }
+
         function editRow(index) {
             const row = document.getElementById(`row-${index}`);
             row.querySelectorAll('input, select').forEach(input => input.disabled = false);
             row.querySelector('.action-buttons').style.display = 'flex';
             row.classList.remove('active');
         }
+
         function removeRow(index) {
             document.getElementById(`row-${index}`).remove();
             savePrestations();
             updateTotals();
         }
+
         function savePrestations() {
             const prestationsData = [];
             document.querySelectorAll('#prestationsBody tr').forEach(row => {
@@ -381,6 +401,7 @@
             localStorage.setItem('prestationsData', JSON.stringify(prestationsData));
             saveDraft();
         }
+
         function loadPrestations() {
             const prestationsData = JSON.parse(localStorage.getItem('prestationsData') || '[]');
             const tbody = document.getElementById('prestationsBody');
@@ -415,18 +436,21 @@
             });
             updateTotals();
         }
+
         function toggleDelaiInput() {
             const select = document.getElementById('delaiReglement');
             const input = document.getElementById('delaiCustom');
             input.style.display = select.value === 'custom' ? 'block' : 'none';
             saveDraft();
         }
+
         function toggleMoyenInput() {
             const select = document.getElementById('moyenReglement');
             const input = document.getElementById('moyenCustom');
             input.style.display = select.value === 'custom' ? 'block' : 'none';
             saveDraft();
         }
+
         function saveDraft() {
             const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
             drafts['bon_intervention'] = {
@@ -447,11 +471,12 @@
             };
             localStorage.setItem('drafts', JSON.stringify(drafts));
         }
+
         function loadDraft() {
             const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
             const draft = drafts['bon_intervention'];
             if (draft) {
-                document.getElementById('interventionDate').value = draft.interventionDate || '2025-05-18';
+                document.getElementById('interventionDate').value = draft.interventionDate || '2025-05-19';
                 document.getElementById('technician').value = draft.technician || '';
                 document.getElementById('duration').value = draft.duration || '';
                 document.getElementById('delaiReglement').value = draft.delaiReglement === draft.delaiCustom ? 'custom' : draft.delaiReglement || 'Immédiat à l’intervention';
@@ -463,6 +488,7 @@
                 toggleMoyenInput();
             }
         }
+
         function validateBonIntervention() {
             const prestations = JSON.parse(localStorage.getItem('prestationsData') || '[]');
             if (prestations.length === 0) {
@@ -508,6 +534,7 @@
             alert('Bon d’intervention validé et enregistré.');
             window.location.href = 'intervention.html';
         }
+
         function updateTotals() {
             let totalHT = 0;
             document.querySelectorAll('#prestationsBody tr').forEach(row => {
@@ -520,6 +547,7 @@
             document.getElementById('tva').textContent = tva.toFixed(2) + ' €';
             document.getElementById('totalTTC').textContent = totalTTC.toFixed(2) + ' €';
         }
+
         function generatePDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -614,6 +642,7 @@
             }
             doc.save(`bon_intervention_${new Date().toISOString().slice(0,10)}.pdf`);
         }
+
         function sendEmail() {
             const clientEmail = document.getElementById('email').textContent;
             const subject = 'Bon d’intervention MPro Incendie';
