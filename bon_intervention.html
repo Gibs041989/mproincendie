@@ -13,8 +13,11 @@
         .info-container { display: flex; flex-wrap: wrap; gap: 20px; }
         .info-box { flex: 1; min-width: 250px; }
         .info-box label { font-weight: bold; font-size: 14px; color: #444; }
-        .info-box input, .info-box select { width: 100%; padding: 6px; margin-top: 5px; font-size: 13px; border: 1px solid #ccc; border-radius: 3px; }
-        .info-box input.error, .info-box select.error { border: 1px solid red; }
+        .info-box input, .info-box select, .info-box textarea {
+            width: 100%; padding: 6px; margin-top: 5px; font-size: 13px;
+            border: 1px solid #ccc; border-radius: 3px; box-sizing: border-box;
+        }
+        .info-box input.error, .info-box select.error, .info-box textarea.error { border: 1px solid red; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
         th, td { border: 1px solid #ddd; padding: 8px; font-size: 14px; vertical-align: top; }
         th { background-color: #f3f4f6; }
@@ -33,12 +36,6 @@
             cursor: pointer; margin: 10px 0; justify-content: flex-start;
         }
         .add-btn:hover { background-color: #059669; }
-        .save-btn {
-            background-color: #3b82f6; color: white; padding: 8px 16px;
-            border: none; border-radius: 5px; font-size: 14px;
-            cursor: pointer; margin-top: 20px;
-        }
-        .save-btn:hover { background-color: #2563eb; }
         .validated { background-color: #f0fdf4; }
         .check-icon { color: #10b981; margin-left: 6px; cursor: pointer; }
         .check-icon.disabled { color: #ccc; cursor: not-allowed; }
@@ -50,7 +47,17 @@
         .action-buttons { margin-top: 8px; display: flex; justify-content: flex-start; gap: 8px; }
         .action-buttons button { font-size: 14px; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; }
         .action-buttons .validate-modif-btn { background: #10b981; color: white; }
-        input[type='number'], input[type='text'], select {
+        .shortcuts { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .shortcut-btn { background: #3b82f6; color: white; padding: 8px; border-radius: 5px; cursor: pointer; }
+        .shortcut-btn:hover { background: #2563eb; }
+        .shortcut-btn i { font-size: 16px; }
+        .save-btn {
+            background-color: #3b82f6; color: white; padding: 8px 16px;
+            border: none; border-radius: 5px; font-size: 14px;
+            cursor: pointer; margin-top: 20px; width: 100%;
+        }
+        .save-btn:hover { background-color: #2563eb; }
+        input[type='number'], input[type='text'], select, textarea {
             width: 100%; padding: 6px; font-size: 13px;
             box-sizing: border-box; border: 1px solid #ccc; border-radius: 3px;
         }
@@ -88,6 +95,7 @@
             #totalsTable th, #totalsTable td { padding: 4px; font-size: 12px; }
             .add-btn { font-size: 12px; padding: 5px 10px; }
             .save-btn { width: 100%; }
+            .shortcuts { flex-wrap: wrap; }
         }
     </style>
 </head>
@@ -95,12 +103,30 @@
     <div class="container">
         <h1>Bon d'Intervention - MPro Incendie</h1>
 
+        <!-- Section Résumé CRM -->
+        <section class="section">
+            <h2>Résumé CRM</h2>
+            <table id="crmTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Intervention</th>
+                        <th>Technicien</th>
+                        <th>Montant TTC</th>
+                    </tr>
+                </thead>
+                <tbody id="crmBody">
+                    <!-- Données chargées dynamiquement -->
+                </tbody>
+            </table>
+        </section>
+
         <!-- Section Informations Client -->
         <section class="section">
             <h2>Informations Client</h2>
             <div class="info-container">
                 <div class="info-box">
-                    <label for="clientName">Nom du client</label>
+                    <label for="clientName">Nom du client *</label>
                     <input type="text" id="clientName" placeholder="Nom du client">
                 </div>
                 <div class="info-box">
@@ -119,11 +145,11 @@
             <h2>Détails Intervention</h2>
             <div class="info-container">
                 <div class="info-box">
-                    <label for="interventionDate">Date</label>
+                    <label for="interventionDate">Date *</label>
                     <input type="date" id="interventionDate">
                 </div>
                 <div class="info-box">
-                    <label for="technician">Technicien</label>
+                    <label for="technician">Technicien *</label>
                     <input type="text" id="technician" placeholder="Nom du technicien">
                 </div>
                 <div class="info-box">
@@ -132,6 +158,14 @@
                         <option value="en_cours">En cours</option>
                         <option value="termine">Terminé</option>
                         <option value="annule">Annulé</option>
+                    </select>
+                </div>
+                <div class="info-box">
+                    <label for="paymentTerms">Modalités de paiement</label>
+                    <select id="paymentTerms">
+                        <option value="virement_30j">Virement 30 jours</option>
+                        <option value="cheque">Chèque à réception</option>
+                        <option value="especes">Espèces</option>
                     </select>
                 </div>
             </div>
@@ -159,12 +193,18 @@
             </table>
         </section>
 
-        <!-- Bouton Enregistrer -->
-        <button class="save-btn" onclick="saveIntervention()">Enregistrer le bon</button>
+        <!-- Raccourcis -->
+        <div class="shortcuts">
+            <button class="shortcut-btn" onclick="saveIntervention()" title="Enregistrer"><i class="fas fa-save"></i></button>
+            <button class="shortcut-btn" onclick="printIntervention()" title="Imprimer"><i class="fas fa-print"></i></button>
+            <button class="shortcut-btn" onclick="sendIntervention()" title="Envoyer"><i class="fas fa-envelope"></i></button>
+            <button class="shortcut-btn" onclick="cancelIntervention()" title="Annuler"><i class="fas fa-times"></i></button>
+        </div>
     </div>
 
     <script>
         let index = 0;
+        let isValidated = false;
         const articlesDB = [
             { name: "Extincteur CO2 5kg", unitPrice: 150.00 },
             { name: "Maintenance RIA", unitPrice: 80.00 },
@@ -211,12 +251,12 @@
             if (desSel.value === "custom") {
                 custInput.style.display = "block";
                 designation = custInput.value.trim();
-                puInput.value = ""; // Réinitialiser PU HT pour saisie manuelle
+                puInput.value = "";
             } else {
                 custInput.style.display = "none";
                 designation = desSel.value;
                 if (desSel.selectedOptions[0].dataset.price) {
-                    puInput.value = desSel.selectedOptions[0].dataset.price; // Réinitialiser PU HT
+                    puInput.value = desSel.selectedOptions[0].dataset.price;
                 }
             }
 
@@ -237,13 +277,6 @@
                 qteInput.style.border = '1px solid #ccc';
             }
             total.value = (qte > 0 && pu > 0) ? (qte * pu).toFixed(2) : "";
-
-            if (designation && qte > 0 && pu > 0 && !row.classList.contains("validated")) {
-                validateRow(i);
-                addRow();
-            }
-            savePrestations();
-            updateTotals();
         }
 
         function validateRow(i) {
@@ -270,6 +303,7 @@
             if (buttonRow) buttonRow.remove();
             savePrestations();
             updateTotals();
+            addRow();
         }
 
         function enableEdit(i) {
@@ -356,6 +390,21 @@
             if (prestationsData.length === 0) addRow();
         }
 
+        function updateTotals() {
+            let totalHT = 0;
+            document.querySelectorAll('#prestationsBody tr:not([id*="button-row"])').forEach(row => {
+                const total = parseFloat(row.querySelector('.total')?.value) || 0;
+                if (!isNaN(total) && total >= 0) {
+                    totalHT += total;
+                }
+            });
+            const tva = totalHT * 0.2;
+            const totalTTC = totalHT + tva;
+            document.getElementById('totalHT').textContent = totalHT.toFixed(2) + ' €';
+            document.getElementById('tva').textContent = tva.toFixed(2) + ' €';
+            document.getElementById('totalTTC').textContent = totalTTC.toFixed(2) + ' €';
+        }
+
         function saveIntervention() {
             const clientData = {
                 clientName: document.getElementById('clientName').value.trim(),
@@ -363,8 +412,10 @@
                 clientPhone: document.getElementById('clientPhone').value.trim(),
                 interventionDate: document.getElementById('interventionDate').value,
                 technician: document.getElementById('technician').value.trim(),
-                status: document.getElementById('status').value
+                status: document.getElementById('status').value,
+                paymentTerms: document.getElementById('paymentTerms').value
             };
+            const prestationsData = JSON.parse(localStorage.getItem('prestationsData') || '[]');
             if (!clientData.clientName || !clientData.interventionDate || !clientData.technician) {
                 alert('Veuillez remplir les champs obligatoires : Nom du client, Date, Technicien.');
                 if (!clientData.clientName) document.getElementById('clientName').classList.add('error');
@@ -372,9 +423,23 @@
                 if (!clientData.technician) document.getElementById('technician').classList.add('error');
                 return;
             }
+            if (prestationsData.length === 0) {
+                alert('Veuillez ajouter au moins une prestation validée.');
+                return;
+            }
+            isValidated = true;
             localStorage.setItem('interventionData', JSON.stringify(clientData));
-            alert('Bon d’intervention enregistré avec succès !');
+            const crmData = JSON.parse(localStorage.getItem('crmData') || '[]');
+            crmData.push({
+                date: clientData.interventionDate,
+                intervention: `Intervention pour ${clientData.clientName}`,
+                technician: clientData.technician,
+                montantTTC: document.getElementById('totalTTC').textContent
+            });
+            localStorage.setItem('crmData', JSON.stringify(crmData));
+            alert('Bon d’intervention validé et enregistré !');
             document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+            loadCrmData();
         }
 
         function loadIntervention() {
@@ -385,11 +450,52 @@
             document.getElementById('interventionDate').value = clientData.interventionDate || '';
             document.getElementById('technician').value = clientData.technician || '';
             document.getElementById('status').value = clientData.status || 'en_cours';
+            document.getElementById('paymentTerms').value = clientData.paymentTerms || 'virement_30j';
+        }
+
+        function loadCrmData() {
+            const crmData = JSON.parse(localStorage.getItem('crmData') || '[]');
+            const tbody = document.getElementById('crmBody');
+            tbody.innerHTML = '';
+            crmData.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.date}</td>
+                    <td>${item.intervention}</td>
+                    <td>${item.technician}</td>
+                    <td>${item.montantTTC}</td>`;
+                tbody.appendChild(row);
+            });
+        }
+
+        function printIntervention() {
+            if (!isValidated) {
+                alert('Veuillez valider le bon d’intervention avant d’imprimer.');
+                return;
+            }
+            window.print();
+        }
+
+        function sendIntervention() {
+            if (!isValidated) {
+                alert('Veuillez valider le bon d’intervention avant d’envoyer.');
+                return;
+            }
+            alert('Bon d’intervention envoyé (fonctionnalité simulée).');
+        }
+
+        function cancelIntervention() {
+            if (confirm('Voulez-vous annuler ce bon d’intervention ?')) {
+                localStorage.removeItem('interventionData');
+                localStorage.removeItem('prestationsData');
+                window.location.reload();
+            }
         }
 
         // Initialisation
         loadIntervention();
         loadPrestations();
+        loadCrmData();
     </script>
 </body>
 </html>
