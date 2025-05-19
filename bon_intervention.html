@@ -8,30 +8,34 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.2.0/dist/signature_pad.umd.min.js"></script>
     <style>
-        .section { margin-bottom: 20px; padding: 10px; border-bottom: 1px solid #eee; }
-        .info-container { display: flex; flex-wrap: wrap; gap: 20px; }
-        .info-box { flex: 1; min-width: 250px; }
-        .info-box input.error, .info-box select.error, .info-box textarea.error { border: 1px solid #e63946; }
-        #totalsTable { max-width: 220px; margin: 10px 0; }
-        .add-btn { background-color: #10b981; color: white; padding: 8px 16px; border-radius: 8px; }
-        .add-btn:hover { background-color: #059669; }
-        .validated { background-color: #f0fdf4; }
+        .section { margin-bottom: 20px; padding: 10px; }
+        .client-info { margin-bottom: 20px; padding: 15px; background: #f9fafb; border-radius: 8px; }
+        .client-info p { font-size: 15px; margin: 5px 0; }
+        #prestationsTable th, #prestationsTable td { padding: 12px; font-size: 15px; }
+        #prestationsTable input, #prestationsTable select { padding: 10px; font-size: 15px; }
+        .add-btn { background: #10b981; color: white; padding: 10px 20px; border-radius: 8px; }
+        .add-btn:hover { background: #059669; }
+        .validated { background: #f0fdf4; }
         .check-icon { color: #10b981; margin-left: 8px; }
         .check-icon.disabled { color: #ccc; }
         .edit-icon { color: #3b82f6; }
         .delete-icon { color: #ef4444; }
         .shortcuts { display: flex; justify-content: space-evenly; gap: 15px; margin-top: 20px; }
-        .shortcut-btn { background: #9ca3af; color: white; padding: 10px; border-radius: 8px; }
+        .shortcut-btn { background: #9ca3af; color: white; padding: 12px; border-radius: 8px; }
         .shortcut-btn:hover { background: #8b929e; }
+        .signature-container { margin-top: 20px; }
+        #signaturePad { border: 1px solid #ddd; border-radius: 8px; width: 100%; height: 150px; }
         @media (max-width: 600px) {
-            .info-container { flex-direction: column; }
-            table td:before { font-size: 12px; }
-            table td select, table td input { font-size: 13px; }
-            #totalsTable { max-width: 160px; margin-left: auto; }
+            #prestationsTable td:before { font-size: 14px; }
+            #prestationsTable td select, #prestationsTable td input { font-size: 14px; padding: 8px; }
+            .shortcuts { flex-wrap: wrap; gap: 10px; }
+            .shortcut-btn { padding: 10px; }
         }
         @media print {
-            .shortcuts, .add-btn { display: none; }
+            .shortcuts, .add-btn, .signature-container canvas { display: none; }
+            .signature-container img { display: block; }
         }
     </style>
 </head>
@@ -39,32 +43,21 @@
     <div class="container">
         <h1>Bon d'Intervention</h1>
 
-        <section class="section">
-            <h2>Résumé CRM</h2>
-            <table id="crmTable">
-                <thead>
-                    <tr><th>Date</th><th>Intervention</th><th>Technicien</th><th>Montant TTC</th></tr>
-                </thead>
-                <tbody id="crmBody"></tbody>
-            </table>
+        <section class="section client-info">
+            <h2>Client</h2>
+            <p><strong>Nom :</strong> <span id="clientName"></span></p>
+            <p><strong>Adresse :</strong> <span id="clientAddress"></span></p>
+            <p><strong>Lieu d’intervention :</strong> <span id="locationAddress"></span></p>
         </section>
 
         <section class="section">
-            <h2>Informations Client</h2>
-            <div class="info-container">
-                <div class="info-box">
-                    <label for="clientName">Nom du client *</label>
-                    <input type="text" id="clientName" placeholder="Nom du client">
-                </div>
-                <div class="info-box">
-                    <label for="clientAddress">Adresse</label>
-                    <input type="text" id="clientAddress" placeholder="Adresse">
-                </div>
-                <div class="info-box">
-                    <label for="clientPhone">Téléphone</label>
-                    <input type="text" id="clientPhone" placeholder="Téléphone">
-                </div>
-            </div>
+            <h2>Résumé CRM Extincteurs</h2>
+            <table id="crmExtincteursTable">
+                <thead>
+                    <tr><th>ID</th><th>Type</th><th>État</th><th>Abréviation</th></tr>
+                </thead>
+                <tbody id="crmExtincteursBody"></tbody>
+            </table>
         </section>
 
         <section class="section">
@@ -72,11 +65,11 @@
             <div class="info-container">
                 <div class="info-box">
                     <label for="interventionDate">Date *</label>
-                    <input type="date" id="interventionDate">
+                    <input type="date" id="interventionDate" required>
                 </div>
                 <div class="info-box">
                     <label for="technician">Technicien *</label>
-                    <input type="text" id="technician" placeholder="Nom du technicien">
+                    <input type="text" id="technician" placeholder="Nom du technicien" required>
                 </div>
                 <div class="info-box">
                     <label for="status">Statut</label>
@@ -87,8 +80,8 @@
                     </select>
                 </div>
                 <div class="info-box">
-                    <label for="paymentTerms">Modalités de paiement</label>
-                    <select id="paymentTerms">
+                    <label for="paymentTerms">Modalités de paiement *</label>
+                    <select id="paymentTerms" required>
                         <option value="virement_30j">Virement 30 jours</option>
                         <option value="cheque">Chèque à réception</option>
                         <option value="especes">Espèces</option>
@@ -113,6 +106,13 @@
             </table>
         </section>
 
+        <section class="section signature-container">
+            <h2>Signature Client</h2>
+            <canvas id="signaturePad"></canvas>
+            <button class="secondary" onclick="clearSignature()">Effacer</button>
+            <img id="signatureImage" style="display: none;">
+        </section>
+
         <div class="shortcuts">
             <button class="shortcut-btn" onclick="saveIntervention()" title="Enregistrer"><i class="fas fa-save"></i></button>
             <button class="shortcut-btn" onclick="printIntervention()" title="PDF"><i class="fas fa-file-pdf"></i></button>
@@ -123,13 +123,34 @@
 
     <script>
         emailjs.init("YOUR_EMAILJS_USER_ID"); // Remplacer par ton ID EmailJS
-        let index = document.querySelectorAll('#prestationsBody tr').length;
+        let index = 0;
         let isValidated = false;
         const articlesDB = [
             { name: "Extincteur CO2 5kg", unitPrice: 150.00 },
             { name: "Maintenance RIA", unitPrice: 80.00 },
             { name: "BAES Type 1", unitPrice: 120.00 }
         ];
+
+        // Initialiser SignaturePad
+        const canvas = document.getElementById('signaturePad');
+        const signaturePad = new SignaturePad(canvas, {
+            penColor: 'black',
+            backgroundColor: 'white'
+        });
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext('2d').scale(ratio, ratio);
+            signaturePad.clear();
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        function clearSignature() {
+            signaturePad.clear();
+            document.getElementById('signatureImage').src = '';
+            document.getElementById('signatureImage').style.display = 'none';
+        }
 
         function addRow() {
             const tbody = document.getElementById('prestationsBody');
@@ -151,7 +172,7 @@
                 </td>
                 <td data-label="Qté"><input type="number" class="quantity" id="qte-${index}" min="1" onblur="onInputChange(${index})"/></td>
                 <td data-label="PU HT"><input type="number" step="0.01" class="unitPrice" id="pu-${index}" placeholder="en €" onblur="onInputChange(${index})"/></td>
-                <td data-label="Total HT"><input type="number" class="total no-arrows" id="total-${index}" readonly /></td>`;
+                <td data-label="Total HT"><input type="number" class="total" id="total-${index}" readonly /></td>`;
             tbody.appendChild(row);
             index++;
             savePrestations();
@@ -182,16 +203,14 @@
                 qteInput.classList.add('error');
                 total.value = "";
                 return;
-            } else {
-                qteInput.classList.remove('error');
             }
             if (pu <= 0 || isNaN(pu)) {
                 puInput.classList.add('error');
                 total.value = "";
                 return;
-            } else {
-                puInput.classList.remove('error');
             }
+            qteInput.classList.remove('error');
+            puInput.classList.remove('error');
             total.value = (qte * pu).toFixed(2);
             savePrestations();
             updateTotals();
@@ -215,8 +234,8 @@
             row.classList.add('validated');
             row.querySelector('.icon-holder').innerHTML = `
                 <i class="fas fa-check-circle check-icon disabled" title="Validé"></i>
-                <i class="fas fa-pen edit-icon" onclick="enableEdit(${i})" title="Modifier"></i>
-                <i class="fas fa-trash delete-icon" onclick="deleteRow(${i})" title="Supprimer"></i>`;
+                <i class="fas fa-pen edit-icon" onclick="enableEdit(${index})" title="Modifier"></i>
+                <i class="fas fa-trash delete-icon" onclick="deleteRow(${index})" title="Supprimer"></i>`;
             savePrestations();
             updateTotals();
             addRow();
@@ -283,7 +302,7 @@
                     </td>
                     <td data-label="Qté"><input type="number" class="quantity" id="qte-${i}" value="${item.quantity}" min="1" onblur="onInputChange(${i})" disabled/></td>
                     <td data-label="PU HT"><input type="number" step="0.01" class="unitPrice" id="pu-${i}" value="${item.unitPrice}" onblur="onInputChange(${i})" disabled/></td>
-                    <td data-label="Total HT"><input type="number" class="total no-arrows" id="total-${i}" value="${item.total}" readonly /></td>`;
+                    <td data-label="Total HT"><input type="number" class="total" id="total-${i}" value="${item.total}" readonly /></td>`;
                 row.classList.add('validated');
                 tbody.appendChild(row);
             });
@@ -305,20 +324,37 @@
             document.getElementById('totalTTC').textContent = totalTTC.toFixed(2) + ' €';
         }
 
+        function loadClientInfo() {
+            const intervention = JSON.parse(localStorage.getItem('currentIntervention') || '{}');
+            document.getElementById('clientName').textContent = intervention.client || 'Non défini';
+            document.getElementById('clientAddress').textContent = intervention.adresse || 'Non défini';
+            const locationAddress = document.getElementById('locationAddress');
+            const location = document.getElementById('locationSelect')?.value || intervention.locationAddress || '';
+            locationAddress.textContent = location && location !== intervention.adresse ? location : 'Même adresse';
+        }
+
+        function loadCrmExtincteurs() {
+            const extincteursData = JSON.parse(localStorage.getItem('extincteursData') || '[]');
+            const tbody = document.getElementById('crmExtincteursBody');
+            tbody.innerHTML = '';
+            extincteursData.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${item.id || 'N/A'}</td><td>${item.type || 'N/A'}</td><td>${item.etat || 'N/A'}</td><td>${item.abreviation || 'N/A'}</td>`;
+                tbody.appendChild(row);
+            });
+        }
+
         function saveIntervention() {
             const clientData = {
-                clientName: document.getElementById('clientName').value.trim(),
-                clientAddress: document.getElementById('clientAddress').value.trim(),
-                clientPhone: document.getElementById('clientPhone').value.trim(),
                 interventionDate: document.getElementById('interventionDate').value,
                 technician: document.getElementById('technician').value.trim(),
                 status: document.getElementById('status').value,
                 paymentTerms: document.getElementById('paymentTerms').value
             };
             const prestationsData = JSON.parse(localStorage.getItem('prestationsData') || '[]');
-            if (!clientData.clientName || !clientData.interventionDate || !clientData.technician) {
-                alert('Champs obligatoires : Nom du client, Date, Technicien.');
-                ['clientName', 'interventionDate', 'technician'].forEach(id => {
+            if (!clientData.interventionDate || !clientData.technician || !clientData.paymentTerms) {
+                alert('Champs obligatoires : Date, Technicien, Modalités de paiement.');
+                ['interventionDate', 'technician', 'paymentTerms'].forEach(id => {
                     if (!document.getElementById(id).value) document.getElementById(id).classList.add('error');
                 });
                 return;
@@ -327,41 +363,27 @@
                 alert('Ajoutez au moins une prestation validée.');
                 return;
             }
+            if (signaturePad.isEmpty()) {
+                alert('Signature client requise.');
+                return;
+            }
             isValidated = true;
+            const signatureData = signaturePad.toDataURL();
+            document.getElementById('signatureImage').src = signatureData;
+            document.getElementById('signatureImage').style.display = 'block';
             localStorage.setItem('interventionData', JSON.stringify(clientData));
+            localStorage.setItem('signatureData', signatureData);
             const crmData = JSON.parse(localStorage.getItem('crmData') || '[]');
+            const intervention = JSON.parse(localStorage.getItem('currentIntervention') || '{}');
             crmData.push({
                 date: clientData.interventionDate,
-                intervention: `Intervention pour ${clientData.clientName}`,
+                intervention: `Intervention pour ${intervention.client || 'Client'}`,
                 technician: clientData.technician,
                 montantTTC: document.getElementById('totalTTC').textContent
             });
             localStorage.setItem('crmData', JSON.stringify(crmData));
             alert('Bon validé et enregistré !');
             document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
-            loadCrmData();
-        }
-
-        function loadIntervention() {
-            const clientData = JSON.parse(localStorage.getItem('interventionData') || '{}');
-            document.getElementById('clientName').value = clientData.clientName || '';
-            document.getElementById('clientAddress').value = clientData.clientAddress || '';
-            document.getElementById('clientPhone').value = clientData.clientPhone || '';
-            document.getElementById('interventionDate').value = clientData.interventionDate || '';
-            document.getElementById('technician').value = clientData.technician || '';
-            document.getElementById('status').value = clientData.status || 'en_cours';
-            document.getElementById('paymentTerms').value = clientData.paymentTerms || 'virement_30j';
-        }
-
-        function loadCrmData() {
-            const crmData = JSON.parse(localStorage.getItem('crmData') || '[]');
-            const tbody = document.getElementById('crmBody');
-            tbody.innerHTML = '';
-            crmData.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `<td>${item.date}</td><td>${item.intervention}</td><td>${item.technician}</td><td>${item.montantTTC}</td>`;
-                tbody.appendChild(row);
-            });
         }
 
         function printIntervention() {
@@ -379,13 +401,16 @@
                 return;
             }
             const clientData = JSON.parse(localStorage.getItem('interventionData') || '{}');
+            const intervention = JSON.parse(localStorage.getItem('currentIntervention') || '{}');
             const prestationsData = JSON.parse(localStorage.getItem('prestationsData') || '[]');
+            const signatureData = localStorage.getItem('signatureData') || '';
             emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', {
-                to_email: clientData.clientPhone || 'client@example.com',
-                client: clientData.clientName,
+                to_email: intervention.email || 'client@example.com',
+                client: intervention.client,
                 date: clientData.interventionDate,
                 prestations: JSON.stringify(prestationsData),
-                total: document.getElementById('totalTTC').textContent
+                total: document.getElementById('totalTTC').textContent,
+                signature: signatureData
             }).then(() => alert('Email envoyé !'), () => alert('Erreur envoi.'));
         }
 
@@ -393,14 +418,15 @@
             if (confirm('Annuler le bon d’intervention ?')) {
                 localStorage.removeItem('interventionData');
                 localStorage.removeItem('prestationsData');
+                localStorage.removeItem('signatureData');
                 window.location.reload();
             }
         }
 
         window.onload = () => {
-            loadIntervention();
+            loadClientInfo();
+            loadCrmExtincteurs();
             loadPrestations();
-            loadCrmData();
         };
     </script>
 </body>
