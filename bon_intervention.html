@@ -12,11 +12,9 @@
         .container { padding-bottom: 80px; }
         table tr { cursor: pointer; }
         table tr.active { background: #f9f9f9; }
-        .action-buttons { margin-top: 8px; display: flex; justify-content: flex-end; gap: 8px; }
+        .action-buttons { margin-top: 8px; display: flex; justify-content: flex-start; gap: 8px; }
         .action-buttons button { font-size: 14px; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; }
-        .action-buttons .validate-btn { background: #10b981; color: white; }
-        .action-buttons .delete-btn { background: #ef4444; color: white; }
-        .action-buttons button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .action-buttons .validate-modif-btn { background: #10b981; color: white; }
         .section { margin-bottom: 40px; padding: 15px; border-bottom: 1px solid #eee; }
         .table-container { width: 100%; }
         #prestationsTable { width: 100%; border-collapse: collapse; }
@@ -30,7 +28,7 @@
         #totalsTable th { background-color: #f0f0f0; }
         #totalsTable td { background-color: #fff; }
         .nav-buttons { margin-top: 20px; padding-bottom: 50px; }
-        .add-prestation-btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; font-size: 14px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 10px; }
+        .add-prestation-btn { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; font-size: 14px; background: #10b981; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; }
         .add-prestation-btn:hover { background: #059669; }
         .footer-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: #f5f5f5; padding: 6px 0; box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); z-index: 1000; }
         .footer-nav .navigation { margin: 0; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-around; align-items: center; gap: 10px; }
@@ -42,17 +40,17 @@
         .modal-content { background: #fff; margin: 10% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px; }
         .modal-content canvas { width: 100%; height: 200px; border: 1px solid #ddd; border-radius: 5px; }
         .modal-buttons { display: flex; justify-content: space-between; margin-top: 10px; }
+        .dialog-modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1003; }
+        .dialog-modal button { margin: 10px 5px; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; }
+        .dialog-modal .modify-btn { background: #3b82f6; color: white; }
+        .dialog-modal .delete-btn { background: #ef4444; color: white; }
+        .dialog-modal .cancel-btn { background: #6b7280; color: white; }
         @media (max-width: 600px) {
             .section { margin-bottom: 40px; padding: 10px; }
             #prestationsTable th { display: none; }
             #prestationsTable tr { display: block; margin-bottom: 8px; border: 0.5px solid #e0e0e0; padding: 8px; border-radius: 5px; background: #fff; }
-            #prestationsTable td:nth-child(1) { display: block; width: 100%; padding: 4px 0; }
-            #prestationsTable td:nth-child(1) select, #prestationsTable td:nth-child(1) input { width: 100%; font-size: 11px; padding: 6px; border: 1px solid #ccc; border-radius: 3px; }
-            .prestations-row { display: flex; gap: 4%; align-items: center; }
-            #prestationsTable td:nth-child(2) { flex: 0 0 20%; padding: 4px 0; }
-            #prestationsTable td:nth-child(3) { flex: 0 0 30%; padding: 4px 0; }
-            #prestationsTable td:nth-child(4) { flex: 0 0 40%; padding: 4px 0; }
-            #prestationsTable td input, #prestationsTable td select { width: 100%; padding: 6px; font-size: 11px; border: 1px solid #ccc; border-radius: 3px; }
+            #prestationsTable td { display: block; width: 100%; padding: 4px 0; }
+            #prestationsTable td select, #prestationsTable td input { width: 100%; font-size: 11px; padding: 6px; border: 1px solid #ccc; border-radius: 3px; }
             #prestationsTable td:before { content: attr(data-label); display: block; font-size: 10px; font-weight: bold; color: #444; margin-bottom: 2px; }
             #prestationsTable td:nth-child(1):before { content: "Désignation"; }
             #prestationsTable td:nth-child(2):before { content: "Qté"; }
@@ -65,6 +63,7 @@
             .signature-pad { width: 100%; height: 90px; }
             .add-prestation-btn { font-size: 13px; padding: 6px 12px; }
             .modal-content { margin: 20% auto; width: 95%; }
+            .dialog-modal { width: 80%; max-width: 300px; }
         }
     </style>
 </head>
@@ -86,7 +85,6 @@
         </section>
         <section class="section">
             <h2>📋 Prestations & Matériel</h2>
-            <button class="add-prestation-btn" onclick="addPrestation()"><i class="fas fa-plus"></i> Ajouter une prestation</button>
             <div class="table-container">
                 <table id="prestationsTable">
                     <thead>
@@ -99,6 +97,7 @@
                     </thead>
                     <tbody id="prestationsBody"></tbody>
                 </table>
+                <button class="add-prestation-btn" onclick="addPrestation()"><i class="fas fa-plus"></i> Ajouter une prestation</button>
             </div>
             <table id="totalsTable">
                 <tr><th>Total HT</th><td id="totalHT">0.00 €</td></tr>
@@ -176,8 +175,15 @@
             </div>
         </div>
     </div>
+    <div id="dialog-modal" class="dialog-modal">
+        <p>Que voulez-vous faire ?</p>
+        <button class="modify-btn" onclick="handleDialogAction('modify')">Modifier</button>
+        <button class="delete-btn" onclick="handleDialogAction('delete')">Supprimer</button>
+        <button class="cancel-btn" onclick="closeDialogModal()">Annuler</button>
+    </div>
     <script>
         let currentSignatureType = '';
+        let currentDialogIndex = null;
         const clientCanvas = document.getElementById('client-signature-pad');
         const technicianCanvas = document.getElementById('technician-signature-pad');
         const modalCanvas = document.getElementById('modal-signature-pad');
@@ -244,6 +250,34 @@
             closeSignatureModal();
         }
 
+        function openDialogModal(index) {
+            currentDialogIndex = index;
+            document.getElementById('dialog-modal').style.display = 'block';
+        }
+
+        function closeDialogModal() {
+            document.getElementById('dialog-modal').style.display = 'none';
+            currentDialogIndex = null;
+        }
+
+        function handleDialogAction(action) {
+            if (action === 'modify') {
+                const row = document.getElementById(`row-${currentDialogIndex}`);
+                row.querySelectorAll('input, select').forEach(input => input.disabled = false);
+                row.classList.remove('active');
+                const buttonRow = document.getElementById(`button-row-${currentDialogIndex}`);
+                buttonRow.innerHTML = `
+                    <td colspan="4">
+                        <div class="action-buttons">
+                            <button class="validate-modif-btn" onclick="validateRow(${currentDialogIndex})">Valider modif</button>
+                        </div>
+                    </td>`;
+            } else if (action === 'delete') {
+                removeRow(currentDialogIndex);
+            }
+            closeDialogModal();
+        }
+
         window.onload = () => {
             const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
             if (!interventionData.client) {
@@ -262,6 +296,7 @@
             loadSignatures();
             loadDraft();
             setInterval(saveDraft, 10000);
+            addPrestation(); // Ajouter une ligne par défaut
         };
 
         const articlesDB = [
@@ -288,32 +323,39 @@
 
         function addPrestation() {
             const tbody = document.getElementById('prestationsBody');
-            const index = tbody.children.length / 2; // Chaque prestation = 2 lignes (données + boutons)
+            const rows = document.querySelectorAll('#prestationsBody tr:not([id*="button-row"])');
+            if (rows.length > 0) {
+                const lastRow = rows[rows.length - 1];
+                const index = lastRow.id.split('-')[1];
+                const select = lastRow.querySelector('.designation');
+                const customDesignation = lastRow.querySelector('.custom-designation');
+                const designation = select.value === 'custom' ? customDesignation.value.trim() : select.value;
+                const quantity = parseFloat(lastRow.querySelector('.quantity').value) || 0;
+                const unitPrice = parseFloat(lastRow.querySelector('.unitPrice').value) || 0;
+                if (!designation || quantity <= 0 || unitPrice <= 0) {
+                    alert('Veuillez remplir désignation, quantité (>0) et PU HT (>0) avant d’ajouter une nouvelle ligne.');
+                    return;
+                }
+                lastRow.querySelectorAll('input, select').forEach(input => input.disabled = true);
+                lastRow.classList.add('active');
+                lastRow.onclick = () => openDialogModal(index);
+            }
+            const newIndex = rows.length;
             const row = document.createElement('tr');
-            row.id = `row-${index}`;
+            row.id = `row-${newIndex}`;
             row.innerHTML = `
                 <td data-label="Désignation">
-                    <select class="designation" onchange="updateDesignation(${index})">
+                    <select class="designation" onchange="updateDesignation(${newIndex})">
                         <option value="">Choisir un article</option>
                         ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}">${article.name}</option>`).join('')}
                         <option value="custom">Saisie libre</option>
                     </select>
-                    <input type="text" class="custom-designation" style="display:none;" placeholder="Désignation manuelle" oninput="updateRow(${index})">
+                    <input type="text" class="custom-designation" style="display:none;" placeholder="Désignation manuelle" oninput="updateRow(${newIndex})">
                 </td>
-                <td data-label="Qté"><input type="number" class="quantity" placeholder="Qté" oninput="updateRow(${index})" min="1"></td>
-                <td data-label="PU HT"><input type="number" class="unitPrice" placeholder="PU HT" oninput="updateRow(${index})" step="0.01"></td>
+                <td data-label="Qté"><input type="number" class="quantity" placeholder="Qté" oninput="updateRow(${newIndex})" min="1"></td>
+                <td data-label="PU HT"><input type="number" class="unitPrice" placeholder="PU HT" oninput="updateRow(${newIndex})" step="0.01"></td>
                 <td data-label="Prix Total HT"><input type="number" class="total" readonly></td>`;
-            const buttonRow = document.createElement('tr');
-            buttonRow.id = `button-row-${index}`;
-            buttonRow.innerHTML = `
-                <td colspan="4">
-                    <div class="action-buttons">
-                        <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" title="Valider">Valider</button>
-                        <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer">Supprimer</button>
-                    </div>
-                </td>`;
             tbody.appendChild(row);
-            tbody.appendChild(buttonRow);
             savePrestations();
             updateTotals();
         }
@@ -351,8 +393,6 @@
                 return;
             } else (select.value === 'custom' ? customDesignation : select).style.border = '';
             totalInput.value = (quantity * unitPrice).toFixed(2);
-            const validateBtn = document.getElementById(`validate-${index}`);
-            validateBtn.disabled = !(designation && quantity > 0 && unitPrice > 0);
             savePrestations();
             updateTotals();
         }
@@ -365,34 +405,32 @@
             const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
             const unitPrice = parseFloat(row.querySelector('.unitPrice').value) || 0;
             if (!designation || quantity <= 0 || unitPrice <= 0) {
-                alert('Veuillez remplir tous les champs correctement.');
+                alert('Veuillez remplir désignation, quantité (>0) et PU HT (>0).');
                 return;
             }
             row.querySelectorAll('input, select').forEach(input => input.disabled = true);
             row.classList.add('active');
+            row.onclick = () => openDialogModal(index);
+            const buttonRow = document.getElementById(`button-row-${index}`);
+            if (buttonRow) buttonRow.remove();
             savePrestations();
             updateTotals();
-        }
-
-        function editRow(index) {
-            const row = document.getElementById(`row-${index}`);
-            row.querySelectorAll('input, select').forEach(input => input.disabled = false);
-            row.classList.remove('active');
         }
 
         function removeRow(index) {
             const row = document.getElementById(`row-${index}`);
             const buttonRow = document.getElementById(`button-row-${index}`);
-            row.remove();
-            buttonRow.remove();
+            if (row) row.remove();
+            if (buttonRow) buttonRow.remove();
             savePrestations();
             updateTotals();
         }
 
         function savePrestations() {
             const prestationsData = [];
-            document.querySelectorAll('#prestationsBody tr:not([id*="button-row"])').forEach(row => {
+            document.querySelectorAll('#prestationsBody tr').forEach(row => {
                 const select = row.querySelector('.designation');
+                if (!select) return; // Ignorer les lignes de boutons
                 const customDesignation = row.querySelector('.custom-designation');
                 const designation = select.value === 'custom' ? customDesignation.value : select.value;
                 prestationsData.push({
@@ -415,27 +453,19 @@
                 row.id = `row-${index}`;
                 row.innerHTML = `
                     <td data-label="Désignation">
-                        <select class="designation" onchange="updateDesignation(${index})">
+                        <select class="designation" onchange="updateDesignation(${index})" disabled>
                             <option value="">Choisir un article</option>
                             ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}" ${article.name === item.designation ? 'selected' : ''}>${article.name}</option>`).join('')}
                             <option value="custom" ${isCustom ? 'selected' : ''}>Saisie libre</option>
                         </select>
-                        <input type="text" class="custom-designation" value="${isCustom ? item.designation : ''}" style="display:${isCustom ? 'block' : 'none'};" oninput="updateRow(${index})">
+                        <input type="text" class="custom-designation" value="${isCustom ? item.designation : ''}" style="display:${isCustom ? 'block' : 'none'};" oninput="updateRow(${index})" disabled>
                     </td>
-                    <td data-label="Qté"><input type="number" class="quantity" value="${item.quantity || ''}" min="1" oninput="updateRow(${index})"></td>
-                    <td data-label="PU HT"><input type="number" class="unitPrice" value="${item.unitPrice || ''}" step="0.01" oninput="updateRow(${index})"></td>
+                    <td data-label="Qté"><input type="number" class="quantity" value="${item.quantity || ''}" min="1" oninput="updateRow(${index})" disabled></td>
+                    <td data-label="PU HT"><input type="number" class="unitPrice" value="${item.unitPrice || ''}" step="0.01" oninput="updateRow(${index})" disabled></td>
                     <td data-label="Prix Total HT"><input type="number" class="total" value="${item.total || ''}" readonly></td>`;
-                const buttonRow = document.createElement('tr');
-                buttonRow.id = `button-row-${index}`;
-                buttonRow.innerHTML = `
-                    <td colspan="4">
-                        <div class="action-buttons">
-                            <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" title="Valider">Valider</button>
-                            <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer">Supprimer</button>
-                        </div>
-                    </td>`;
+                row.classList.add('active');
+                row.onclick = () => openDialogModal(index);
                 tbody.appendChild(row);
-                tbody.appendChild(buttonRow);
             });
             updateTotals();
         }
@@ -540,8 +570,8 @@
 
         function updateTotals() {
             let totalHT = 0;
-            document.querySelectorAll('#prestationsBody tr:not([id*="button-row"])').forEach(row => {
-                const total = parseFloat(row.querySelector('.total').value) || 0;
+            document.querySelectorAll('#prestationsBody tr').forEach(row => {
+                const total = parseFloat(row.querySelector('.total')?.value) || 0;
                 totalHT += total;
             });
             const tva = totalHT * 0.2;
