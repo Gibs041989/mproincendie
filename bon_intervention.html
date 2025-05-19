@@ -4,366 +4,388 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bon d'Intervention - MPro Incendie</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f9fafb; }
-        .container { max-width: 100%; box-sizing: border-box; }
-        .section { margin-bottom: 20px; padding: 10px; border-bottom: 1px solid #eee; }
-        h1, h2 { color: #222; }
-        .info-container { display: flex; flex-wrap: wrap; gap: 20px; }
-        .info-box { flex: 1; min-width: 250px; }
-        .info-box label { font-weight: bold; font-size: 14px; color: #444; }
-        .info-box input, .info-box select, .info-box textarea {
-            width: 100%; padding: 6px; margin-top: 5px; font-size: 13px;
-            border: 1px solid #ccc; border-radius: 3px; box-sizing: border-box;
-        }
-        .info-box input.error, .info-box select.error, .info-box textarea.error { border: 1px solid red; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; font-size: 14px; vertical-align: top; }
-        th { background-color: #f3f4f6; }
-        th:nth-child(1), td:nth-child(1) { width: 40%; }
-        th:nth-child(2), td:nth-child(2) { width: 15%; }
-        th:nth-child(3), td:nth-child(3) { width: 20%; }
-        th:nth-child(4), td:nth-child(4) { width: 25%; }
+        .container { padding-bottom: 80px; }
+        table tr { cursor: pointer; }
+        table tr.active { background: #f0f0f0; }
+        .action-buttons { text-align: right; margin-top: 4px; display: flex; justify-content: flex-end; }
+        .action-buttons button { font-size: 16px; padding: 5px; margin: 0 3px; border: none; background: none; cursor: pointer; }
+        .action-buttons button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .section { margin-bottom: 40px; padding: 15px; } /* Espacement accru + padding */
+        .section { margin-bottom: 40px; padding: 15px; } /* Uniformisé à 40px */
+        .table-container { width: 100%; }
+        #prestationsTable { width: 100%; border-collapse: collapse; }
+        #prestationsTable th, #prestationsTable td { padding: 8px; text-align: left; border: 1px solid #ddd; font-size: 14px; }
+        #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { width: 40%; }
+        #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { width: 15%; }
+        #prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) { width: 20%; }
+        #prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) { width: 25%; }
         #totalsTable { width: 100%; max-width: 220px; margin: 10px 0; border-collapse: collapse; }
-        #totalsTable th, #totalsTable td { padding: 6px; border: 1px solid #ddd; text-align: left; font-size: 13px; color: #222; font-weight: 500; }
-        #totalsTable th { background-color: #f0f0f0; }
+        #totalsTable th, #totalsTable td { padding: 5px; border: 1px solid #ddd; text-align: left; font-size: 13px; color: #222; font-weight: 500; }
+        #totalsTable th { background-color: #e8e8e8; }
         #totalsTable td { background-color: #fff; }
-        .add-btn {
-            background-color: #10b981; color: white; padding: 6px 12px;
-            border: none; border-radius: 5px; font-size: 13px;
-            display: inline-flex; align-items: center; gap: 6px;
-            cursor: pointer; margin: 10px 0; justify-content: flex-start;
-        }
-        .add-btn:hover { background-color: #059669; }
-        .validated { background-color: #f0fdf4; }
-        .check-icon { color: #10b981; margin-left: 6px; cursor: pointer; }
-        .check-icon.disabled { color: #ccc; cursor: not-allowed; }
-        .edit-icon, .delete-icon {
-            margin-left: 6px; cursor: pointer;
-        }
-        .edit-icon { color: #3b82f6; }
-        .delete-icon { color: #ef4444; }
-        .action-buttons { margin-top: 8px; display: flex; justify-content: flex-start; gap: 8px; }
-        .action-buttons button { font-size: 14px; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; }
-        .action-buttons .validate-modif-btn { background: #10b981; color: white; }
-        .shortcuts { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-        .shortcut-btn { background: #3b82f6; color: white; padding: 8px; border-radius: 5px; cursor: pointer; }
-        .shortcut-btn:hover { background: #2563eb; }
-        .shortcut-btn i { font-size: 16px; }
-        .save-btn {
-            background-color: #3b82f6; color: white; padding: 8px 16px;
-            border: none; border-radius: 5px; font-size: 14px;
-            cursor: pointer; margin-top: 20px; width: 100%;
-        }
-        .save-btn:hover { background-color: #2563eb; }
-        input[type='number'], input[type='text'], select, textarea {
-            width: 100%; padding: 6px; font-size: 13px;
-            box-sizing: border-box; border: 1px solid #ccc; border-radius: 3px;
-        }
-        input[type='number'].no-arrows {
-            -webkit-appearance: none;
-            -moz-appearance: textfield;
-            appearance: none;
-        }
-        input[type='number'].no-arrows::-webkit-inner-spin-button,
-        input[type='number'].no-arrows::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
+        .nav-buttons { margin-top: 20px; padding-bottom: 50px; }
+        .footer-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: #f5f5f5; padding: 6px 0; box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); z-index: 1000; }
+        .footer-nav .navigation { margin: 0; display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-around; align-items: center; gap: 10px; }
+        .footer-nav a { flex: 1; text-align: center; padding: 6px; font-size: 18px; background-color: transparent; border-radius: 5px; transition: background-color 0.3s ease; }
+        .footer-nav a:hover { background-color: #ffebee; }
+        .signature-pad { border: 1px solid #ddd; border-radius: 5px; margin-top: 6px; width: 100%; height: 90px; pointer-events: none; }
+        .signature-block { margin-bottom: 30px; }
+        .signature-block { margin-bottom: 45px; } /* Augmenté à 45px */
+        .floating-btn { position: fixed; bottom: 70px; right: 10px; background-color: #10b981; color: white; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); cursor: pointer; z-index: 1001; }
+        .floating-btn:hover::after { content: "Ajouter une prestation"; position: absolute; right: 60px; background: #333; color: white; padding: 4px 8px; border-radius: 3px; font-size: 12px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1002; }
+        .modal-content { background: #fff; margin: 10% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px; }
+        .modal-content canvas { width: 100%; height: 200px; border: 1px solid #ddd; border-radius: 5px; }
+        .modal-buttons { display: flex; justify-content: space-between; margin-top: 10px; }
         @media (max-width: 600px) {
-            body { padding: 10px; }
-            .section { margin-bottom: 20px; padding: 8px; }
-            .info-container { flex-direction: column; }
-            table th { display: none; }
-            table tr { display: block; margin-bottom: 8px; border: 1px solid #ddd; padding: 8px; border-radius: 5px; background: #fff; }
-            table td:nth-child(1) { display: block; width: 100%; padding: 4px 0; }
-            table td:nth-child(1) select, table td:nth-child(1) input { width: 100%; font-size: 11px; padding: 6px; }
-            .prestations-row { display: flex; gap: 3%; align-items: flex-start; margin-top: 4px; }
-            table td:nth-child(2) { flex: 0 0 25%; padding: 4px 0; }
-            table td:nth-child(3) { flex: 0 0 35%; padding: 4px 0; }
-            table td:nth-child(4) { flex: 0 0 40%; padding: 4px 0; }
-            table td select, table td input { width: 100%; font-size: 11px; padding: 6px; }
-            table td:before { content: attr(data-label); display: block; font-size: 10px; font-weight: bold; color: #444; margin-bottom: 2px; }
-            table td:nth-child(1):before { content: "Désignation"; }
-            table td:nth-child(2):before { content: "Qté"; }
-            table td:nth-child(3):before { content: "PU HT (€)"; }
-            table td:nth-child(4):before { content: "Total HT (€)"; }
-            .action-buttons { justify-content: flex-start; margin-top: 8px; }
-            .action-buttons button { font-size: 12px; padding: 6px 10px; }
+            .section { margin-bottom: 30px; padding: 10px; }
+            .section { margin-bottom: 40px; padding: 10px; } /* Uniformisé à 40px */
+            #prestationsTable th { display: none; }
+            #prestationsTable tr { display: block; margin-bottom: 8px; border: 1px solid #ddd; padding: 6px; border-radius: 5px; background: #fff; }
+            #prestationsTable td:nth-child(1) { display: block; width: 100%; padding: 4px 0; }
+            #prestationsTable td:nth-child(1) select, #prestationsTable td:nth-child(1) input { width: 100%; font-size: 13px; padding: 5px; border: 1px solid #ccc; border-radius: 3px; }
+            .prestations-row { display: flex; gap: 2%; align-items: center; }
+            #prestationsTable td:nth-child(2) { flex: 0 0 18%; padding: 4px 0; }
+            #prestationsTable td:nth-child(3) { flex: 0 0 35%; padding: 4px 0; }
+            #prestationsTable td:nth-child(4) { flex: 0 0 45%; padding: 4px 0; }
+            #prestationsTable td input, #prestationsTable td select { width: 100%; padding: 5px; font-size: 12px; border: 1px solid #ccc; border-radius: 3px; }
+            #prestationsTable td:before { content: attr(data-label); display: block; font-size: 11px; font-weight: bold; color: #555; margin-bottom: 2px; }
+            #prestationsTable td:nth-child(1):before { content: "Désignation"; }
+            #prestationsTable td:nth-child(2):before { content: "Qté"; }
+            #prestationsTable td:nth-child(3):before { content: "PU HT (€)"; }
+            #prestationsTable td:nth-child(4):before { content: "Total HT (€)"; }
             #totalsTable { max-width: 160px; margin-left: auto; margin-right: 0; }
-            #totalsTable th, #totalsTable td { padding: 4px; font-size: 12px; }
-            .add-btn { font-size: 12px; padding: 5px 10px; }
-            .save-btn { width: 100%; }
-            .shortcuts { flex-wrap: wrap; }
+            #totalsTable th, #totalsTable td { padding: 4px; font-size: 12px; color: #222; font-weight: 500; }
+            .signature-pad { width: 100%; height: 90px; }
+            .floating-btn { bottom: 75px; width: 45px; height: 45px; font-size: 20px; }
+            .action-buttons button { font-size: 14px; padding: 4px; }
+            .modal-content { margin: 20% auto; width: 95%; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Bon d'Intervention - MPro Incendie</h1>
-
-        <!-- Section Résumé CRM -->
+        <h1>🔥 Bon d'Intervention</h1>
         <section class="section">
-            <h2>Résumé CRM</h2>
-            <table id="crmTable">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Intervention</th>
-                        <th>Technicien</th>
-                        <th>Montant TTC</th>
-                    </tr>
-                </thead>
-                <tbody id="crmBody">
-                    <!-- Données chargées dynamiquement -->
-                </tbody>
-            </table>
+            <h2>🧾 Client</h2>
+            <p><strong>Client:</strong> <span id="clientName">Non sélectionné</span></p>
+            <p><strong>Adresse:</strong> <span id="adresse">Non sélectionnée</span></p>
+            <p><strong>Code postal:</strong> <span id="codePostal">Non sélectionné</span></p>
+            <p><strong>Ville:</strong> <span id="ville">Non sélectionnée</span></p>
+            <p><strong>Téléphone:</strong> <span id="telephone">Non sélectionné</span></p>
+            <p><strong>Email:</strong> <span id="email">Non sélectionné</span></p>
         </section>
-
-        <!-- Section Informations Client -->
-        <section class="section">
-            <h2>Informations Client</h2>
-            <div class="info-container">
-                <div class="info-box">
-                    <label for="clientName">Nom du client *</label>
-                    <input type="text" id="clientName" placeholder="Nom du client">
-                </div>
-                <div class="info-box">
-                    <label for="clientAddress">Adresse</label>
-                    <input type="text" id="clientAddress" placeholder="Adresse">
-                </div>
-                <div class="info-box">
-                    <label for="clientPhone">Téléphone</label>
-                    <input type="text" id="clientPhone" placeholder="Téléphone">
-                </div>
-            </div>
+        <section class="section" id="crmSummary">
+            <h2>📄 Résumé des CRM</h2>
+            <p id="crmSummaryText">Aucun CRM enregistré.</p>
+            <ul id="crmSummaryList"></ul>
         </section>
-
-        <!-- Section Détails Intervention -->
-        <section class="section">
-            <h2>Détails Intervention</h2>
-            <div class="info-container">
-                <div class="info-box">
-                    <label for="interventionDate">Date *</label>
-                    <input type="date" id="interventionDate">
-                </div>
-                <div class="info-box">
-                    <label for="technician">Technicien *</label>
-                    <input type="text" id="technician" placeholder="Nom du technicien">
-                </div>
-                <div class="info-box">
-                    <label for="status">Statut</label>
-                    <select id="status">
-                        <option value="en_cours">En cours</option>
-                        <option value="termine">Terminé</option>
-                        <option value="annule">Annulé</option>
-                    </select>
-                </div>
-                <div class="info-box">
-                    <label for="paymentTerms">Modalités de paiement</label>
-                    <select id="paymentTerms">
-                        <option value="virement_30j">Virement 30 jours</option>
-                        <option value="cheque">Chèque à réception</option>
-                        <option value="especes">Espèces</option>
-                    </select>
-                </div>
-            </div>
-        </section>
-
-        <!-- Section Prestations & Matériel -->
         <section class="section">
             <h2>📋 Prestations & Matériel</h2>
-            <table id="prestationsTable">
-                <thead>
-                    <tr>
-                        <th>Désignation</th>
-                        <th>Qté</th>
-                        <th>PU HT (€)</th>
-                        <th>Total HT</th>
-                    </tr>
-                </thead>
-                <tbody id="prestationsBody"></tbody>
-            </table>
-            <button class="add-btn" onclick="addRow()">➕ Ajouter une ligne</button>
+            <div class="table-container">
+                <table id="prestationsTable">
+                    <thead>
+                        <tr>
+                            <th>Désignation</th>
+                            <th>Qté</th>
+                            <th>PU HT</th>
+                            <th>Prix Total HT</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prestationsBody"></tbody>
+                </table>
+            </div>
             <table id="totalsTable">
                 <tr><th>Total HT</th><td id="totalHT">0.00 €</td></tr>
                 <tr><th>TVA 20%</th><td id="tva">0.00 €</td></tr>
                 <tr><th>Total TTC</th><td id="totalTTC">0.00 €</td></tr>
             </table>
         </section>
-
-        <!-- Raccourcis -->
-        <div class="shortcuts">
-            <button class="shortcut-btn" onclick="saveIntervention()" title="Enregistrer"><i class="fas fa-save"></i></button>
-            <button class="shortcut-btn" onclick="printIntervention()" title="Imprimer"><i class="fas fa-print"></i></button>
-            <button class="shortcut-btn" onclick="sendIntervention()" title="Envoyer"><i class="fas fa-envelope"></i></button>
-            <button class="shortcut-btn" onclick="cancelIntervention()" title="Annuler"><i class="fas fa-times"></i></button>
+        <section class="section">
+            <h2>💳 Modalités de règlement</h2>
+            <label>Délais de règlement:
+                <select id="delaiReglement" onchange="toggleDelaiInput()">
+                    <option value="Immédiat à l’intervention">Immédiat à l’intervention</option>
+                    <option value="À réception de facture">À réception de facture</option>
+                    <option value="Sous 30 jours à réception de facture">Sous 30 jours à réception de facture</option>
+                    <option value="custom">Saisie libre</option>
+                </select>
+                <input type="text" id="delaiCustom" style="display:none;" placeholder="Délais personnalisé" oninput="saveDraft()">
+            </label>
+            <label>Moyen de règlement:
+                <select id="moyenReglement" onchange="toggleMoyenInput()">
+                    <option value="Chèque">Chèque</option>
+                    <option value="Virement">Virement</option>
+                    <option value="Espèces">Espèces</option>
+                    <option value="custom">Saisie libre</option>
+                </select>
+                <input type="text" id="moyenCustom" style="display:none;" placeholder="Moyen personnalisé" oninput="saveDraft()">
+            </label>
+            <label>Observations:
+                <textarea id="observations" rows="3" placeholder="Notes supplémentaires" oninput="saveDraft()"></textarea>
+            </label>
+        </section>
+        <section class="section">
+            <h2>📅 Détails de l’intervention</h2>
+            <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-18" required oninput="saveDraft()"></label>
+            <label>Technicien intervenant: <input type="text" id="technician" placeholder="Nom du technicien" oninput="saveDraft()"></label>
+            <label>Durée (heures): <input type="number" id="duration" placeholder="Durée en heures" oninput="saveDraft()"></label>
+        </section>
+        <section class="section">
+            <h2>✍️ Signatures</h2>
+            <div class="signature-block">
+                <h3>Client</h3>
+                <button class="action" onclick="openSignatureModal('client')">Signer</button>
+                <canvas id="client-signature-pad" class="signature-pad"></canvas>
+            </div>
+            <div class="signature-block">
+                <h3>Technicien</h3>
+                <button class="action" onclick="openSignatureModal('technician')">Signer</button>
+                <canvas id="technician-signature-pad" class="signature-pad"></canvas>
+            </div>
+        </section>
+        <section class="section nav-buttons">
+            <button class="primary" onclick="validateBonIntervention()">✅ Valider bon d’intervention</button>
+            <button class="secondary" onclick="saveDraft()">💾 Enregistrer brouillon</button>
+            <button class="secondary" onclick="generatePDF()">📄 Générer le PDF</button>
+            <button class="secondary" onclick="sendEmail()">📧 Envoyer par email</button>
+            <a href="intervention.html"><button class="neutral">⬅️ Retour</button></a>
+        </section>
+    </div>
+    <div class="footer-nav">
+        <div class="navigation nav-buttons">
+            <a href="index.html">🏠</a>
+            <a href="client.html">📁</a>
+            <a href="intervention.html">🛠️</a>
+            <a href="parametres.html">⚙️</a>
         </div>
     </div>
-
+    <div id="signature-modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Signature</h3>
+            <canvas id="modal-signature-pad"></canvas>
+            <div class="modal-buttons">
+                <button class="secondary" onclick="clearModalSignature()">Effacer</button>
+                <button class="secondary" onclick="closeSignatureModal()">Annuler</button>
+                <button class="action" onclick="validateModalSignature()">Valider</button>
+            </div>
+        </div>
+    </div>
     <script>
-        let index = 0;
-        let isValidated = false;
+        let currentSignatureType = '';
+        const clientCanvas = document.getElementById('client-signature-pad');
+        const technicianCanvas = document.getElementById('technician-signature-pad');
+        const modalCanvas = document.getElementById('modal-signature-pad');
+        const clientSignaturePad = new SignaturePad(clientCanvas, { penColor: 'black' });
+        const technicianSignaturePad = new SignaturePad(technicianCanvas, { penColor: 'black' });
+        let modalSignaturePad;
+        function resizeCanvas(canvas) {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext('2d').scale(ratio, ratio);
+        }
+        function loadSignatures() {
+            const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
+            if (signatures.client) clientSignaturePad.fromDataURL(signatures.client);
+            if (signatures.technician) technicianSignaturePad.fromDataURL(signatures.technician);
+        }
+        window.addEventListener('resize', () => {
+            resizeCanvas(clientCanvas);
+            resizeCanvas(technicianCanvas);
+            loadSignatures();
+            if (modalSignaturePad) resizeCanvas(modalCanvas);
+        });
+        resizeCanvas(clientCanvas);
+        resizeCanvas(technicianCanvas);
+        function openSignatureModal(type) {
+            currentSignatureType = type;
+            document.getElementById('signature-modal').style.display = 'block';
+            document.getElementById('modal-title').textContent = type === 'client' ? 'Signature Client' : 'Signature Technicien';
+            modalSignaturePad = new SignaturePad(modalCanvas, { penColor: 'black' });
+            resizeCanvas(modalCanvas);
+        }
+        function closeSignatureModal() {
+            document.getElementById('signature-modal').style.display = 'none';
+            modalSignaturePad = null;
+        }
+        function clearModalSignature() {
+            modalSignaturePad.clear();
+        }
+        function validateModalSignature() {
+            if (modalSignaturePad.isEmpty()) {
+                alert('Veuillez apposer une signature.');
+                return;
+            }
+            const dataURL = modalSignaturePad.toDataURL();
+            const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
+            if (currentSignatureType === 'client') {
+                clientSignaturePad.fromDataURL(dataURL);
+                signatures.client = dataURL;
+            } else {
+                technicianSignaturePad.fromDataURL(dataURL);
+                signatures.technician = dataURL;
+            }
+            localStorage.setItem('signatures', JSON.stringify(signatures));
+            saveDraft();
+            closeSignatureModal();
+        }
+        window.onload = () => {
+            const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
+            if (!interventionData.client) {
+                alert('Aucun client sélectionné.');
+                window.location.href = 'intervention.html';
+                return;
+            }
+            document.getElementById('clientName').textContent = interventionData.client || 'Non sélectionné';
+            document.getElementById('adresse').textContent = interventionData.adresse || 'Non sélectionnée';
+            document.getElementById('codePostal').textContent = interventionData.codePostal || 'Non sélectionné';
+            document.getElementById('ville').textContent = interventionData.ville || 'Non sélectionnée';
+            document.getElementById('telephone').textContent = interventionData.telephone || 'Non sélectionné';
+            document.getElementById('email').textContent = interventionData.email || 'Non sélectionné';
+            const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
+            document.getElementById('crmSummaryText').textContent = drafts['crm_extincteurs']?.summary || 'Aucun CRM enregistré.';
+            loadCRMSummary();
+            loadPrestations();
+            loadSignatures();
+            loadDraft();
+            setInterval(saveDraft, 10000);
+        };
         const articlesDB = [
             { name: "Extincteur CO2 5kg", unitPrice: 150.00 },
             { name: "Maintenance RIA", unitPrice: 80.00 },
             { name: "BAES Type 1", unitPrice: 120.00 }
         ];
-
-        function addRow() {
+        function loadCRMSummary() {
+            const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
+            const crmList = document.getElementById('crmSummaryList');
+            crmList.innerHTML = '';
+            const crmKeys = Object.keys(drafts).filter(key => key.startsWith('crm_') && drafts[key].summary);
+            if (crmKeys.length === 0) {
+                crmList.innerHTML = '<li>Aucun CRM enregistré.</li>';
+            } else {
+                crmKeys.forEach(key => {
+                    const li = document.createElement('li');
+                    li.textContent = drafts[key].summary;
+                    crmList.appendChild(li);
+                });
+            }
+        }
+        function addPrestation() {
             const tbody = document.getElementById('prestationsBody');
-            const rows = document.querySelectorAll('#prestationsBody tr:not([id*="button-row"])');
-            const newIndex = index++;
+            const index = tbody.children.length;
             const row = document.createElement('tr');
-            row.id = `row-${newIndex}`;
+            row.id = `row-${index}`;
             row.innerHTML = `
                 <td data-label="Désignation">
-                    <select class="designation" id="des-${newIndex}" onchange="onInputChange(${newIndex})">
-                        <option value="">--Choisir--</option>
+                    <select class="designation" onchange="updateDesignation(${index})">
+                        <option value="">Choisir un article</option>
                         ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}">${article.name}</option>`).join('')}
-                        <option value="custom">Autre (saisie manuelle)</option>
+                        <option value="custom">Saisie libre</option>
                     </select>
-                    <input type="text" class="custom-designation" id="cust-${newIndex}" style="display:none;" placeholder="Saisie libre" oninput="onInputChange(${newIndex})">
-                    <span class="icon-holder">
-                        <i class="fas fa-check-circle check-icon" onclick="validateRow(${newIndex})" title="Valider"></i>
-                        <i class="fas fa-pen edit-icon disabled" title="Modifier"></i>
-                        <i class="fas fa-trash delete-icon disabled" title="Supprimer"></i>
-                    </span>
+                    <input type="text" class="custom-designation" style="display:none;" placeholder="Désignation manuelle" oninput="updateRow(${index})">
                 </td>
-                <td data-label="Qté"><input type="number" class="quantity" id="qte-${newIndex}" min="1" onblur="onInputChange(${newIndex})"/></td>
-                <td data-label="PU HT"><input type="text" inputmode="decimal" pattern="[0-9]*\.?[0-9]+" class="unitPrice" id="pu-${newIndex}" placeholder="en €" onblur="onInputChange(${newIndex})"/></td>
-                <td data-label="Prix Total HT"><input type="number" class="total no-arrows" id="total-${newIndex}" readonly /></td>`;
+                <td data-label="Qté"><input type="number" class="quantity" placeholder="Qté" oninput="updateRow(${index})" min="1"></td>
+                <td data-label="PU HT"><input type="number" class="unitPrice" placeholder="PU HT" oninput="updateRow(${index})" step="0.01"></td>
+                <td data-label="Prix Total HT">
+                    <div class="prestations-row">
+                        <input type="number" class="total" readonly>
+                        <div class="action-buttons">
+                            <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" title="Valider"><i class="fas fa-check-circle"></i></button>
+                            <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>
+                </td>`;
             tbody.appendChild(row);
+            row.querySelector('.action-buttons').style.display = 'flex';
             savePrestations();
             updateTotals();
         }
-
-        function onInputChange(i) {
-            const row = document.getElementById(`row-${i}`);
-            const desSel = document.getElementById(`des-${i}`);
-            const custInput = document.getElementById(`cust-${i}`);
-            const qteInput = document.getElementById(`qte-${i}`);
-            const puInput = document.getElementById(`pu-${i}`);
-            const total = document.getElementById(`total-${i}`);
-            let designation = "";
-
-            if (desSel.value === "custom") {
-                custInput.style.display = "block";
-                designation = custInput.value.trim();
-                puInput.value = "";
+        function updateDesignation(index) {
+            const row = document.getElementById(`row-${index}`);
+            const select = row.querySelector('.designation');
+            const customInput = row.querySelector('.custom-designation');
+            const unitPriceInput = row.querySelector('.unitPrice');
+            if (select.value === 'custom') {
+                customInput.style.display = 'block';
+                unitPriceInput.value = '';
             } else {
-                custInput.style.display = "none";
-                designation = desSel.value;
-                if (desSel.selectedOptions[0].dataset.price) {
-                    puInput.value = desSel.selectedOptions[0].dataset.price;
-                }
+                customInput.style.display = 'none';
+                const selectedOption = select.options[select.selectedIndex];
+                unitPriceInput.value = selectedOption.dataset.price || '';
             }
-
-            const qte = parseFloat(qteInput.value) || 0;
-            const pu = parseFloat(puInput.value);
-            if (isNaN(pu) || pu < 0) {
-                puInput.style.border = '1px solid red';
-                total.value = "";
+            updateRow(index);
+        }
+        function updateRow(index) {
+            const row = document.getElementById(`row-${index}`);
+            const select = row.querySelector('.designation');
+            const customDesignation = row.querySelector('.custom-designation');
+            const designation = select.value === 'custom' ? customDesignation.value.trim() : select.value;
+            const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
+            const unitPrice = parseFloat(row.querySelector('.unitPrice').value) || 0;
+            const totalInput = row.querySelector('.total');
+            if (quantity <= 0 && quantity !== '') {
+                row.querySelector('.quantity').style.border = '1px solid red';
                 return;
-            } else {
-                puInput.style.border = '1px solid #ccc';
-            }
-            if (qte <= 0 && qteInput.value !== "") {
-                qteInput.style.border = '1px solid red';
-                total.value = "";
+            } else row.querySelector('.quantity').style.border = '';
+            if (!designation && select.value !== '') {
+                (select.value === 'custom' ? customDesignation : select).style.border = '1px solid red';
                 return;
-            } else {
-                qteInput.style.border = '1px solid #ccc';
-            }
-            total.value = (qte > 0 && pu > 0) ? (qte * pu).toFixed(2) : "";
-
-            if (designation && qte > 0 && pu > 0 && !row.classList.contains("validated")) {
-                validateRow(i);
-                addRow();
-            }
+            } else (select.value === 'custom' ? customDesignation : select).style.border = '';
+            totalInput.value = (quantity * unitPrice).toFixed(2);
+            const validateBtn = row.querySelector(`#validate-${index}`);
+            validateBtn.disabled = !(designation && quantity > 0 && unitPrice > 0);
             savePrestations();
             updateTotals();
         }
-
-        function validateRow(i) {
-            const row = document.getElementById(`row-${i}`);
-            const desSel = document.getElementById(`des-${i}`);
-            const custInput = document.getElementById(`cust-${i}`);
-            const qteInput = document.getElementById(`qte-${i}`);
-            const puInput = document.getElementById(`pu-${i}`);
-            const designation = desSel.value === "custom" ? custInput.value.trim() : desSel.value;
-            const quantity = parseFloat(qteInput.value) || 0;
-            const unitPrice = parseFloat(puInput.value) || 0;
+        function validateRow(index) {
+            const row = document.getElementById(`row-${index}`);
+            const select = row.querySelector('.designation');
+            const customDesignation = row.querySelector('.custom-designation');
+            const designation = select.value === 'custom' ? customDesignation.value.trim() : select.value;
+            const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
+            const unitPrice = parseFloat(row.querySelector('.unitPrice').value) || 0;
             if (!designation || quantity <= 0 || unitPrice <= 0) {
-                alert('Veuillez remplir désignation, quantité (>0) et PU HT (>0).');
+                alert('Veuillez remplir tous les champs correctement.');
                 return;
             }
             row.querySelectorAll('input, select').forEach(input => input.disabled = true);
-            row.classList.add('validated');
-            const iconHolder = row.querySelector('.icon-holder');
-            iconHolder.innerHTML = `
-                <i class="fas fa-check-circle check-icon disabled" title="Validé"></i>
-                <i class="fas fa-pen edit-icon" onclick="enableEdit(${i})" title="Modifier"></i>
-                <i class="fas fa-trash delete-icon" onclick="deleteRow(${i})" title="Supprimer"></i>`;
-            const buttonRow = document.getElementById(`button-row-${i}`);
-            if (buttonRow) buttonRow.remove();
+            row.classList.add('active');
             savePrestations();
             updateTotals();
         }
-
-        function enableEdit(i) {
-            const row = document.getElementById(`row-${i}`);
+        function editRow(index) {
+            const row = document.getElementById(`row-${index}`);
             row.querySelectorAll('input, select').forEach(input => input.disabled = false);
-            row.classList.remove('validated');
-            const iconHolder = row.querySelector('.icon-holder');
-            iconHolder.innerHTML = `
-                <i class="fas fa-check-circle check-icon" onclick="validateRow(${i})" title="Valider"></i>
-                <i class="fas fa-pen edit-icon disabled" title="Modifier"></i>
-                <i class="fas fa-trash delete-icon disabled" title="Supprimer"></i>`;
-            const buttonRow = document.createElement('tr');
-            buttonRow.id = `button-row-${i}`;
-            row.innerHTML = `
-                <td colspan="4">
-                    <div class="action-buttons">
-                        <button class="validate-modif-btn" onclick="validateRow(${i})">Valider modif</button>
-                    </div>
-                </td>`;
-            document.getElementById('prestationsBody').insertBefore(buttonRow, row.nextSibling);
+            row.querySelector('.action-buttons').style.display = 'flex';
+            row.classList.remove('active');
+        }
+        function removeRow(index) {
+            document.getElementById(`row-${index}`).remove();
             savePrestations();
             updateTotals();
         }
-
-        function deleteRow(i) {
-            const row = document.getElementById(`row-${i}`);
-            const buttonRow = document.getElementById(`button-row-${i}`);
-            if (row) row.remove();
-            if (buttonRow) buttonRow.remove();
-            savePrestations();
-            updateTotals();
-        }
-
         function savePrestations() {
             const prestationsData = [];
-            document.querySelectorAll('#prestationsBody tr:not([id*="button-row"])').forEach(row => {
+            document.querySelectorAll('#prestationsBody tr').forEach(row => {
                 const select = row.querySelector('.designation');
                 const customDesignation = row.querySelector('.custom-designation');
                 const designation = select.value === 'custom' ? customDesignation.value : select.value;
-                const quantity = row.querySelector('.quantity').value;
-                const unitPrice = row.querySelector('.unitPrice').value;
-                const total = row.querySelector('.total').value;
-                if (designation && quantity && unitPrice && total) {
-                    prestationsData.push({
-                        designation: designation,
-                        quantity: quantity,
-                        unitPrice: unitPrice,
-                        total: total
-                    });
-                }
+                prestationsData.push({
+                    designation: designation,
+                    quantity: row.querySelector('.quantity').value,
+                    unitPrice: row.querySelector('.unitPrice').value,
+                    total: row.querySelector('.total').value
+                });
             });
             localStorage.setItem('prestationsData', JSON.stringify(prestationsData));
+            saveDraft();
         }
-
         function loadPrestations() {
             const prestationsData = JSON.parse(localStorage.getItem('prestationsData') || '[]');
             const tbody = document.getElementById('prestationsBody');
@@ -373,120 +395,241 @@
                 row.id = `row-${index}`;
                 row.innerHTML = `
                     <td data-label="Désignation">
-                        <select class="designation" id="des-${index}" onchange="onInputChange(${index})" disabled>
-                            <option value="">--Choisir--</option>
+                        <select class="designation" onchange="updateDesignation(${index})">
+                            <option value="">Choisir un article</option>
                             ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}" ${article.name === item.designation ? 'selected' : ''}>${article.name}</option>`).join('')}
-                            <option value="custom" ${isCustom ? 'selected' : ''}>Autre (saisie manuelle)</option>
+                            <option value="custom" ${isCustom ? 'selected' : ''}>Saisie libre</option>
                         </select>
-                        <input type="text" class="custom-designation" id="cust-${index}" value="${isCustom ? item.designation : ''}" style="display:${isCustom ? 'block' : 'none'};" oninput="onInputChange(${index})" disabled>
-                        <span class="icon-holder">
-                            <i class="fas fa-check-circle check-icon disabled" title="Validé"></i>
-                            <i class="fas fa-pen edit-icon" onclick="enableEdit(${index})" title="Modifier"></i>
-                            <i class="fas fa-trash delete-icon" onclick="deleteRow(${index})" title="Supprimer"></i>
-                        </span>
+                        <input type="text" class="custom-designation" value="${isCustom ? item.designation : ''}" style="display:${isCustom ? 'block' : 'none'};" oninput="updateRow(${index})">
                     </td>
-                    <td data-label="Qté"><input type="number" class="quantity" id="qte-${index}" value="${item.quantity || ''}" min="1" onblur="onInputChange(${index})" disabled/></td>
-                    <td data-label="PU HT"><input type="text" inputmode="decimal" pattern="[0-9]*\.?[0-9]+" class="unitPrice" id="pu-${index}" value="${item.unitPrice || ''}" onblur="onInputChange(${index})" disabled/></td>
-                    <td data-label="Prix Total HT"><input type="number" class="total no-arrows" id="total-${index}" value="${item.total || ''}" readonly /></td>`;
-                row.classList.add('validated');
+                    <td data-label="Qté"><input type="number" class="quantity" value="${item.quantity || ''}" min="1" oninput="updateRow(${index})"></td>
+                    <td data-label="PU HT"><input type="number" class="unitPrice" value="${item.unitPrice || ''}" step="0.01" oninput="updateRow(${index})"></td>
+                    <td data-label="Prix Total HT">
+                        <div class="prestations-row">
+                            <input type="number" class="total" value="${item.total || ''}" readonly>
+                            <div class="action-buttons">
+                                <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" title="Valider"><i class="fas fa-check-circle"></i></button>
+                                <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
+                    </td>`;
+                row.classList.add('active');
+                row.onclick = () => editRow(index);
                 tbody.appendChild(row);
+                row.querySelector('.action-buttons').style.display = 'flex';
             });
-            index = prestationsData.length;
             updateTotals();
-            if (prestationsData.length === 0) addRow();
         }
-
-        function saveIntervention() {
-            const clientData = {
-                clientName: document.getElementById('clientName').value.trim(),
-                clientAddress: document.getElementById('clientAddress').value.trim(),
-                clientPhone: document.getElementById('clientPhone').value.trim(),
+        function toggleDelaiInput() {
+            const select = document.getElementById('delaiReglement');
+            const input = document.getElementById('delaiCustom');
+            input.style.display = select.value === 'custom' ? 'block' : 'none';
+            saveDraft();
+        }
+        function toggleMoyenInput() {
+            const select = document.getElementById('moyenReglement');
+            const input = document.getElementById('moyenCustom');
+            input.style.display = select.value === 'custom' ? 'block' : 'none';
+            saveDraft();
+        }
+        function saveDraft() {
+            const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
+            drafts['bon_intervention'] = {
+                client: document.getElementById('clientName').textContent,
+                adresse: document.getElementById('adresse').textContent,
+                codePostal: document.getElementById('codePostal').textContent,
+                ville: document.getElementById('ville').textContent,
+                telephone: document.getElementById('telephone').textContent,
+                email: document.getElementById('email').textContent,
                 interventionDate: document.getElementById('interventionDate').value,
-                technician: document.getElementById('technician').value.trim(),
-                status: document.getElementById('status').value,
-                paymentTerms: document.getElementById('paymentTerms').value
+                technician: document.getElementById('technician').value,
+                duration: document.getElementById('duration').value,
+                delaiReglement: document.getElementById('delaiReglement').value === 'custom' ? document.getElementById('delaiCustom').value : document.getElementById('delaiReglement').value,
+                moyenReglement: document.getElementById('moyenReglement').value === 'custom' ? document.getElementById('moyenCustom').value : document.getElementById('moyenReglement').value,
+                observations: document.getElementById('observations').value,
+                prestations: JSON.parse(localStorage.getItem('prestationsData') || '[]'),
+                summary: `Bon d'intervention pour ${document.getElementById('clientName').textContent}`
             };
-            const prestationsData = JSON.parse(localStorage.getItem('prestationsData') || '[]');
-            if (!clientData.clientName || !clientData.interventionDate || !clientData.technician) {
-                alert('Veuillez remplir les champs obligatoires : Nom du client, Date, Technicien.');
-                if (!clientData.clientName) document.getElementById('clientName').classList.add('error');
-                if (!clientData.interventionDate) document.getElementById('interventionDate').classList.add('error');
-                if (!clientData.technician) document.getElementById('technician').classList.add('error');
+            localStorage.setItem('drafts', JSON.stringify(drafts));
+        }
+        function loadDraft() {
+            const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
+            const draft = drafts['bon_intervention'];
+            if (draft) {
+                document.getElementById('interventionDate').value = draft.interventionDate || '2025-05-18';
+                document.getElementById('technician').value = draft.technician || '';
+                document.getElementById('duration').value = draft.duration || '';
+                document.getElementById('delaiReglement').value = draft.delaiReglement === draft.delaiCustom ? 'custom' : draft.delaiReglement || 'Immédiat à l’intervention';
+                document.getElementById('moyenReglement').value = draft.moyenReglement === draft.moyenCustom ? 'custom' : draft.moyenReglement || 'Chèque';
+                document.getElementById('delaiCustom').value = draft.delaiReglement === 'custom' ? draft.delaiCustom : '';
+                document.getElementById('moyenCustom').value = draft.moyenReglement === 'custom' ? draft.moyenCustom : '';
+                document.getElementById('observations').value = draft.observations || '';
+                toggleDelaiInput();
+                toggleMoyenInput();
+            }
+        }
+        function validateBonIntervention() {
+            const prestations = JSON.parse(localStorage.getItem('prestationsData') || '[]');
+            if (prestations.length === 0) {
+                alert('Veuillez ajouter au moins une prestation.');
                 return;
             }
-            if (prestationsData.length === 0) {
-                alert('Veuillez ajouter au moins une prestation validée.');
+            if (clientSignaturePad.isEmpty() || technicianSignaturePad.isEmpty()) {
+                alert('Les signatures client et technicien sont requises.');
                 return;
             }
-            isValidated = true;
-            localStorage.setItem('interventionData', JSON.stringify(clientData));
-            const crmData = JSON.parse(localStorage.getItem('crmData') || '[]');
-            crmData.push({
-                date: clientData.interventionDate,
-                intervention: `Intervention pour ${clientData.clientName}`,
-                technician: clientData.technician,
-                montantTTC: document.getElementById('totalTTC').textContent
+            if (!document.getElementById('interventionDate').value || !document.getElementById('technician').value) {
+                alert('Veuillez remplir la date d’intervention et le nom du technicien.');
+                return;
+            }
+            const clients = JSON.parse(localStorage.getItem('clients') || '[]');
+            const clientName = document.getElementById('clientName').textContent;
+            const client = clients.find(c => c.name === clientName);
+            if (client) {
+                if (!client.interventions) client.interventions = [];
+                const bon = {
+                    id: `bon_${Date.now()}`,
+                    date: document.getElementById('interventionDate').value,
+                    technician: document.getElementById('technician').value,
+                    duration: document.getElementById('duration').value,
+                    prestations: prestations,
+                    totalHT: document.getElementById('totalHT').textContent,
+                    tva: document.getElementById('tva').textContent,
+                    totalTTC: document.getElementById('totalTTC').textContent,
+                    delaiReglement: document.getElementById('delaiReglement').value === 'custom' ? document.getElementById('delaiCustom').value : document.getElementById('delaiReglement').value,
+                    moyenReglement: document.getElementById('moyenReglement').value === 'custom' ? document.getElementById('moyenCustom').value : document.getElementById('moyenReglement').value,
+                    observations: document.getElementById('observations').value,
+                    signatures: JSON.parse(localStorage.getItem('signatures') || '{}'),
+                    summary: `Bon d'intervention du ${document.getElementById('interventionDate').value}`
+                };
+                client.interventions.push(bon);
+                localStorage.setItem('clients', JSON.stringify(clients));
+            }
+            const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
+            delete drafts['bon_intervention'];
+            localStorage.setItem('drafts', JSON.stringify(drafts));
+            localStorage.removeItem('prestationsData');
+            localStorage.removeItem('signatures');
+            alert('Bon d’intervention validé et enregistré.');
+            window.location.href = 'intervention.html';
+        }
+        function updateTotals() {
+            let totalHT = 0;
+            document.querySelectorAll('#prestationsBody tr').forEach(row => {
+                const total = parseFloat(row.querySelector('.total').value) || 0;
+                totalHT += total;
             });
-            localStorage.setItem('crmData', JSON.stringify(crmData));
-            alert('Bon d’intervention validé et enregistré !');
-            document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
-            loadCrmData();
+            const tva = totalHT * 0.2;
+            const totalTTC = totalHT + tva;
+            document.getElementById('totalHT').textContent = totalHT.toFixed(2) + ' €';
+            document.getElementById('tva').textContent = tva.toFixed(2) + ' €';
+            document.getElementById('totalTTC').textContent = totalTTC.toFixed(2) + ' €';
         }
-
-        function loadIntervention() {
-            const clientData = JSON.parse(localStorage.getItem('interventionData') || '{}');
-            document.getElementById('clientName').value = clientData.clientName || '';
-            document.getElementById('clientAddress').value = clientData.clientAddress || '';
-            document.getElementById('clientPhone').value = clientData.clientPhone || '';
-            document.getElementById('interventionDate').value = clientData.interventionDate || '';
-            document.getElementById('technician').value = clientData.technician || '';
-            document.getElementById('status').value = clientData.status || 'en_cours';
-            document.getElementById('paymentTerms').value = clientData.paymentTerms || 'virement_30j';
-        }
-
-        function loadCrmData() {
-            const crmData = JSON.parse(localStorage.getItem('crmData') || '[]');
-            const tbody = document.getElementById('crmBody');
-            tbody.innerHTML = '';
-            crmData.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${item.date}</td>
-                    <td>${item.intervention}</td>
-                    <td>${item.technician}</td>
-                    <td>${item.montantTTC}</td>`;
-                tbody.appendChild(row);
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            // En-tête
+            doc.setFontSize(20);
+            doc.setFont("helvetica", "bold");
+            doc.text("Bon d'Intervention - MPro Incendie", 20, 20);
+            doc.setLineWidth(0.5);
+            doc.line(20, 25, 190, 25);
+            // Section Client
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text("Client", 20, 35);
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Nom: ${document.getElementById('clientName').textContent}`, 20, 45);
+            doc.text(`Adresse: ${document.getElementById('adresse').textContent}`, 20, 50);
+            doc.text(`Code postal: ${document.getElementById('codePostal').textContent}`, 20, 55);
+            doc.text(`Ville: ${document.getElementById('ville').textContent}`, 20, 60);
+            doc.text(`Téléphone: ${document.getElementById('telephone').textContent}`, 20, 65);
+            doc.text(`Email: ${document.getElementById('email').textContent}`, 20, 70);
+            // Section Prestations
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text("Prestations & Matériel", 20, 85);
+            const rows = document.querySelectorAll('#prestationsBody tr');
+            let y = 95;
+            if (rows.length > 0) {
+                doc.autoTable({
+                    startY: y,
+                    head: [['Désignation', 'Qté', 'PU HT (€)', 'Total HT (€)']],
+                    body: Array.from(rows).map(row => {
+                        const select = row.querySelector('.designation');
+                        const customDesignation = row.querySelector('.custom-designation');
+                        const designation = select.value === 'custom' ? customDesignation.value : select.value;
+                        return [
+                            designation || '-',
+                            row.querySelector('.quantity').value || '0',
+                            row.querySelector('.unitPrice').value || '0.00',
+                            row.querySelector('.total').value || '0.00'
+                        ];
+                    }),
+                    styles: { fontSize: 10, cellPadding: 2 },
+                    headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0] },
+                    margin: { left: 20, right: 20 }
+                });
+                y = doc.lastAutoTable.finalY + 10;
+            } else {
+                doc.setFontSize(10);
+                doc.text("Aucune prestation enregistrée.", 20, y);
+                y += 10;
+            }
+            // Section Totaux
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text("Totaux", 20, y);
+            doc.autoTable({
+                startY: y + 5,
+                body: [
+                    ['Total HT', document.getElementById('totalHT').textContent],
+                    ['TVA 20%', document.getElementById('tva').textContent],
+                    ['Total TTC', document.getElementById('totalTTC').textContent]
+                ],
+                styles: { fontSize: 10, cellPadding: 2 },
+                columnStyles: { 0: { fontStyle: 'bold' } },
+                margin: { left: 20, right: 20 }
             });
-        }
-
-        function printIntervention() {
-            if (!isValidated) {
-                alert('Veuillez valider le bon d’intervention avant d’imprimer.');
-                return;
+            y = doc.lastAutoTable.finalY + 10;
+            // Section Modalités
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text("Modalités de règlement", 20, y);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Délais: ${document.getElementById('delaiReglement').value === 'custom' ? document.getElementById('delaiCustom').value : document.getElementById('delaiReglement').value}`, 20, y + 5);
+            doc.text(`Moyen: ${document.getElementById('moyenReglement').value === 'custom' ? document.getElementById('moyenCustom').value : document.getElementById('moyenReglement').value}`, 20, y + 10);
+            const observations = document.getElementById('observations').value;
+            if (observations) {
+                doc.text("Observations:", 20, y + 15);
+                doc.text(doc.splitTextToSize(observations, 170), 20, y + 20);
+                y += 20 + (Math.ceil(observations.length / 85) * 5);
+            } else {
+                y += 15;
             }
-            window.print();
-        }
-
-        function sendIntervention() {
-            if (!isValidated) {
-                alert('Veuillez valider le bon d’intervention avant d’envoyer.');
-                return;
+            // Section Signatures
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text("Signatures", 20, y);
+            if (!clientSignaturePad.isEmpty()) {
+                doc.setFontSize(10);
+                doc.text('Client:', 20, y + 10);
+                doc.addImage(clientSignaturePad.toDataURL(), 'PNG', 20, y + 15, 80, 40);
             }
-            alert('Bon d’intervention envoyé (fonctionnalité simulée).');
-        }
-
-        function cancelIntervention() {
-            if (confirm('Voulez-vous annuler ce bon d’intervention ?')) {
-                localStorage.removeItem('interventionData');
-                localStorage.removeItem('prestationsData');
-                window.location.reload();
+            if (!technicianSignaturePad.isEmpty()) {
+                doc.setFontSize(10);
+                doc.text('Technicien:', 110, y + 10);
+                doc.addImage(technicianSignaturePad.toDataURL(), 'PNG', 110, y + 15, 80, 40);
             }
+            doc.save(`bon_intervention_${new Date().toISOString().slice(0,10)}.pdf`);
         }
-
-        // Initialisation
-        loadIntervention();
-        loadPrestations();
-        loadCrmData();
+        function sendEmail() {
+            const clientEmail = document.getElementById('email').textContent;
+            const subject = 'Bon d’intervention MPro Incendie';
+            const body = `Veuillez trouver ci-joint le bon d’intervention.\n\nDélais de règlement: ${document.getElementById('delaiReglement').value === 'custom' ? document.getElementById('delaiCustom').value : document.getElementById('delaiReglement').value}\nMoyen de règlement: ${document.getElementById('moyenReglement').value === 'custom' ? document.getElementById('moyenCustom').value : document.getElementById('moyenReglement').value}\nObservations: ${document.getElementById('observations').value}`;
+            window.location.href = `mailto:${clientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
     </script>
 </body>
-</html>
