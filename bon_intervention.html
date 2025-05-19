@@ -17,17 +17,17 @@
         .section { margin-bottom: 40px; padding: 15px; }
         .table-container { width: 100%; }
         #prestationsTable, #crmExtincteursTable { width: 100%; border-collapse: collapse; }
-        #prestationsTable th, #prestationsTable td { padding: 8px; font-size: 14px; border: 1px solid #ddd; line-height: 1.2; }
+        #prestationsTable th, #prestationsTable td { padding: 8px; font-size: 15px; border: 1px solid #ddd; line-height: 1.2; }
         #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { width: 40%; }
         #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { width: 15%; }
         #prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) { width: 20%; }
         #prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) { width: 25%; }
-        #prestationsTable input, #prestationsTable select { padding: 6px; font-size: 14px; height: 30px; }
+        #prestationsTable input, #prestationsTable select { padding: 8px; font-size: 15px; height: 32px; width: 100%; box-sizing: border-box; }
         #totalsTable { max-width: 220px; margin: 10px 0; }
         #totalsTable th, #totalsTable td { padding: 6px; font-size: 13px; }
-        #crmExtincteursTable th, #crmExtincteursTable td { padding: 10px; font-size: 14px; border: 1px solid #ddd; }
+        #crmExtincteursTable th, #crmExtincteursTable td { padding: 10px; font-size: 15px; border: 1px solid #ddd; }
         .action-buttons { display: flex; justify-content: flex-end; }
-        .action-buttons button { font-size: 14px; padding: 4px; margin: 0 4px; border: none; }
+        .action-buttons button { font-size: 16px; padding: 8px; margin: 0 4px; border: none; }
         .action-buttons button:disabled { opacity: 0.5; }
         .floating-btn { position: fixed; bottom: 70px; right: 10px; background: #10b981; color: white; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
         .floating-btn:hover::after { content: "Ajouter prestation"; position: absolute; right: 60px; background: #333; color: white; padding: 4px 8px; font-size: 12px; }
@@ -38,22 +38,31 @@
         .modal-content canvas { width: 100%; height: 200px; border: 1px solid #ddd; }
         .modal-buttons { display: flex; justify-content: space-between; margin-top: 10px; }
         .error { border: 1px solid red !important; }
+        .error-message { color: red; font-size: 12px; margin-top: 2px; display: none; }
         @media (max-width: 600px) {
             .section { padding: 10px; }
-            #prestationsTable th, #crmExtincteursTable th { display: none; }
-            #prestationsTable tr, #crmExtincteursTable tr { display: block; margin-bottom: 8px; border: 1px solid #ddd; padding: 6px; border-radius: 5px; background: #fff; }
-            #prestationsTable td, #crmExtincteursTable td { display: block; width: 100%; padding: 4px 0; }
-            #prestationsTable td select, #prestationsTable td input { font-size: 13px; padding: 6px; height: 28px; }
-            .prestations-row { display: flex; gap: 2%; align-items: center; }
-            #prestationsTable td:nth-child(2) { flex: 0 0 18%; }
-            #prestationsTable td:nth-child(3) { flex: 0 0 35%; }
-            #prestationsTable td:nth-child(4) { flex: 0 0 45%; }
-            #prestationsTable td:before, #crmExtincteursTable td:before { font-size: 12px; font-weight: bold; color: #555; }
+            #prestationsTable th { display: none; }
+            #prestationsTable tr { display: block; margin-bottom: 12px; border: 1px solid #ddd; padding: 8px; border-radius: 5px; background: #fff; }
+            #prestationsTable td { display: block; width: 100%; padding: 4px 0; }
+            #prestationsTable td select, #prestationsTable td input { font-size: 15px; padding: 8px; height: 32px; }
+            #prestationsTable td:before { content: attr(data-label); display: block; font-size: 14px; font-weight: bold; color: #555; margin-bottom: 4px; }
             #prestationsTable td:nth-child(1):before { content: "Désignation"; }
             #prestationsTable td:nth-child(2):before { content: "Qté"; }
             #prestationsTable td:nth-child(3):before { content: "PU HT (€)"; }
             #prestationsTable td:nth-child(4):before { content: "Total HT (€)"; }
-            .action-buttons button { font-size: 14px; padding: 4px; }
+            .prestations-row { display: block; }
+            .action-buttons { justify-content: flex-start; margin-top: 8px; }
+            .action-buttons button { font-size: 16px; padding: 8px; }
+            .select2-container { width: 100% !important; }
+            .select2-selection { height: 32px !important; font-size: 15px !important; padding: 6px !important; }
+            #crmExtincteursTable th { display: none; }
+            #crmExtincteursTable tr { display: block; margin-bottom: 8px; border: 1px solid #ddd; padding: 6px; border-radius: 5px; background: #fff; }
+            #crmExtincteursTable td { display: block; width: 100%; padding: 4px 0; }
+            #crmExtincteursTable td:before { font-size: 12px; font-weight: bold; color: #555; }
+            #crmExtincteursTable td:nth-child(1):before { content: "ID"; }
+            #crmExtincteursTable td:nth-child(2):before { content: "Type"; }
+            #crmExtincteursTable td:nth-child(3):before { content: "État"; }
+            #crmExtincteursTable td:nth-child(4):before { content: "Abréviation"; }
             .floating-btn { bottom: 75px; width: 45px; height: 45px; font-size: 20px; }
             .modal-content { margin: 20% auto; width: 95%; }
         }
@@ -64,10 +73,10 @@
         <h1>🔥 Bon d'Intervention</h1>
         <section class="section">
             <h2>🧾 Client</h2>
-            <p><strong>Client:</strong> <span id="clientName">Non sélectionné</span></p>
-            <p><strong>Adresse:</strong> <span id="adresse">Non sélectionnée</span></p>
-            <p><strong>Lieu d’intervention:</strong> <span id="locationAddress">Non sélectionné</span></p>
-            <p><strong>Email:</strong> <span id="email">Non sélectionné</span></p>
+            <p><strong>Client :</strong> <span id="clientName">Non sélectionné</span></p>
+            <p><strong>Adresse :</strong> <span id="adresse">Non sélectionnée</span></p>
+            <p><strong>Lieu d’intervention :</strong> <span id="locationAddress">Non sélectionné</span></p>
+            <p><strong>Email :</strong> <span id="email">Non sélectionné</span></p>
         </section>
         <section class="section">
             <h2>📋 Résumé CRM Extincteurs</h2>
@@ -78,9 +87,9 @@
         </section>
         <section class="section">
             <h2>📅 Détails de l’intervention</h2>
-            <label>Date d’intervention: <input type="date" id="interventionDate" required oninput="saveDraft()"></label>
-            <label>Technicien: <input type="text" id="technician" placeholder="Nom du technicien" required oninput="saveDraft()"></label>
-            <label>Durée (heures): <input type="number" id="duration" min="0" step="0.5" oninput="saveDraft()"></label>
+            <label>Date d’intervention : <input type="date" id="interventionDate" required oninput="saveDraft()"></label>
+            <label>Technicien : <input type="text" id="technician" placeholder="Nom du technicien" required oninput="saveDraft()"></label>
+            <label>Durée (heures) : <input type="number" id="duration" min="0" step="0.5" oninput="saveDraft()"></label>
         </section>
         <section class="section">
             <h2>📋 Prestations & Matériel</h2>
@@ -98,7 +107,7 @@
         </section>
         <section class="section">
             <h2>💳 Modalités de règlement</h2>
-            <label>Délais de règlement:
+            <label>Délais de règlement :
                 <select id="delaiReglement" onchange="toggleDelaiInput(); saveDraft()">
                     <option value="Immédiat à l’intervention">Immédiat à l’intervention</option>
                     <option value="À réception de facture">À réception de facture</option>
@@ -107,7 +116,7 @@
                 </select>
                 <input type="text" id="delaiCustom" style="display:none;" placeholder="Délais personnalisé" oninput="saveDraft()">
             </label>
-            <label>Moyen de règlement:
+            <label>Moyen de règlement :
                 <select id="moyenReglement" onchange="toggleMoyenInput(); saveDraft()">
                     <option value="Chèque">Chèque</option>
                     <option value="Virement">Virement</option>
@@ -116,7 +125,7 @@
                 </select>
                 <input type="text" id="moyenCustom" style="display:none;" placeholder="Moyen personnalisé" oninput="saveDraft()">
             </label>
-            <label>Observations:
+            <label>Observations :
                 <textarea id="observations" rows="3" placeholder="Notes supplémentaires" oninput="saveDraft()"></textarea>
             </label>
         </section>
@@ -170,38 +179,46 @@
         const clientSignaturePad = new SignaturePad(clientCanvas, { penColor: 'black' });
         const technicianSignaturePad = new SignaturePad(technicianCanvas, { penColor: 'black' });
         let modalSignaturePad;
+
         function resizeCanvas(canvas) {
             const ratio = Math.max(window.devicePixelRatio || 1, 1);
             canvas.width = canvas.offsetWidth * ratio;
             canvas.height = canvas.offsetHeight * ratio;
             canvas.getContext('2d').scale(ratio, ratio);
         }
+
         function loadSignatures() {
             const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
             if (signatures.client) clientSignaturePad.fromDataURL(signatures.client);
             if (signatures.technician) technicianSignaturePad.fromDataURL(signatures.technician);
         }
+
         window.addEventListener('resize', () => {
             resizeCanvas(clientCanvas);
             resizeCanvas(technicianCanvas);
             loadSignatures();
             if (modalSignaturePad) resizeCanvas(modalCanvas);
         });
+
         resizeCanvas(clientCanvas);
         resizeCanvas(technicianCanvas);
+
         function openSignatureModal(type) {
             currentSignatureType = type;
             document.getElementById('signature-modal').style.display = 'block';
             modalSignaturePad = new SignaturePad(modalCanvas, { penColor: 'black' });
             resizeCanvas(modalCanvas);
         }
+
         function closeSignatureModal() {
             document.getElementById('signature-modal').style.display = 'none';
             modalSignaturePad = null;
         }
+
         function clearModalSignature() {
             modalSignaturePad.clear();
         }
+
         function validateModalSignature() {
             if (modalSignaturePad.isEmpty() || modalSignaturePad.toData().length < 5) {
                 alert('Signature vide ou trop simple.');
@@ -224,11 +241,13 @@
             saveDraft();
             closeSignatureModal();
         }
+
         const articlesDB = [
             { name: "Extincteur CO2 5kg", unitPrice: 150.00 },
             { name: "Maintenance RIA", unitPrice: 80.00 },
             { name: "BAES Type 1", unitPrice: 120.00 }
         ];
+
         function addPrestation() {
             const tbody = document.getElementById('prestationsBody');
             const index = tbody.children.length;
@@ -242,9 +261,16 @@
                         <option value="custom">Saisie libre</option>
                     </select>
                     <input type="text" class="custom-designation" style="display:none;" placeholder="Désignation manuelle" oninput="updateRow(${index})">
+                    <div class="error-message" id="designation-error-${index}">Veuillez sélectionner ou saisir une désignation</div>
                 </td>
-                <td data-label="Qté"><input type="number" class="quantity" placeholder="Qté" min="1" required oninput="updateRow(${index})"></td>
-                <td data-label="PU HT"><input type="number" class="unitPrice" placeholder="PU HT" step="0.01" required oninput="updateRow(${index})"></td>
+                <td data-label="Qté">
+                    <input type="number" class="quantity" placeholder="Qté" min="1" required oninput="updateRow(${index})">
+                    <div class="error-message" id="quantity-error-${index}">Quantité doit être > 0</div>
+                </td>
+                <td data-label="PU HT">
+                    <input type="number" class="unitPrice" placeholder="PU HT" step="0.01" required oninput="updateRow(${index})">
+                    <div class="error-message" id="unitPrice-error-${index}">Prix unitaire doit être > 0</div>
+                </td>
                 <td data-label="Prix Total HT">
                     <div class="prestations-row">
                         <input type="number" class="total" readonly>
@@ -259,6 +285,7 @@
             savePrestations();
             updateTotals();
         }
+
         function updateDesignation(index) {
             const row = document.getElementById(`row-${index}`);
             const select = row.querySelector('.designation');
@@ -274,6 +301,7 @@
             }
             updateRow(index);
         }
+
         function updateRow(index) {
             const row = document.getElementById(`row-${index}`);
             const select = row.querySelector('.designation');
@@ -281,33 +309,50 @@
             const quantityInput = row.querySelector('.quantity');
             const unitPriceInput = row.querySelector('.unitPrice');
             const totalInput = row.querySelector('.total');
+            const designationError = document.getElementById(`designation-error-${index}`);
+            const quantityError = document.getElementById(`quantity-error-${index}`);
+            const unitPriceError = document.getElementById(`unitPrice-error-${index}`);
             const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value.trim()) : select.value;
             const quantity = parseFloat(quantityInput.value) || 0;
             const unitPrice = parseFloat(unitPriceInput.value) || 0;
+
+            let isValid = true;
+
             if (!designation) {
                 (select.value === 'custom' ? customDesignation : select).classList.add('error');
-                return;
+                designationError.style.display = 'block';
+                isValid = false;
             } else {
                 (select.value === 'custom' ? customDesignation : select).classList.remove('error');
+                designationError.style.display = 'none';
             }
+
             if (quantity <= 0) {
                 quantityInput.value = 1;
                 quantityInput.classList.add('error');
-                return;
+                quantityError.style.display = 'block';
+                isValid = false;
             } else {
                 quantityInput.classList.remove('error');
+                quantityError.style.display = 'none';
             }
+
             if (unitPrice <= 0) {
                 unitPriceInput.classList.add('error');
-                return;
+                unitPriceError.style.display = 'block';
+                isValid = false;
             } else {
                 unitPriceInput.classList.remove('error');
+                unitPriceError.style.display = 'none';
             }
+
             totalInput.value = (quantity * unitPrice).toFixed(2);
-            row.querySelector(`#validate-${index}`).disabled = !(designation && quantity > 0 && unitPrice > 0);
+            row.querySelector(`#validate-${index}`).disabled = !isValid;
+
             savePrestations();
             updateTotals();
         }
+
         function validateRow(index) {
             const row = document.getElementById(`row-${index}`);
             const select = row.querySelector('.designation');
@@ -325,6 +370,7 @@
             savePrestations();
             updateTotals();
         }
+
         function editRow(index) {
             const row = document.getElementById(`row-${index}`);
             row.querySelectorAll('input, select').forEach(input => input.disabled = false);
@@ -332,11 +378,13 @@
             row.classList.remove('active');
             row.onclick = null;
         }
+
         function removeRow(index) {
             document.getElementById(`row-${index}`).remove();
             savePrestations();
             updateTotals();
         }
+
         function savePrestations() {
             const prestationsData = [];
             document.querySelectorAll('#prestationsBody tr').forEach(row => {
@@ -357,6 +405,7 @@
             }
             saveDraft();
         }
+
         function loadPrestations() {
             const prestationsData = JSON.parse(localStorage.getItem('prestationsData') || '[]');
             const tbody = document.getElementById('prestationsBody');
@@ -372,9 +421,16 @@
                             <option value="custom" ${isCustom ? 'selected' : ''}>Saisie libre</option>
                         </select>
                         <input type="text" class="custom-designation" value="${isCustom ? item.designation : ''}" style="display:${isCustom ? 'block' : 'none'};" disabled>
+                        <div class="error-message" id="designation-error-${index}">Veuillez sélectionner ou saisir une désignation</div>
                     </td>
-                    <td data-label="Qté"><input type="number" class="quantity" value="${item.quantity || ''}" min="1" required disabled></td>
-                    <td data-label="PU HT"><input type="number" class="unitPrice" value="${item.unitPrice || ''}" step="0.01" required disabled></td>
+                    <td data-label="Qté">
+                        <input type="number" class="quantity" value="${item.quantity || ''}" min="1" required disabled>
+                        <div class="error-message" id="quantity-error-${index}">Quantité doit être > 0</div>
+                    </td>
+                    <td data-label="PU HT">
+                        <input type="number" class="unitPrice" value="${item.unitPrice || ''}" step="0.01" required disabled>
+                        <div class="error-message" id="unitPrice-error-${index}">Prix unitaire doit être > 0</div>
+                    </td>
                     <td data-label="Prix Total HT">
                         <div class="prestations-row">
                             <input type="number" class="total" value="${item.total || ''}" readonly>
@@ -392,6 +448,7 @@
             updateTotals();
             if (!prestationsData.length) addPrestation();
         }
+
         function updateTotals() {
             let totalHT = 0;
             document.querySelectorAll('#prestationsBody tr').forEach(row => {
@@ -404,17 +461,21 @@
             document.getElementById('tva').textContent = tva.toFixed(2) + ' €';
             document.getElementById('totalTTC').textContent = totalTTC.toFixed(2) + ' €';
         }
+
         function toggleDelaiInput() {
             const select = document.getElementById('delaiReglement');
             document.getElementById('delaiCustom').style.display = select.value === 'custom' ? 'block' : 'none';
         }
+
         function toggleMoyenInput() {
             const select = document.getElementById('moyenReglement');
             document.getElementById('moyenCustom').style.display = select.value === 'custom' ? 'block' : 'none';
         }
+
         function sanitizeInput(input) {
             return DOMPurify.sanitize(input);
         }
+
         function loadClientInfo() {
             const intervention = JSON.parse(localStorage.getItem('currentIntervention') || {});
             if (!intervention.client) {
@@ -435,6 +496,7 @@
                 toggleDelaiInput();
             }
         }
+
         function loadCrmExtincteurs() {
             const extincteursData = JSON.parse(localStorage.getItem('extincteursData') || '[]');
             const tbody = document.getElementById('crmExtincteursBody');
@@ -443,6 +505,7 @@
                 tbody.innerHTML += `<tr><td>${item.id || 'N/A'}</td><td>${item.type || 'N/A'}</td><td>${item.etat || 'N/A'}</td><td>${item.abreviation || 'N/A'}</td></tr>`;
             });
         }
+
         function saveDraft() {
             const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
             drafts['bon_intervention'] = {
@@ -466,6 +529,7 @@
                 alert('Stockage plein.');
             }
         }
+
         function loadDraft() {
             const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
             const draft = drafts['bon_intervention'];
@@ -482,6 +546,7 @@
                 toggleMoyenInput();
             }
         }
+
         function validateBonIntervention() {
             const prestations = JSON.parse(localStorage.getItem('prestationsData') || '[]');
             if (prestations.length === 0) {
@@ -532,6 +597,7 @@
             alert('Bon validé !');
             window.location.href = 'intervention.html';
         }
+
         function generatePDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -651,6 +717,7 @@
             doc.text('MPro Incendie - SIRET: 123456789', 20, 280);
             doc.save(`bon_intervention_${new Date().toISOString().slice(0,10)}.pdf`);
         }
+
         function sendEmail() {
             const clientEmail = document.getElementById('email').textContent;
             const prestations = JSON.parse(localStorage.getItem('prestationsData') || '[]');
@@ -669,6 +736,7 @@
                 signature_technician: technicianSignaturePad.toDataURL('image/png', 0.7)
             }).then(() => alert('Email envoyé !'), () => alert('Erreur envoi.'));
         }
+
         window.onload = () => {
             loadClientInfo();
             loadCrmExtincteurs();
