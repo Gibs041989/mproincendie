@@ -12,70 +12,11 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
-    <style>
-        .container { padding-bottom: 80px; }
-        .section { margin-bottom: 40px; padding: 15px; }
-        .table-container { width: 100%; }
-        #prestationsTable, #crmExtincteursTable { width: 100%; border-collapse: collapse; }
-        #prestationsTable th, #prestationsTable td { padding: 8px; font-size: 15px; border: 1px solid #ddd; line-height: 1.2; }
-        #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { width: 100%; }
-        #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { width: 20%; }
-        #prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) { width: 30%; }
-        #prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) { width: 50%; }
-        #prestationsTable input, #prestationsTable select { padding: 8px; font-size: 15px; height: 32px; width: 100%; box-sizing: border-box; }
-        #totalsTable { max-width: 220px; margin: 10px 0; }
-        #totalsTable th, #totalsTable td { padding: 6px; font-size: 13px; }
-        #crmExtincteursTable th, #crmExtincteursTable td { padding: 10px; font-size: 15px; border: 1px solid #ddd; }
-        .action-buttons { display: flex; align-items: center; }
-        .action-buttons button { font-size: 16px; padding: 8px; margin: 0 8px 0 0; border: none; background: none; cursor: pointer; }
-        .action-buttons button:disabled { opacity: 0.5; }
-        .floating-btn { position: fixed; bottom: 70px; right: 10px; background: #10b981; color: white; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
-        .floating-btn:hover::after { content: "Ajouter prestation"; position: absolute; right: 60px; background: #333; color: white; padding: 4px 8px; font-size: 12px; }
-        .signature-pad { border: 1px solid #ddd; border-radius: 5px; margin-top: 6px; width: 100%; height: 100px; }
-        .signature-block { margin-bottom: 45px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1002; }
-        .modal-content { background: #fff; margin: 10% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px; }
-        .modal-content canvas { width: 100%; height: 200px; border: 1px solid #ddd; }
-        .modal-buttons { display: flex; justify-content: space-between; margin-top: 10px; }
-        .error { border: 1px solid red !important; }
-        .error-message { color: red; font-size: 12px; margin-top: 2px; display: none; }
-        @media (max-width: 600px) {
-            .section { padding: 10px; }
-            #prestationsTable { margin: 0; }
-            #prestationsTable th { display: none; }
-            #prestationsTable tr { display: block; margin-bottom: 12px; border: 1px solid #ddd; padding: 8px; border-radius: 5px; background: #fff; width: 100%; }
-            #prestationsTable td { display: block; width: 100%; padding: 4px 0; }
-            #prestationsTable td select, #prestationsTable td input { font-size: 15px; padding: 8px; height: 32px; }
-            #prestationsTable td:before { content: attr(data-label); display: block; font-size: 14px; font-weight: bold; color: #555; margin-bottom: 4px; }
-            #prestationsTable td:nth-child(1):before { content: "Désignation"; }
-            #prestationsTable td:nth-child(2):before { content: "Qté"; }
-            #prestationsTable td:nth-child(3):before { content: "PU HT (€)"; }
-            #prestationsTable td:nth-child(4):before { content: "Total HT (€)"; }
-            .prestations-row { display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; }
-            #prestationsTable td:nth-child(2) input { width: 50px; }
-            #prestationsTable td:nth-child(3) input { width: 70px; }
-            #prestationsTable td:nth-child(4) input { width: 70px; }
-            #prestationsTable td:nth-child(4) .prestations-row { flex-grow: 1; justify-content: space-between; }
-            .action-buttons { margin-left: 8px; }
-            .action-buttons button { font-size: 16px; padding: 8px; }
-            .select2-container { width: 100% !important; }
-            .select2-selection { height: 32px !important; font-size: 15px !important; padding: 6px !important; }
-            #crmExtincteursTable th { display: none; }
-            #crmExtincteursTable tr { display: block; margin-bottom: 8px; border: 1px solid #ddd; padding: 6px; border-radius: 5px; background: #fff; }
-            #crmExtincteursTable td { display: block; width: 100%; padding: 4px 0; }
-            #crmExtincteursTable td:before { font-size: 12px; font-weight: bold; color: #555; }
-            #crmExtincteursTable td:nth-child(1):before { content: "ID"; }
-            #crmExtincteursTable td:nth-child(2):before { content: "Type"; }
-            #crmExtincteursTable td:nth-child(3):before { content: "État"; }
-            #crmExtincteursTable td:nth-child(4):before { content: "Abréviation"; }
-            .floating-btn { bottom: 75px; width: 45px; height: 45px; font-size: 20px; }
-            .modal-content { margin: 20% auto; width: 95%; }
-        }
-    </style>
 </head>
 <body>
     <div class="container">
         <h1>🔥 Bon d'Intervention</h1>
+
         <section class="section">
             <h2>🧾 Client</h2>
             <p><strong>Client :</strong> <span id="clientName">Non sélectionné</span></p>
@@ -83,6 +24,7 @@
             <p><strong>Lieu d’intervention :</strong> <span id="locationAddress">Non sélectionné</span></p>
             <p><strong>Email :</strong> <span id="email">Non sélectionné</span></p>
         </section>
+
         <section class="section">
             <h2>📋 Résumé CRM Extincteurs</h2>
             <table id="crmExtincteursTable">
@@ -90,17 +32,27 @@
                 <tbody id="crmExtincteursBody"></tbody>
             </table>
         </section>
+
         <section class="section">
             <h2>📅 Détails de l’intervention</h2>
             <label>Date d’intervention : <input type="date" id="interventionDate" required oninput="saveDraft()"></label>
             <label>Technicien : <input type="text" id="technician" placeholder="Nom du technicien" required oninput="saveDraft()"></label>
             <label>Durée (heures) : <input type="number" id="duration" min="0" step="0.5" oninput="saveDraft()"></label>
         </section>
+
         <section class="section">
             <h2>📋 Prestations & Matériel</h2>
             <div class="table-container">
                 <table id="prestationsTable">
-                    <thead><tr><th>Désignation</th><th>Qté</th><th>PU HT</th><th>Prix Total HT</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th>Désignation</th>
+                            <th>Qté</th>
+                            <th>PU HT</th>
+                            <th>Prix Total HT</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
                     <tbody id="prestationsBody"></tbody>
                 </table>
             </div>
@@ -110,6 +62,7 @@
                 <tr><th>Total TTC</th><td id="totalTTC">0.00 €</td></tr>
             </table>
         </section>
+
         <section class="section">
             <h2>💳 Modalités de règlement</h2>
             <label>Délais de règlement :
@@ -134,6 +87,7 @@
                 <textarea id="observations" rows="3" placeholder="Notes supplémentaires" oninput="saveDraft()"></textarea>
             </label>
         </section>
+
         <section class="section">
             <h2>✍️ Signatures</h2>
             <div class="signature-block">
@@ -147,14 +101,16 @@
                 <canvas id="technician-signature-pad" class="signature-pad"></canvas>
             </div>
         </section>
+
         <section class="section nav-buttons">
             <button class="primary" onclick="validateBonIntervention()">✅ Valider</button>
             <button class="secondary" onclick="saveDraft()">💾 Brouillon</button>
             <button class="secondary" onclick="generatePDF()">📄 PDF</button>
             <button class="secondary" onclick="sendEmail()">📧 Email</button>
-            <a href="intervention.html"><button class="neutral">⬅️ Retour</button></a>
+            <a href="intervention.html" class="neutral">⬅️ Retour</a>
         </section>
     </div>
+
     <div class="footer-nav">
         <div class="navigation nav-buttons">
             <a href="index.html">🏠</a>
@@ -163,6 +119,7 @@
             <a href="parametres.html">⚙️</a>
         </div>
     </div>
+
     <div id="signature-modal" class="modal">
         <div class="modal-content">
             <h3 id="modal-title">Signature</h3>
@@ -174,9 +131,12 @@
             </div>
         </div>
     </div>
+
     <div class="floating-btn" onclick="addPrestation()">➕</div>
+
     <script>
         emailjs.init("YOUR_EMAILJS_USER_ID"); // Remplacer par ton ID EmailJS
+
         let currentSignatureType = '';
         const clientCanvas = document.getElementById('client-signature-pad');
         const technicianCanvas = document.getElementById('technician-signature-pad');
@@ -451,308 +411,133 @@
                 row.classList.add('active');
                 row.onclick = () => editRow(index);
                 tbody.appendChild(row);
-                $(row.querySelector('.designation')).select2({ width: '100%' });
-            });
-            updateTotals();
-            if (!prestationsData.length) addPrestation();
-        }
+                $(row.querySelector('.design CONCEPT: 1px solid #ddd;
+    border-radius: 8px;
+    width: 100%;
+    height: 150px;
+}
 
-        function updateTotals() {
-            let totalHT = 0;
-            document.querySelectorAll('#prestationsBody tr').forEach(row => {
-                const total = parseFloat(row.querySelector('.total').value) || 0;
-                totalHT += total;
-            });
-            const tva = totalHT * 0.2;
-            const totalTTC = totalHT + tva;
-            document.getElementById('totalHT').textContent = totalHT.toFixed(2) + ' €';
-            document.getElementById('tva').textContent = tva.toFixed(2) + ' €';
-            document.getElementById('totalTTC').textContent = totalTTC.toFixed(2) + ' €';
-        }
+/* Styles responsives */
+@media (max-width: 600px) {
+    .container {
+        padding: 15px;
+        margin: 15px;
+    }
 
-        function toggleDelaiInput() {
-            const select = document.getElementById('delaiReglement');
-            document.getElementById('delaiCustom').style.display = select.value === 'custom' ? 'block' : 'none';
-        }
+    h1 {
+        font-size: 26px;
+    }
 
-        function toggleMoyenInput() {
-            const select = document.getElementById('moyenReglement');
-            document.getElementById('moyenCustom').style.display = select.value === 'custom' ? 'block' : 'none';
-        }
+    h2 {
+        font-size: 20px;
+    }
 
-        function sanitizeInput(input) {
-            return DOMPurify.sanitize(input);
-        }
+    h3 {
+        font-size: 16px;
+    }
 
-        function loadClientInfo() {
-            const intervention = JSON.parse(localStorage.getItem('currentIntervention') || {});
-            if (!intervention.client) {
-                alert('Aucun client sélectionné.');
-                window.location.href = 'intervention.html';
-                return;
-            }
-            document.getElementById('clientName').textContent = intervention.client || 'Non sélectionné';
-            document.getElementById('adresse').textContent = intervention.adresse || 'Non sélectionnée';
-            document.getElementById('email').textContent = intervention.email || 'Non sélectionné';
-            document.getElementById('locationAddress').textContent = intervention.locationAddress && intervention.locationAddress !== intervention.adresse ? intervention.locationAddress : 'Même adresse';
-            const clients = JSON.parse(localStorage.getItem('clients') || '[]');
-            const client = clients.find(c => c.name === intervention.client);
-            if (client) {
-                document.getElementById('moyenReglement').value = client.moyenReglement || 'Chèque';
-                document.getElementById('delaiReglement').value = client.delaiReglement || 'Immédiat à l’intervention';
-                toggleMoyenInput();
-                toggleDelaiInput();
-            }
-        }
+    button {
+        font-size: 12px;
+        padding: 8px 16px;
+    }
 
-        function loadCrmExtincteurs() {
-            const extincteursData = JSON.parse(localStorage.getItem('extincteursData') || '[]');
-            const tbody = document.getElementById('crmExtincteursBody');
-            tbody.innerHTML = extincteursData.length ? '' : '<tr><td colspan="4">Aucun extincteur.</td></tr>';
-            extincteursData.forEach(item => {
-                tbody.innerHTML += `<tr><td>${item.id || 'N/A'}</td><td>${item.type || 'N/A'}</td><td>${item.etat || 'N/A'}</td><td>${item.abreviation || 'N/A'}</td></tr>`;
-            });
-        }
+    button.primary {
+        font-size: 14px;
+        padding: 10px 20px;
+    }
 
-        function saveDraft() {
-            const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
-            drafts['bon_intervention'] = {
-                client: sanitizeInput(document.getElementById('clientName').textContent),
-                adresse: sanitizeInput(document.getElementById('adresse').textContent),
-                locationAddress: sanitizeInput(document.getElementById('locationAddress').textContent),
-                email: sanitizeInput(document.getElementById('email').textContent),
-                interventionDate: document.getElementById('interventionDate').value,
-                technician: sanitizeInput(document.getElementById('technician').value),
-                duration: document.getElementById('duration').value,
-                delaiReglement: document.getElementById('delaiReglement').value === 'custom' ? sanitizeInput(document.getElementById('delaiCustom').value) : document.getElementById('delaiReglement').value,
-                moyenReglement: document.getElementById('moyenReglement').value === 'custom' ? sanitizeInput(document.getElementById('moyenCustom').value) : document.getElementById('moyenReglement').value,
-                observations: sanitizeInput(document.getElementById('observations').value),
-                prestations: JSON.parse(localStorage.getItem('prestationsData') || '[]'),
-                summary: `Bon d'intervention pour ${sanitizeInput(document.getElementById('clientName').textContent)}`,
-                timestamp: Date.now()
-            };
-            try {
-                localStorage.setItem('drafts', JSON.stringify(drafts));
-            } catch {
-                alert('Stockage plein.');
-            }
-        }
+    input, select, textarea {
+        font-size: 14px;
+        padding: 10px;
+    }
 
-        function loadDraft() {
-            const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
-            const draft = drafts['bon_intervention'];
-            if (draft) {
-                document.getElementById('interventionDate').value = draft.interventionDate || '';
-                document.getElementById('technician').value = draft.technician || '';
-                document.getElementById('duration').value = draft.duration || '';
-                document.getElementById('delaiReglement').value = draft.delaiReglement === draft.delaiCustom ? 'custom' : draft.delaiReglement || 'Immédiat à l’intervention';
-                document.getElementById('moyenReglement').value = draft.moyenReglement === draft.moyenCustom ? 'custom' : draft.moyenReglement || 'Chèque';
-                document.getElementById('delaiCustom').value = draft.delaiReglement === 'custom' ? draft.delaiCustom : '';
-                document.getElementById('moyenCustom').value = draft.moyenReglement === 'custom' ? draft.moyenCustom : '';
-                document.getElementById('observations').value = draft.observations || '';
-                toggleDelaiInput();
-                toggleMoyenInput();
-            }
-        }
+    th, td {
+        padding: 10px;
+    }
 
-        function validateBonIntervention() {
-            const prestations = JSON.parse(localStorage.getItem('prestationsData') || '[]');
-            if (prestations.length === 0) {
-                alert('Ajoutez au moins une prestation.');
-                return;
-            }
-            if (clientSignaturePad.isEmpty() || technicianSignaturePad.isEmpty()) {
-                alert('Signatures client et technicien requises.');
-                return;
-            }
-            if (!document.getElementById('interventionDate').value || !document.getElementById('technician').value) {
-                alert('Date et technicien requis.');
-                return;
-            }
-            const clients = JSON.parse(localStorage.getItem('clients') || '[]');
-            const clientName = document.getElementById('clientName').textContent;
-            const client = clients.find(c => c.name === clientName);
-            if (client) {
-                client.interventions = client.interventions || [];
-                client.moyenReglement = document.getElementById('moyenReglement').value === 'custom' ? sanitizeInput(document.getElementById('moyenCustom').value) : document.getElementById('moyenReglement').value;
-                client.delaiReglement = document.getElementById('delaiReglement').value === 'custom' ? sanitizeInput(document.getElementById('delaiCustom').value) : document.getElementById('delaiReglement').value;
-                client.interventions.push({
-                    id: `bon_${Date.now()}`,
-                    date: document.getElementById('interventionDate').value,
-                    technician: sanitizeInput(document.getElementById('technician').value),
-                    duration: document.getElementById('duration').value,
-                    prestations,
-                    totalHT: document.getElementById('totalHT').textContent,
-                    tva: document.getElementById('tva').textContent,
-                    totalTTC: document.getElementById('totalTTC').textContent,
-                    delaiReglement: document.getElementById('delaiReglement').value === 'custom' ? sanitizeInput(document.getElementById('delaiCustom').value) : document.getElementById('delaiReglement').value,
-                    moyenReglement: document.getElementById('moyenReglement').value === 'custom' ? sanitizeInput(document.getElementById('moyenCustom').value) : document.getElementById('moyenReglement').value,
-                    observations: sanitizeInput(document.getElementById('observations').value),
-                    signatures: JSON.parse(localStorage.getItem('signatures') || '{}'),
-                    summary: `Bon d'intervention du ${document.getElementById('interventionDate').value}`
-                });
-                try {
-                    localStorage.setItem('clients', JSON.stringify(clients));
-                } catch {
-                    alert('Stockage plein.');
-                }
-            }
-            const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
-            delete drafts['bon_intervention'];
-            localStorage.setItem('drafts', JSON.stringify(drafts));
-            localStorage.removeItem('prestationsData');
-            localStorage.removeItem('signatures');
-            alert('Bon validé !');
-            window.location.href = 'intervention.html';
-        }
+    .nav-buttons {
+        gap: 10px;
+    }
 
-        function generatePDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.addImage('assets/logo.png', 'PNG', 160, 10, 30, 15);
-            doc.setFontSize(20);
-            doc.setFont("helvetica", "bold");
-            doc.text("Bon d'Intervention - MPro Incendie", 20, 20);
-            doc.setLineWidth(0.5);
-            doc.line(20, 25, 190, 25);
-            doc.setFontSize(14);
-            doc.setFont("helvetica", "bold");
-            doc.text("Client", 20, 35);
-            doc.setFontSize(12);
-            doc.setFont("helvetica", "normal");
-            doc.text(`Nom: ${sanitizeInput(document.getElementById('clientName').textContent)}`, 20, 45);
-            doc.text(`Adresse: ${sanitizeInput(document.getElementById('adresse').textContent)}`, 20, 50);
-            doc.text(`Lieu: ${sanitizeInput(document.getElementById('locationAddress').textContent)}`, 20, 55);
-            doc.text(`Email: ${sanitizeInput(document.getElementById('email').textContent)}`, 20, 60);
-            doc.setFontSize(14);
-            doc.setFont("helvetica", "bold");
-            doc.text("Résumé CRM Extincteurs", 20, 75);
-            const extincteursData = JSON.parse(localStorage.getItem('extincteursData') || '[]');
-            let y = 80;
-            if (extincteursData.length > 0) {
-                doc.autoTable({
-                    startY: y,
-                    head: [['ID', 'Type', 'État', 'Abréviation']],
-                    body: extincteursData.map(item => [
-                        item.id || 'N/A',
-                        item.type || 'N/A',
-                        item.etat || 'N/A',
-                        item.abreviation || 'N/A'
-                    ]),
-                    styles: { fontSize: 10, cellPadding: 2 },
-                    headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0] },
-                    margin: { left: 20, right: 20 }
-                });
-                y = doc.lastAutoTable.finalY + 10;
-            } else {
-                doc.setFontSize(10);
-                doc.text("Aucun extincteur.", 20, y);
-                y += 10;
-            }
-            doc.setFontSize(14);
-            doc.setFont("helvetica", "bold");
-            doc.text("Prestations & Matériel", 20, y);
-            const rows = document.querySelectorAll('#prestationsBody tr');
-            if (rows.length > 0) {
-                doc.autoTable({
-                    startY: y + 5,
-                    head: [['Désignation', 'Qté', 'PU HT (€)', 'Total HT (€)']],
-                    body: Array.from(rows).map(row => {
-                        const select = row.querySelector('.designation');
-                        const customDesignation = row.querySelector('.custom-designation');
-                        const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value) : select.value;
-                        return [
-                            designation || '-',
-                            row.querySelector('.quantity').value || '0',
-                            row.querySelector('.unitPrice').value || '0.00',
-                            row.querySelector('.total').value || '0.00'
-                        ];
-                    }),
-                    styles: { fontSize: 10, cellPadding: 2 },
-                    headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0] },
-                    margin: { left: 20, right: 20 }
-                });
-                y = doc.lastAutoTable.finalY + 10;
-            } else {
-                doc.setFontSize(10);
-                doc.text("Aucune prestation.", 20, y + 5);
-                y += 15;
-            }
-            doc.setFontSize(12);
-            doc.setFont("helvetica", "bold");
-            doc.text("Totaux", 20, y);
-            doc.autoTable({
-                startY: y + 5,
-                body: [
-                    ['Total HT', document.getElementById('totalHT').textContent],
-                    ['TVA 20%', document.getElementById('tva').textContent],
-                    ['Total TTC', document.getElementById('totalTTC').textContent]
-                ],
-                styles: { fontSize: 10, cellPadding: 2 },
-                columnStyles: { 0: { fontStyle: 'bold' } },
-                margin: { left: 20, right: 20 }
-            });
-            y = doc.lastAutoTable.finalY + 10;
-            doc.setFontSize(12);
-            doc.setFont("helvetica", "bold");
-            doc.text("Modalités de règlement", 20, y);
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "normal");
-            doc.text(`Délais: ${sanitizeInput(document.getElementById('delaiReglement').value === 'custom' ? document.getElementById('delaiCustom').value : document.getElementById('delaiReglement').value)}`, 20, y + 5);
-            doc.text(`Moyen: ${sanitizeInput(document.getElementById('moyenReglement').value === 'custom' ? document.getElementById('moyenCustom').value : document.getElementById('moyenReglement').value)}`, 20, y + 10);
-            const observations = sanitizeInput(document.getElementById('observations').value);
-            if (observations) {
-                doc.text("Observations:", 20, y + 15);
-                doc.text(doc.splitTextToSize(observations, 170), 20, y + 20);
-                y += 20 + (Math.ceil(observations.length / 85) * 5);
-            } else {
-                y += 15;
-            }
-            doc.setFontSize(12);
-            doc.setFont("helvetica", "bold");
-            doc.text("Signatures", 20, y);
-            if (!clientSignaturePad.isEmpty()) {
-                doc.setFontSize(10);
-                doc.text('Client:', 20, y + 10);
-                doc.addImage(clientSignaturePad.toDataURL('image/png', 1.0), 'PNG', 20, y + 15, 60, 30);
-            }
-            if (!technicianSignaturePad.isEmpty()) {
-                doc.setFontSize(10);
-                doc.text('Technicien:', 110, y + 10);
-                doc.addImage(technicianSignaturePad.toDataURL('image/png', 1.0), 'PNG', 110, y + 15, 60, 30);
-            }
-            doc.setFontSize(10);
-            doc.text('MPro Incendie - SIRET: 123456789', 20, 280);
-            doc.save(`bon_intervention_${new Date().toISOString().slice(0,10)}.pdf`);
-        }
+    .grid {
+        grid-template-columns: 1fr;
+    }
 
-        function sendEmail() {
-            const clientEmail = document.getElementById('email').textContent;
-            const prestations = JSON.parse(localStorage.getItem('prestationsData') || '[]');
-            if (prestations.length === 0) {
-                alert('Ajoutez au moins une prestation avant envoi.');
-                return;
-            }
-            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', {
-                to_email: clientEmail,
-                client: sanitizeInput(document.getElementById('clientName').textContent),
-                date: document.getElementById('interventionDate').value,
-                prestations: JSON.stringify(prestations),
-                total: document.getElementById('totalTTC').textContent,
-                observations: sanitizeInput(document.getElementById('observations').value),
-                signature_client: clientSignaturePad.toDataURL('image/png', 0.7),
-                signature_technician: technicianSignaturePad.toDataURL('image/png', 0.7)
-            }).then(() => alert('Email envoyé !'), () => alert('Erreur envoi.'));
-        }
+    #prestationsTable {
+        margin: 0;
+    }
 
-        window.onload = () => {
-            loadClientInfo();
-            loadCrmExtincteurs();
-            loadPrestations();
-            loadSignatures();
-            loadDraft();
-            setInterval(saveDraft, 10000);
-        };
-    </script>
-</body>
-</html>
+    #prestationsTable th {
+        display: none;
+    }
+
+    #prestationsTable tr {
+        display: block;
+        margin-bottom: 12px;
+        border: 1px solid #ddd;
+        padding: 8px;
+        border-radius: 5px;
+        background: #fff;
+        width: 100%;
+    }
+
+    #prestationsTable td {
+        display: block;
+        width: 100%;
+        padding: 4px 0;
+    }
+
+    #prestationsTable td select, #prestationsTable td input {
+        font-size: 15px;
+        padding: 8px;
+        height: 32px;
+    }
+
+    #prestationsTable td:before {
+        content: attr(data-label);
+        display: block;
+        font-size: 14px;
+        font-weight: bold;
+        color: #555;
+        margin-bottom: 4px;
+    }
+
+    #prestationsTable td:nth-child(1):before { content: "Désignation"; }
+    #prestationsTable td:nth-child(2):before { content: "Qté"; }
+    #prestationsTable td:nth-child(3):before { content: "PU HT (€)"; }
+    #prestationsTable td:nth-child(4):before { content: "Total HT (€)"; }
+    #prestationsTable td:nth-child(5):before { content: "Actions"; }
+
+    .prestations-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+
+    #prestationsTable td:nth-child(2) input { width: 50px; }
+    #prestationsTable td:nth-child(3) input { width: 70px; }
+    #prestationsTable td:nth-child(4) input { width: 70px; }
+    #prestationsTable td:nth-child(4) .prestations-row { flex-grow: 1; justify-content: space-between; }
+
+    .action-buttons {
+        margin-left: 8px;
+    }
+
+    .action-buttons button {
+        font-size: 16px;
+        padding: 8px;
+    }
+
+    .floating-btn {
+        bottom: 75px;
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+
+    .modal-content {
+        margin: 20% auto;
+        width: 95%;
+    }
+}
