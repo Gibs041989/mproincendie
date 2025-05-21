@@ -18,10 +18,6 @@
         .table-container { width: 100%; }
         #prestationsTable, #crmExtincteursTable { width: 100%; border-collapse: collapse; background: #fff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); border-radius: 8px; }
         #prestationsTable th, #prestationsTable td { padding: 8px; font-size: 15px; border: 1px solid #e5e7eb; line-height: 1.2; }
-        #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { width: 100%; }
-        #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { width: 20%; }
-        #prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) { width: 30%; }
-        #prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) { width: 30%; }
         #prestationsTable input, #prestationsTable select { padding: 8px; font-size: 15px; height: 32px; width: 100%; box-sizing: border-box; border: 1px solid #d1d5db; border-radius: 4px; }
         #totalsTable { max-width: 220px; margin: 10px 0; }
         #totalsTable th, #totalsTable td { padding: 6px; font-size: 13px; }
@@ -46,21 +42,18 @@
         .error { border: 1px solid red !important; }
         .error-message { color: red; font-size: 12px; margin-top: 2px; display: none; }
         #debug-message { color: red; font-size: 14px; margin: 10px 0; display: none; }
+        .details-row { display: flex; flex-wrap: wrap; gap: 10px; }
+        .details-row > div { flex: 1; min-width: 80px; }
+        .details-row label { font-size: 14px; font-weight: bold; color: #374151; margin-bottom: 2px; display: block; }
         @media (max-width: 600px) {
             .section { padding: 10px; }
-            #prestationsTable { margin: 0; background: #f9fafb; }
             #prestationsTable th { display: none; }
-            #prestationsTable tr { display: block; margin-bottom: 12px; border: none; padding: 8px; border-radius: 8px; background: #fff; width: 100%; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+            #prestationsTable tr.designation-row { display: block; margin-bottom: 8px; border: none; padding: 8px; border-radius: 8px; background: #fff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+            #prestationsTable tr.details-row { display: block; margin-bottom: 12px; border: none; padding: 8px; }
             #prestationsTable td { display: block; width: 100%; padding: 4px 0; border: none; }
-            #prestationsTable td:before { content: attr(data-label); display: block; font-size: 14px; font-weight: bold; color: #374151; margin-bottom: 4px; }
-            #prestationsTable td:nth-child(1):before { content: "Désignation"; }
-            #prestationsTable td:nth-child(2):before { content: "Qté"; }
-            #prestationsTable td:nth-child(3):before { content: "PU HT (€)"; }
-            #prestationsTable td:nth-child(4):before { content: "Total HT (€)"; }
-            .prestations-row { display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; }
-            #prestationsTable td:nth-child(2) input { width: 50px; }
-            #prestationsTable td:nth-child(3) input { width: 70px; }
-            #prestationsTable td:nth-child(4) input { width: 70px; }
+            .details-row { display: flex; flex-wrap: wrap; gap: 10px; }
+            .details-row > div { flex: 1; min-width: 80px; }
+            .details-row input { width: 100%; }
             .action-buttons { margin: 8px 0; }
             .action-buttons button { font-size: 16px; padding: 8px; }
             .select2-container { width: 100% !important; }
@@ -183,7 +176,7 @@
     <div class="floating-btn" onclick="addPrestation()">➕</div>
     <script>
         // IMPORTANT: Servez ce fichier via un serveur local (ex: python -m http.server) pour éviter les restrictions de localStorage.
-        // Accédez à http://localhost:8000/bon_intervention.html dans votre navigateur.
+        // Exécutez `python -m http.server 8000` et accédez à http://localhost:8000/bon_intervention.html
 
         emailjs.init("YOUR_EMAILJS_USER_ID"); // Remplacer par votre ID EmailJS réel
 
@@ -276,33 +269,44 @@
 
         function addPrestation() {
             const tbody = document.getElementById('prestationsBody');
-            const index = tbody.children.length;
-            const row = document.createElement('tr');
-            row.id = `row-${index}`;
-            row.innerHTML = `
-                <td data-label="Désignation">
-                    <select class="designation" onchange="updateDesignation(${index})">
+            const index = tbody.querySelectorAll('.designation-row').length;
+            const designationRow = document.createElement('tr');
+            designationRow.className = 'designation-row';
+            designationRow.id = `row-${index}-designation`;
+            designationRow.innerHTML = `
+                <td colspan="4">
+                    <select class="designation" id="designation-${index}" onchange="updateDesignation(${index})">
                         <option value="">Choisir un article</option>
                         ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}">${article.name}</option>`).join('')}
                         <option value="custom">Saisie libre</option>
                     </select>
-                    <input type="text" class="custom-designation" style="display:none;" placeholder="Désignation manuelle" oninput="updateRow(${index})">
+                    <input type="text" class="custom-designation" id="custom-designation-${index}" style="display:none;" placeholder="Désignation manuelle" oninput="updateRow(${index})">
                     <div class="error-message" id="designation-error-${index}">Veuillez sélectionner ou saisir une désignation</div>
-                </td>
-                <td data-label="Qté">
-                    <input type="number" class="quantity" placeholder="Qté" min="1" required oninput="updateRow(${index})">
-                    <div class="error-message" id="quantity-error-${index}">Quantité doit être > 0</div>
-                </td>
-                <td data-label="PU HT">
-                    <input type="number" class="unitPrice" placeholder="PU HT" step="0.01" required oninput="updateRow(${index})">
-                    <div class="error-message" id="unitPrice-error-${index}">Prix unitaire doit être > 0</div>
-                </td>
-                <td data-label="Prix Total HT">
-                    <div class="prestations-row">
-                        <input type="number" class="total" readonly>
+                </td>`;
+            const detailsRow = document.createElement('tr');
+            detailsRow.className = 'details-row';
+            detailsRow.id = `row-${index}-details`;
+            detailsRow.innerHTML = `
+                <td colspan="4">
+                    <div class="details-row">
+                        <div>
+                            <label for="quantity-${index}">Qté</label>
+                            <input type="number" id="quantity-${index}" class="quantity" placeholder="Qté" min="1" required oninput="updateRow(${index})">
+                            <div class="error-message" id="quantity-error-${index}">Quantité doit être > 0</div>
+                        </div>
+                        <div>
+                            <label for="unitPrice-${index}">PU HT</label>
+                            <input type="number" id="unitPrice-${index}" class="unitPrice" placeholder="PU HT" step="0.01" required oninput="updateRow(${index})">
+                            <div class="error-message" id="unitPrice-error-${index}">Prix unitaire doit être > 0</div>
+                        </div>
+                        <div>
+                            <label for="total-${index}">Total HT</label>
+                            <input type="number" id="total-${index}" class="total" readonly>
+                        </div>
                     </div>
                 </td>`;
-            tbody.appendChild(row);
+            tbody.appendChild(designationRow);
+            tbody.appendChild(detailsRow);
             const actionsDiv = document.createElement('div');
             actionsDiv.className = 'action-buttons';
             actionsDiv.innerHTML = `
@@ -311,17 +315,18 @@
                 <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
                 <button class="add-btn" onclick="addPrestation()" title="Nouvelle ligne"><i class="fas fa-plus"></i></button>
             `;
-            tbody.parentNode.insertBefore(actionsDiv, row.nextSibling);
-            $(row.querySelector('.designation')).select2({ width: '100%' });
+            tbody.appendChild(actionsDiv);
+            $(designationRow.querySelector('.designation')).select2({ width: '100%' });
             savePrestations();
             updateTotals();
         }
 
         function updateDesignation(index) {
-            const row = document.getElementById(`row-${index}`);
-            const select = row.querySelector('.designation');
-            const customInput = row.querySelector('.custom-designation');
-            const unitPriceInput = row.querySelector('.unitPrice');
+            const designationRow = document.getElementById(`row-${index}-designation`);
+            const detailsRow = document.getElementById(`row-${index}-details`);
+            const select = designationRow.querySelector('.designation');
+            const customInput = designationRow.querySelector('.custom-designation');
+            const unitPriceInput = detailsRow.querySelector('.unitPrice');
             if (select.value === 'custom') {
                 customInput.style.display = 'block';
                 unitPriceInput.value = '';
@@ -334,15 +339,16 @@
         }
 
         function updateRow(index) {
-            const row = document.getElementById(`row-${index}`);
-            const select = row.querySelector('.designation');
-            const customDesignation = row.querySelector('.custom-designation');
-            const quantityInput = row.querySelector('.quantity');
-            const unitPriceInput = row.querySelector('.unitPrice');
-            const totalInput = row.querySelector('.total');
-            const designationError = document.getElementById(`designation-error-${index}`);
-            const quantityError = document.getElementById(`quantity-error-${index}`);
-            const unitPriceError = document.getElementById(`unitPrice-error-${index}`);
+            const designationRow = document.getElementById(`row-${index}-designation`);
+            const detailsRow = document.getElementById(`row-${index}-details`);
+            const select = designationRow.querySelector('.designation');
+            const customDesignation = designationRow.querySelector('.custom-designation');
+            const quantityInput = detailsRow.querySelector('.quantity');
+            const unitPriceInput = detailsRow.querySelector('.unitPrice');
+            const totalInput = detailsRow.querySelector('.total');
+            const designationError = designationRow.querySelector('.error-message');
+            const quantityError = detailsRow.querySelector('#quantity-error-' + index);
+            const unitPriceError = detailsRow.querySelector('#unitPrice-error-' + index);
             const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value.trim()) : select.value;
             const quantity = parseFloat(quantityInput.value) || 0;
             const unitPrice = parseFloat(unitPriceInput.value) || 0;
@@ -388,50 +394,61 @@
         }
 
         function validateRow(index) {
-            const row = document.getElementById(`row-${index}`);
-            const select = row.querySelector('.designation');
-            const customDesignation = row.querySelector('.custom-designation');
+            const designationRow = document.getElementById(`row-${index}-designation`);
+            const detailsRow = document.getElementById(`row-${index}-details`);
+            const select = designationRow.querySelector('.designation');
+            const customDesignation = designationRow.querySelector('.custom-designation');
             const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value.trim()) : select.value;
-            const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
-            const unitPrice = parseFloat(row.querySelector('.unitPrice').value) || 0;
+            const quantity = parseFloat(detailsRow.querySelector('.quantity').value) || 0;
+            const unitPrice = parseFloat(detailsRow.querySelector('.unitPrice').value) || 0;
             if (!designation || quantity <= 0 || unitPrice <= 0) {
                 alert('Remplir tous les champs correctement.');
                 return;
             }
-            row.querySelectorAll('input, select').forEach(input => input.disabled = true);
-            row.classList.add('active');
-            row.onclick = () => editRow(index);
+            designationRow.querySelectorAll('input, select').forEach(input => input.disabled = true);
+            detailsRow.querySelectorAll('input').forEach(input => input.disabled = true);
+            designationRow.classList.add('active');
+            detailsRow.classList.add('active');
+            designationRow.onclick = () => editRow(index);
+            detailsRow.onclick = () => editRow(index);
             savePrestations();
             updateTotals();
         }
 
         function editRow(index) {
-            const row = document.getElementById(`row-${index}`);
-            row.querySelectorAll('input, select').forEach(input => input.disabled = false);
-            row.classList.remove('active');
-            row.onclick = null;
+            const designationRow = document.getElementById(`row-${index}-designation`);
+            const detailsRow = document.getElementById(`row-${index}-details`);
+            designationRow.querySelectorAll('input, select').forEach(input => input.disabled = false);
+            detailsRow.querySelectorAll('input').forEach(input => input.disabled = false);
+            designationRow.classList.remove('active');
+            detailsRow.classList.remove('active');
+            designationRow.onclick = null;
+            detailsRow.onclick = null;
         }
 
         function removeRow(index) {
-            const row = document.getElementById(`row-${index}`);
-            const nextSibling = row.nextSibling;
+            const designationRow = document.getElementById(`row-${index}-designation`);
+            const detailsRow = document.getElementById(`row-${index}-details`);
+            const nextSibling = detailsRow.nextSibling;
             if (nextSibling && nextSibling.className === 'action-buttons') {
                 nextSibling.remove();
             }
-            row.remove();
+            designationRow.remove();
+            detailsRow.remove();
             savePrestations();
             updateTotals();
         }
 
         function savePrestations() {
             const prestationsData = [];
-            document.querySelectorAll('#prestationsBody tr').forEach(row => {
-                const select = row.querySelector('.designation');
-                const customDesignation = row.querySelector('.custom-designation');
+            document.querySelectorAll('#prestationsBody .designation-row').forEach((designationRow, index) => {
+                const detailsRow = document.getElementById(`row-${index}-details`);
+                const select = designationRow.querySelector('.designation');
+                const customDesignation = designationRow.querySelector('.custom-designation');
                 const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value) : select.value;
-                const quantity = row.querySelector('.quantity').value;
-                const unitPrice = row.querySelector('.unitPrice').value;
-                const total = row.querySelector('.total').value;
+                const quantity = detailsRow.querySelector('.quantity').value;
+                const unitPrice = detailsRow.querySelector('.unitPrice').value;
+                const total = detailsRow.querySelector('.total').value;
                 if (designation && quantity && unitPrice && total) {
                     prestationsData.push({ designation, quantity, unitPrice, total });
                 }
@@ -456,45 +473,56 @@
                 }
             } catch (e) {
                 showDebugMessage("Erreur lors du chargement des prestations : " + e.message);
-                localStorage.removeItem('prestationsData'); // Réinitialise les données corrompues
+                localStorage.removeItem('prestationsData');
                 prestationsData = [];
             }
 
             const tbody = document.getElementById('prestationsBody');
-            tbody.innerHTML = ''; // Nettoie le tableau avant de charger
+            tbody.innerHTML = '';
             if (!prestationsData.length) {
-                addPrestation(); // Ajoute une ligne vide si aucune donnée
+                addPrestation();
                 return;
             }
 
             prestationsData.forEach((item, index) => {
                 const isCustom = !articlesDB.some(article => article.name === item.designation);
-                const row = document.createElement('tr');
-                row.id = `row-${index}`;
-                row.innerHTML = `
-                    <td data-label="Désignation">
-                        <select class="designation" onchange="updateDesignation(${index})" disabled>
+                const designationRow = document.createElement('tr');
+                designationRow.className = 'designation-row';
+                designationRow.id = `row-${index}-designation`;
+                designationRow.innerHTML = `
+                    <td colspan="4">
+                        <select class="designation" id="designation-${index}" onchange="updateDesignation(${index})" disabled>
                             <option value="">Choisir un article</option>
                             ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}" ${article.name === item.designation ? 'selected' : ''}>${article.name}</option>`).join('')}
                             <option value="custom" ${isCustom ? 'selected' : ''}>Saisie libre</option>
                         </select>
-                        <input type="text" class="custom-designation" value="${isCustom ? item.designation : ''}" style="display:${isCustom ? 'block' : 'none'};" disabled>
+                        <input type="text" class="custom-designation" id="custom-designation-${index}" value="${isCustom ? item.designation : ''}" style="display:${isCustom ? 'block' : 'none'};" disabled>
                         <div class="error-message" id="designation-error-${index}">Veuillez sélectionner ou saisir une désignation</div>
-                    </td>
-                    <td data-label="Qté">
-                        <input type="number" class="quantity" value="${item.quantity || ''}" min="1" required disabled>
-                        <div class="error-message" id="quantity-error-${index}">Quantité doit être > 0</div>
-                    </td>
-                    <td data-label="PU HT">
-                        <input type="number" class="unitPrice" value="${item.unitPrice || ''}" step="0.01" required disabled>
-                        <div class="error-message" id="unitPrice-error-${index}">Prix unitaire doit être > 0</div>
-                    </td>
-                    <td data-label="Prix Total HT">
-                        <div class="prestations-row">
-                            <input type="number" class="total" value="${item.total || ''}" readonly>
+                    </td>`;
+                const detailsRow = document.createElement('tr');
+                detailsRow.className = 'details-row';
+                detailsRow.id = `row-${index}-details`;
+                detailsRow.innerHTML = `
+                    <td colspan="4">
+                        <div class="details-row">
+                            <div>
+                                <label for="quantity-${index}">Qté</label>
+                                <input type="number" id="quantity-${index}" class="quantity" value="${item.quantity || ''}" min="1" required disabled>
+                                <div class="error-message" id="quantity-error-${index}">Quantité doit être > 0</div>
+                            </div>
+                            <div>
+                                <label for="unitPrice-${index}">PU HT</label>
+                                <input type="number" id="unitPrice-${index}" class="unitPrice" value="${item.unitPrice || ''}" step="0.01" required disabled>
+                                <div class="error-message" id="unitPrice-error-${index}">Prix unitaire doit être > 0</div>
+                            </div>
+                            <div>
+                                <label for="total-${index}">Total HT</label>
+                                <input type="number" id="total-${index}" class="total" value="${item.total || ''}" readonly>
+                            </div>
                         </div>
                     </td>`;
-                tbody.appendChild(row);
+                tbody.appendChild(designationRow);
+                tbody.appendChild(detailsRow);
                 const actionsDiv = document.createElement('div');
                 actionsDiv.className = 'action-buttons';
                 actionsDiv.innerHTML = `
@@ -503,15 +531,15 @@
                     <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
                     <button class="add-btn" onclick="addPrestation()" title="Nouvelle ligne"><i class="fas fa-plus"></i></button>
                 `;
-                tbody.parentNode.insertBefore(actionsDiv, row.nextSibling);
-                $(row.querySelector('.designation')).select2({ width: '100%' });
+                tbody.appendChild(actionsDiv);
+                $(designationRow.querySelector('.designation')).select2({ width: '100%' });
             });
             updateTotals();
         }
 
         function updateTotals() {
             let totalHT = 0;
-            document.querySelectorAll('#prestationsBody tr').forEach(row => {
+            document.querySelectorAll('#prestationsBody .details-row').forEach(row => {
                 const total = parseFloat(row.querySelector('.total').value) || 0;
                 totalHT += total;
             });
@@ -575,22 +603,18 @@
         }
 
         function saveDraft() {
-            // À implémenter selon vos besoins
             console.log("Sauvegarde du brouillon...");
         }
 
         function validateBonIntervention() {
-            // À implémenter selon vos besoins
             alert("Validation du bon d'intervention...");
         }
 
         function generatePDF() {
-            // À implémenter selon vos besoins
             alert("Génération du PDF...");
         }
 
         function sendEmail() {
-            // À implémenter selon vos besoins avec EmailJS
             alert("Envoi de l'email...");
         }
 
@@ -601,7 +625,6 @@
                 loadPrestations();
                 loadSignatures();
                 setInterval(saveDraft, 10000);
-                // Vérifie que le tableau est visible
                 const table = document.getElementById('prestationsTable');
                 if (window.getComputedStyle(table).display === 'none') {
                     showDebugMessage("Le tableau est masqué par une règle CSS. Vérifiez les styles.");
