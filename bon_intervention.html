@@ -43,33 +43,67 @@
         .error { border: 1px solid red !important; }
         .error-message { color: red; font-size: 12px; margin-top: 2px; display: none; }
         #debug-message { color: red; font-size: 14px; margin: 10px 0; display: none; }
-        .details-row { display: flex; flex-wrap: wrap; gap: 10px; }
-        .details-row > div { flex: 1; min-width: 80px; }
-        .details-row label { font-size: 14px; font-weight: bold; color: #374151; margin-bottom: 2px; display: block; }
+        .details-row { display: flex; flex-direction: row; gap: 8px; align-items: flex-start; }
+        .details-row > div { min-width: 70px; max-width: 100px; }
+        .details-row label { font-size: 12px; font-weight: bold; color: #374151; margin-bottom: 2px; display: block; line-height: 1.2; }
+        .details-row input { padding: 6px; height: 28px; font-size: 14px; }
         @media (max-width: 600px) {
-            .section { padding: 10px; }
-            #prestationsTable { background: #f9fafb; }
+            .section { padding: 8px; }
+            #prestationsTable { background: #fff; margin: 0; }
             #prestationsTable th { display: none; }
-            #prestationsTable tr.designation-row { display: block; margin-bottom: 8px; border: none; padding: 8px; border-radius: 8px; background: #fff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
-            #prestationsTable tr.details-row { display: block; margin-bottom: 12px; border: none; padding: 8px; }
-            #prestationsTable td { display: block; width: 100%; padding: 4px 0; border: none; }
-            .details-row { display: flex; flex-wrap: wrap; gap: 10px; }
-            .details-row > div { flex: 1; min-width: 80px; }
-            .details-row input { width: 100%; }
-            .action-buttons { margin: 8px 0; }
-            .action-buttons button { font-size: 16px; padding: 8px; }
+            #prestationsTable tr.designation-row { 
+                display: block; 
+                margin: 0 0 4px 0; 
+                padding: 4px; 
+                border: none; 
+                border-radius: 6px; 
+                background: #fff; 
+            }
+            #prestationsTable tr.details-row { 
+                display: block; 
+                margin: 0 0 8px 0; 
+                padding: 4px; 
+                border: none; 
+            }
+            #prestationsTable td { display: block; width: 100%; padding: 0; border: none; }
+            .details-row { 
+                display: flex; 
+                flex-direction: row; 
+                flex-wrap: nowrap; 
+                gap: 8px; 
+                align-items: flex-start; 
+            }
+            .details-row > div { 
+                min-width: 70px; 
+                max-width: 90px; 
+            }
+            .details-row > div:first-child { min-width: 60px; max-width: 70px; }
+            .details-row input { 
+                width: 100%; 
+                padding: 5px; 
+                height: 26px; 
+                font-size: 13px; 
+                border-radius: 3px; 
+            }
+            .details-row label { 
+                font-size: 11px; 
+                margin-bottom: 1px; 
+                line-height: 1.1; 
+            }
+            .action-buttons { margin: 4px 0; }
+            .action-buttons button { font-size: 14px; padding: 6px; }
             .select2-container { width: 100% !important; }
-            .select2-selection { height: 32px !important; font-size: 15px !important; padding: 6px !important; }
+            .select2-selection { height: 26px !important; font-size: 13px !important; padding: 4px !important; }
             #crmExtincteursTable th { display: none; }
-            #crmExtincteursTable tr { display: block; margin-bottom: 8px; border: none; padding: 6px; border-radius: 8px; background: #fff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
-            #crmExtincteursTable td { display: block; width: 100%; padding: 4px 0; border: none; }
-            #crmExtincteursTable td:before { font-size: 12px; font-weight: bold; color: #374151; }
+            #crmExtincteursTable tr { display: block; margin-bottom: 8px; border: none; padding: 4px; border-radius: 6px; background: #fff; }
+            #crmExtincteursTable td { display: block; width: 100%; padding: 2px 0; border: none; }
+            #crmExtincteursTable td:before { font-size: 11px; font-weight: bold; color: #374151; }
             #crmExtincteursTable td:nth-child(1):before { content: "ID"; }
             #crmExtincteursTable td:nth-child(2):before { content: "Type"; }
             #crmExtincteursTable td:nth-child(3):before { content: "État"; }
             #crmExtincteursTable td:nth-child(4):before { content: "Abréviation"; }
-            .floating-btn { bottom: 75px; width: 45px; height: 45px; font-size: 20px; }
-            .modal-content { margin: 20% auto; width: 95%; }
+            .floating-btn { bottom: 70px; width: 40px; height: 40px; font-size: 18px; }
+            .modal-content { margin: 15% auto; width: 95%; }
         }
     </style>
 </head>
