@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -47,6 +48,7 @@
         .details-row label { font-size: 14px; font-weight: bold; color: #374151; margin-bottom: 2px; display: block; }
         @media (max-width: 600px) {
             .section { padding: 10px; }
+            #prestationsTable { background: #f9fafb; }
             #prestationsTable th { display: none; }
             #prestationsTable tr.designation-row { display: block; margin-bottom: 8px; border: none; padding: 8px; border-radius: 8px; background: #fff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
             #prestationsTable tr.details-row { display: block; margin-bottom: 12px; border: none; padding: 8px; }
@@ -316,7 +318,11 @@
                 <button class="add-btn" onclick="addPrestation()" title="Nouvelle ligne"><i class="fas fa-plus"></i></button>
             `;
             tbody.appendChild(actionsDiv);
-            $(designationRow.querySelector('.designation')).select2({ width: '100%' });
+            try {
+                $(designationRow.querySelector('.designation')).select2({ width: '100%' });
+            } catch (e) {
+                showDebugMessage("Erreur lors de l'initialisation de Select2 : " + e.message);
+            }
             savePrestations();
             updateTotals();
         }
@@ -532,7 +538,11 @@
                     <button class="add-btn" onclick="addPrestation()" title="Nouvelle ligne"><i class="fas fa-plus"></i></button>
                 `;
                 tbody.appendChild(actionsDiv);
-                $(designationRow.querySelector('.designation')).select2({ width: '100%' });
+                try {
+                    $(designationRow.querySelector('.designation')).select2({ width: '100%' });
+                } catch (e) {
+                    showDebugMessage("Erreur lors de l'initialisation de Select2 : " + e.message);
+                }
             });
             updateTotals();
         }
