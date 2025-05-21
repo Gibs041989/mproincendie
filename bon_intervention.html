@@ -51,8 +51,8 @@
         @media (max-width: 600px) {
             .container { margin: 0; padding: 0 8px 80px 8px; }
             .section { padding: 0; margin: 0; }
-            .table-container { margin: 0; padding: 0; width: 100%; }
-            #prestationsTable { background: #fff; width: 100%; max-width: none; margin: 0; }
+            .table-container { margin: 0; padding: 0; width: 100%; display: block !important; }
+            #prestationsTable { background: #fff; width: 100%; max-width: none; margin: 0; display: block !important; }
             #prestationsTable th { display: none; }
             #prestationsTable tr.designation-row { 
                 display: block; 
@@ -391,6 +391,7 @@
             savePrestations();
             updateTotals();
             updateAddButtonPosition();
+            console.log("Prestation ajoutée, index: " + index);
         }
 
         function updateDesignation(index) {
@@ -500,7 +501,7 @@
 
         function removeRow(index) {
             const designationRow = document.getElementById(`row-${index}-designation`);
-            const detailsRow = document.getElementById(`row-${index}-details');
+            const detailsRow = document.getElementById(`row-${index}-details`);
             const nextSibling = detailsRow.nextSibling;
             if (nextSibling && nextSibling.className === 'action-buttons') {
                 nextSibling.remove();
@@ -510,6 +511,7 @@
             savePrestations();
             updateTotals();
             updateAddButtonPosition();
+            console.log("Prestation supprimée, index: " + index);
         }
 
         function savePrestations() {
@@ -544,6 +546,7 @@
                         throw new Error("Données de prestations invalides, réinitialisation.");
                     }
                 }
+                console.log("Chargement des prestations réussi, nombre d'éléments: " + prestationsData.length);
             } catch (e) {
                 showDebugMessage("Erreur lors du chargement des prestations : " + e.message);
                 localStorage.removeItem('prestationsData');
@@ -612,6 +615,10 @@
             });
             updateTotals();
             updateAddButtonPosition();
+            if (!tbody.querySelector('.designation-row')) {
+                showDebugMessage("Aucune prestation chargée, ajout d'une ligne par défaut.");
+                addPrestation();
+            }
         }
 
         function updateTotals() {
@@ -704,7 +711,9 @@
                 setInterval(saveDraft, 10000);
                 const table = document.getElementById('prestationsTable');
                 if (window.getComputedStyle(table).display === 'none') {
-                    showDebugMessage("Le tableau est masqué par une règle CSS. Vérifiez les styles.");
+                    showDebugMessage("Tableau masqué par une règle CSS. Vérifiez les styles.");
+                } else {
+                    console.log("Tableau visible, chargement initial réussi.");
                 }
             } catch (e) {
                 showDebugMessage("Erreur lors du chargement initial : " + e.message);
