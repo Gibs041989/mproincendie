@@ -32,11 +32,9 @@
         .action-buttons .delete-btn { color: #ef4444; }
         .action-buttons .delete-btn:hover { color: #dc2626; }
         .action-buttons button:disabled { opacity: 0.5; }
-        .add-button { display: flex; justify-content: flex-start; margin-top: 8px; }
-        .add-button button { font-size: 16px; padding: 8px; border: none; background: none; color: #10b981; cursor: pointer; transition: color 0.2s; }
+        .add-button { display: flex; justify-content: flex-start; margin-top: 4px; width: 100%; }
+        .add-button button { font-size: 14px; padding: 6px; border: none; background: none; color: #10b981; cursor: pointer; transition: color 0.2s; }
         .add-button button:hover { color: #059669; }
-        .floating-btn { position: fixed; bottom: 70px; right: 10px; background: #10b981; color: white; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); }
-        .floating-btn:hover::after { content: "Ajouter prestation"; position: absolute; right: 60px; background: #333; color: white; padding: 4px 8px; font-size: 12px; }
         .signature-pad { border: 1px solid #d1d5db; border-radius: 5px; margin-top: 6px; width: 100%; height: 100px; }
         .signature-block { margin-bottom: 45px; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1002; }
@@ -51,14 +49,15 @@
         .details-row label { font-size: 12px; font-weight: bold; color: #374151; margin-bottom: 2px; display: block; line-height: 1.2; }
         .details-row input { padding: 6px; height: 28px; font-size: 14px; }
         @media (max-width: 600px) {
-            .section { padding: 8px; margin: 0; }
-            .table-container { margin: 0; width: 100%; }
-            #prestationsTable { background: #fff; width: 100%; max-width: none; }
+            .container { margin: 0; padding: 0 8px 80px 8px; }
+            .section { padding: 0; margin: 0; }
+            .table-container { margin: 0; padding: 0; width: 100%; }
+            #prestationsTable { background: #fff; width: 100%; max-width: none; margin: 0; }
             #prestationsTable th { display: none; }
             #prestationsTable tr.designation-row { 
                 display: block; 
                 margin: 0 0 4px 0; 
-                padding: 4px; 
+                padding: 4px 0; 
                 border: none; 
                 border-radius: 6px; 
                 background: #fff; 
@@ -67,7 +66,7 @@
             #prestationsTable tr.details-row { 
                 display: block; 
                 margin: 0 0 8px 0; 
-                padding: 4px; 
+                padding: 4px 0; 
                 border: none; 
                 width: 100%; 
             }
@@ -81,20 +80,19 @@
                 width: 100%; 
             }
             .details-row > div { 
-                min-width: 70px; 
-                max-width: 90px; 
+                min-width: 60px; 
+                max-width: none; 
                 flex: 1; 
             }
-            .details-row > div:first-child { min-width: 60px; max-width: 70px; }
             .details-row input { 
                 width: 100%; 
-                padding: 5px; 
-                height: 26px; 
-                font-size: 13px; 
+                padding: 4px; 
+                height: 24px; 
+                font-size: 12px; 
                 border-radius: 3px; 
             }
             .details-row label { 
-                font-size: 11px; 
+                font-size: 10px; 
                 margin-bottom: 1px; 
                 line-height: 1.1; 
             }
@@ -111,16 +109,15 @@
             }
             .add-button button { font-size: 14px; padding: 6px; }
             .select2-container { width: 100% !important; }
-            .select2-selection { height: 26px !important; font-size: 13px !important; padding: 4px !important; }
+            .select2-selection { height: 24px !important; font-size: 12px !important; padding: 4px !important; }
             #crmExtincteursTable th { display: none; }
             #crmExtincteursTable tr { display: block; margin-bottom: 8px; border: none; padding: 4px; border-radius: 6px; background: #fff; }
             #crmExtincteursTable td { display: block; width: 100%; padding: 2px 0; border: none; }
-            #crmExtincteursTable td:before { font-size: 11px; font-weight: bold; color: #374151; }
+            #crmExtincteursTable td:before { font-size: 10px; font-weight: bold; color: #374151; }
             #crmExtincteursTable td:nth-child(1):before { content: "ID"; }
             #crmExtincteursTable td:nth-child(2):before { content: "Type"; }
             #crmExtincteursTable td:nth-child(3):before { content: "État"; }
             #crmExtincteursTable td:nth-child(4):before { content: "Abréviation"; }
-            .floating-btn { bottom: 70px; width: 40px; height: 40px; font-size: 18px; }
             .modal-content { margin: 15% auto; width: 95%; }
         }
     </style>
@@ -156,9 +153,6 @@
                     <thead><tr><th>Désignation</th><th>Qté</th><th>PU HT</th><th>Prix Total HT</th></tr></thead>
                     <tbody id="prestationsBody"></tbody>
                 </table>
-                <div class="add-button">
-                    <button onclick="addPrestation()" title="Nouvelle ligne"><i class="fas fa-plus"></i></button>
-                </div>
             </div>
             <table id="totalsTable">
                 <tr><th>Total HT</th><td id="totalHT">0.00 €</td></tr>
@@ -230,7 +224,6 @@
             </div>
         </div>
     </div>
-    <div class="floating-btn" onclick="addPrestation()">➕</div>
     <script>
         // IMPORTANT: Servez ce fichier via un serveur local (ex: python -m http.server) pour éviter les restrictions de localStorage.
         // Exécutez `python -m http.server 8000` et accédez à http://localhost:8000/bon_intervention.html
@@ -302,7 +295,7 @@
             }
             const dataURL = modalSignaturePad.toDataURL('image/png', 0.7);
             const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
-            if (currentSignatureType == 'client') {
+            if (currentSignatureType === 'client') {
                 clientSignaturePad.fromDataURL(dataURL);
                 signatures.client = dataURL;
             } else {
@@ -326,10 +319,17 @@
 
         function updateAddButtonPosition() {
             const tbody = document.getElementById('prestationsBody');
-            const addButton = document.querySelector('.add-button');
+            const existingButton = document.querySelector('.add-button');
+            if (existingButton) {
+                existingButton.remove();
+            }
+            const addButton = document.createElement('div');
+            addButton.className = 'add-button';
+            addButton.innerHTML = `<button onclick="addPrestation()" title="Nouvelle ligne"><i class="fas fa-plus"></i></button>`;
             const lastDetailsRow = tbody.querySelector('.details-row:last-of-type');
-            if (lastDetailsRow) {
-                tbody.insertBefore(addButton, lastDetailsRow.nextSibling);
+            const lastActionButtons = lastDetailsRow ? lastDetailsRow.nextElementSibling : null;
+            if (lastActionButtons && lastActionButtons.className === 'action-buttons') {
+                tbody.insertBefore(addButton, lastActionButtons.nextSibling);
             } else {
                 tbody.appendChild(addButton);
             }
@@ -399,7 +399,7 @@
             const select = designationRow.querySelector('.designation');
             const customInput = designationRow.querySelector('.custom-designation');
             const unitPriceInput = detailsRow.querySelector('.unitPrice');
-            if (select.value == 'custom') {
+            if (select.value === 'custom') {
                 customInput.style.display = 'block';
                 unitPriceInput.value = '';
             } else {
@@ -420,19 +420,19 @@
             const totalInput = detailsRow.querySelector('.total');
             const designationError = designationRow.querySelector('.error-message');
             const quantityError = detailsRow.querySelector('#quantity-error-' + index);
-            const unitPriceError = document.querySelector('#unitPrice-error-' + index);
-            const designation = select.value == 'custom' ? sanitizeInput(customDesignation.value.trim()) : select.value;
+            const unitPriceError = detailsRow.querySelector('#unitPrice-error-' + index);
+            const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value.trim()) : select.value;
             const quantity = parseFloat(quantityInput.value) || 0;
             const unitPrice = parseFloat(unitPriceInput.value) || 0;
 
             let isValid = true;
 
             if (!designation) {
-                (select.value == 'custom' ? customDesignation : select).classList.add('error');
+                (select.value === 'custom' ? customDesignation : select).classList.add('error');
                 designationError.style.display = 'block';
                 isValid = false;
             } else {
-                (select.value == 'custom' ? customDesignation : select).classList.remove('error');
+                (select.value === 'custom' ? customDesignation : select).classList.remove('error');
                 designationError.style.display = 'none';
             }
 
@@ -470,7 +470,7 @@
             const detailsRow = document.getElementById(`row-${index}-details`);
             const select = designationRow.querySelector('.designation');
             const customDesignation = designationRow.querySelector('.custom-designation');
-            const designation = select.value == 'custom' ? sanitizeInput(customDesignation.value.trim()) : select.value;
+            const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value.trim()) : select.value;
             const quantity = parseFloat(detailsRow.querySelector('.quantity').value) || 0;
             const unitPrice = parseFloat(detailsRow.querySelector('.unitPrice').value) || 0;
             if (!designation || quantity <= 0 || unitPrice <= 0) {
@@ -500,9 +500,9 @@
 
         function removeRow(index) {
             const designationRow = document.getElementById(`row-${index}-designation`);
-            const detailsRow = document.getElementById(`row-${index}-details`);
+            const detailsRow = document.getElementById(`row-${index}-details');
             const nextSibling = detailsRow.nextSibling;
-            if (nextSibling && nextSibling.className == 'action-buttons') {
+            if (nextSibling && nextSibling.className === 'action-buttons') {
                 nextSibling.remove();
             }
             designationRow.remove();
@@ -518,7 +518,7 @@
                 const detailsRow = document.getElementById(`row-${index}-details`);
                 const select = designationRow.querySelector('.designation');
                 const customDesignation = designationRow.querySelector('.custom-designation');
-                const designation = select.value == 'custom' ? sanitizeInput(customDesignation.value) : select.value;
+                const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value) : select.value;
                 const quantity = detailsRow.querySelector('.quantity').value;
                 const unitPrice = detailsRow.querySelector('.unitPrice').value;
                 const total = detailsRow.querySelector('.total').value;
@@ -558,7 +558,7 @@
             }
 
             prestationsData.forEach((item, index) => {
-                const isCustom = !articlesDB.some(article => article.name == item.designation);
+                const isCustom = !articlesDB.some(article => article.name === item.designation);
                 const designationRow = document.createElement('tr');
                 designationRow.className = 'designation-row';
                 designationRow.id = `row-${index}-designation`;
@@ -566,7 +566,7 @@
                     <td colspan="4">
                         <select class="designation" id="designation-${index}" onchange="updateDesignation(${index})" disabled>
                             <option value="">Choisir un article</option>
-                            ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}" ${article.name == item.designation ? 'selected' : ''}>${article.name}</option>`).join('')}
+                            ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}" ${article.name === item.designation ? 'selected' : ''}>${article.name}</option>`).join('')}
                             <option value="custom" ${isCustom ? 'selected' : ''}>Saisie libre</option>
                         </select>
                         <input type="text" class="custom-designation" id="custom-designation-${index}" value="${isCustom ? item.designation : ''}" style="display:${isCustom ? 'block' : 'none'};" disabled>
@@ -629,12 +629,12 @@
 
         function toggleDelaiInput() {
             const select = document.getElementById('delaiReglement');
-            document.getElementById('delaiCustom').style.display = select.value == 'custom' ? 'block' : 'none';
+            document.getElementById('delaiCustom').style.display = select.value === 'custom' ? 'block' : 'none';
         }
 
         function toggleMoyenInput() {
             const select = document.getElementById('moyenReglement');
-            document.getElementById('moyenCustom').style.display = select.value == 'custom' ? 'block' : 'none';
+            document.getElementById('moyenCustom').style.display = select.value === 'custom' ? 'block' : 'none';
         }
 
         function sanitizeInput(input) {
@@ -652,9 +652,9 @@
                 document.getElementById('clientName').textContent = intervention.client || 'Non sélectionné';
                 document.getElementById('adresse').textContent = intervention.adresse || 'Non sélectionnée';
                 document.getElementById('email').textContent = intervention.email || 'Non sélectionné';
-                document.getElementById('locationAddress').textContent = intervention.locationAddress && intervention.locationAddress != intervention.adresse ? intervention.locationAddress : 'Même adresse';
+                document.getElementById('locationAddress').textContent = intervention.locationAddress && intervention.locationAddress !== intervention.adresse ? intervention.locationAddress : 'Même adresse';
                 const clients = JSON.parse(localStorage.getItem('clients') || '[]');
-                const client = clients.find(c => c.name == intervention.client);
+                const client = clients.find(c => c.name === intervention.client);
                 if (client) {
                     document.getElementById('moyenReglement').value = client.moyenReglement || 'Chèque';
                     document.getElementById('delaiReglement').value = client.delaiReglement || 'Immédiat à l’intervention';
@@ -703,7 +703,7 @@
                 loadSignatures();
                 setInterval(saveDraft, 10000);
                 const table = document.getElementById('prestationsTable');
-                if (window.getComputedStyle(table).display == 'none') {
+                if (window.getComputedStyle(table).display === 'none') {
                     showDebugMessage("Le tableau est masqué par une règle CSS. Vérifiez les styles.");
                 }
             } catch (e) {
