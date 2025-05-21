@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -214,193 +215,36 @@
         ];
 
         function addPrestation() {
-            const tbody = document.getElementById('prestationsBody');
-            const index = tbody.children.length;
-            const row = document.createElement('tr');
-            row.id = `row-${index}`;
-            row.innerHTML = `
-                <td data-label="Désignation">
-                    <select class="designation" onchange="updateDesignation(${index})">
-                        <option value="">Choisir un article</option>
-                        ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}">${article.name}</option>`).join('')}
-                        <option value="custom">Saisie libre</option>
-                    </select>
-                    <input type="text" class="custom-designation" style="display:none;" placeholder="Désignation manuelle" oninput="updateRow(${index})">
-                    <div class="error-message" id="designation-error-${index}">Veuillez sélectionner ou saisir une désignation</div>
-                </td>
-                <td data-label="Qté">
-                    <input type="number" class="quantity" placeholder="Qté" min="1" required oninput="updateRow(${index})">
-                    <div class="error-message" id="quantity-error-${index}">Quantité doit être > 0</div>
-                </td>
-                <td data-label="PU HT">
-                    <input type="number" class="unitPrice" placeholder="PU HT" step="0.01" required oninput="updateRow(${index})">
-                    <div class="error-message" id="unitPrice-error-${index}">Prix unitaire doit être > 0</div>
-                </td>
-                <td data-label="Prix Total HT">
-                    <div class="prestations-row">
-                        <input type="number" class="total" readonly>
-                        <div class="action-buttons">
-                            <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" disabled title="Valider"><i class="fas fa-check-circle"></i></button>
-                            <button class="edit-btn" id="edit-${index}" onclick="editRow(${index})" disabled title="Modifier"><i class="fas fa-pencil-alt"></i></button>
-                            <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
-                        </div>
-                    </div>
-                </td>`;
-            tbody.appendChild(row);
-            $(row.querySelector('.designation')).select2({ width: '100%' });
-            savePrestations();
-            updateTotals();
-        }
-
-        function updateDesignation(index) {
-            const row = document.getElementById(`row-${index}`);
-            const select = row.querySelector('.designation');
-            const customInput = row.querySelector('.custom-designation');
-            const unitPriceInput = row.querySelector('.unitPrice');
-            if (select.value === 'custom') {
-                customInput.style.display = 'block';
-                unitPriceInput.value = '';
-            } else {
-                customInput.style.display = 'none';
-                const selectedOption = select.options[select.selectedIndex];
-                unitPriceInput.value = selectedOption.dataset.price || '';
-            }
-            updateRow(index);
-        }
-
-        function updateRow(index) {
-            const row = document.getElementById(`row-${index}`);
-            const select = row.querySelector('.designation');
-            const customDesignation = row.querySelector('.custom-designation');
-            const quantityInput = row.querySelector('.quantity');
-            const unitPriceInput = row.querySelector('.unitPrice');
-            const totalInput = row.querySelector('.total');
-            const designationError = document.getElementById(`designation-error-${index}`);
-            const quantityError = document.getElementById(`quantity-error-${index}`);
-            const unitPriceError = document.getElementById(`unitPrice-error-${index}`);
-            const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value.trim()) : select.value;
-            const quantity = parseFloat(quantityInput.value) || 0;
-            const unitPrice = parseFloat(unitPriceInput.value) || 0;
-
-            let isValid = true;
-
-            if (!designation) {
-                (select.value === 'custom' ? customDesignation : select).classList.add('error');
-                designationError.style.display = 'block';
-                isValid = false;
-            } else {
-                (select.value === 'custom' ? customDesignation : select).classList.remove('error');
-                designationError.style.display = 'none';
-            }
-
-            if (quantity <= 0) {
-                quantityInput.value = 1;
-                quantityInput.classList.add('error');
-                quantityError.style.display = 'block';
-                isValid = false;
-            } else {
-                quantityInput.classList.remove('error');
-                quantityError.style.display = 'none';
-            }
-
-            if (unitPrice <= 0) {
-                unitPriceInput.classList.add('error');
-                unitPriceError.style.display = 'block';
-                isValid = false;
-            } else {
-                unitPriceInput.classList.remove('error');
-                unitPriceError.style.display = 'none';
-            }
-
-            totalInput.value = (quantity * unitPrice).toFixed(2);
-            row.querySelector(`#validate-${index}`).disabled = !isValid;
-            row.querySelector(`#edit-${index}`).disabled = !isValid;
-
-            savePrestations();
-            updateTotals();
-        }
-
-        function validateRow(index) {
-            const row = document.getElementById(`row-${index}`);
-            const select = row.querySelector('.designation');
-            const customDesignation = row.querySelector('.custom-designation');
-            const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value.trim()) : select.value;
-            const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
-            const unitPrice = parseFloat(row.querySelector('.unitPrice').value) || 0;
-            if (!designation || quantity <= 0 || unitPrice <= 0) {
-                alert('Remplir tous les champs correctement.');
-                return;
-            }
-            row.querySelectorAll('input, select').forEach(input => input.disabled = true);
-            row.classList.add('active');
-            row.onclick = () => editRow(index);
-            savePrestations();
-            updateTotals();
-        }
-
-        function editRow(index) {
-            const row = document.getElementById(`row-${index}`);
-            row.querySelectorAll('input, select').forEach(input => input.disabled = false);
-            row.querySelector('.action-buttons').style.display = 'flex';
-            row.classList.remove('active');
-            row.onclick = null;
-        }
-
-        function removeRow(index) {
-            document.getElementById(`row-${index}`).remove();
-            savePrestations();
-            updateTotals();
-        }
-
-        function savePrestations() {
-            const prestationsData = [];
-            document.querySelectorAll('#prestationsBody tr').forEach(row => {
-                const select = row.querySelector('.designation');
-                const customDesignation = row.querySelector('.custom-designation');
-                const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value) : select.value;
-                const quantity = row.querySelector('.quantity').value;
-                const unitPrice = row.querySelector('.unitPrice').value;
-                const total = row.querySelector('.total').value;
-                if (designation && quantity && unitPrice && total) {
-                    prestationsData.push({ designation, quantity, unitPrice, total });
-                }
-            });
             try {
-                localStorage.setItem('prestationsData', JSON.stringify(prestationsData));
-            } catch {
-                alert('Stockage plein.');
-            }
-            saveDraft();
-        }
-
-        function loadPrestations() {
-            const prestationsData = JSON.parse(localStorage.getItem('prestationsData') || '[]');
-            const tbody = document.getElementById('prestationsBody');
-            prestationsData.forEach((item, index) => {
-                const isCustom = !articlesDB.some(article => article.name === item.designation);
+                const tbody = document.getElementById('prestationsBody');
+                if (!tbody) {
+                    console.error('Erreur : #prestationsBody non trouvé');
+                    return;
+                }
+                const index = tbody.children.length;
                 const row = document.createElement('tr');
                 row.id = `row-${index}`;
                 row.innerHTML = `
                     <td data-label="Désignation">
-                        <select class="designation" onchange="updateDesignation(${index})" disabled>
+                        <select class="designation" onchange="updateDesignation(${index})">
                             <option value="">Choisir un article</option>
-                            ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}" ${article.name === item.designation ? 'selected' : ''}>${article.name}</option>`).join('')}
-                            <option value="custom" ${isCustom ? 'selected' : ''}>Saisie libre</option>
+                            ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}">${article.name}</option>`).join('')}
+                            <option value="custom">Saisie libre</option>
                         </select>
-                        <input type="text" class="custom-designation" value="${isCustom ? item.designation : ''}" style="display:${isCustom ? 'block' : 'none'};" disabled>
+                        <input type="text" class="custom-designation" style="display:none;" placeholder="Désignation manuelle" oninput="updateRow(${index})">
                         <div class="error-message" id="designation-error-${index}">Veuillez sélectionner ou saisir une désignation</div>
                     </td>
                     <td data-label="Qté">
-                        <input type="number" class="quantity" value="${item.quantity || ''}" min="1" required disabled>
+                        <input type="number" class="quantity" placeholder="Qté" min="1" required oninput="updateRow(${index})">
                         <div class="error-message" id="quantity-error-${index}">Quantité doit être > 0</div>
                     </td>
                     <td data-label="PU HT">
-                        <input type="number" class="unitPrice" value="${item.unitPrice || ''}" step="0.01" required disabled>
+                        <input type="number" class="unitPrice" placeholder="PU HT" step="0.01" required oninput="updateRow(${index})">
                         <div class="error-message" id="unitPrice-error-${index}">Prix unitaire doit être > 0</div>
                     </td>
                     <td data-label="Prix Total HT">
                         <div class="prestations-row">
-                            <input type="number" class="total" value="${item.total || ''}" readonly>
+                            <input type="number" class="total" readonly>
                             <div class="action-buttons">
                                 <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" disabled title="Valider"><i class="fas fa-check-circle"></i></button>
                                 <button class="edit-btn" id="edit-${index}" onclick="editRow(${index})" disabled title="Modifier"><i class="fas fa-pencil-alt"></i></button>
@@ -408,136 +252,336 @@
                             </div>
                         </div>
                     </td>`;
+                tbody.appendChild(row);
+                try {
+                    $(row.querySelector('.designation')).select2({ width: '100%' });
+                } catch (e) {
+                    console.error('Erreur lors de l’initialisation de Select2 :', e);
+                }
+                savePrestations();
+                updateTotals();
+            } catch (e) {
+                console.error('Erreur dans addPrestation :', e);
+            }
+        }
+
+        function updateDesignation(index) {
+            try {
+                const row = document.getElementById(`row-${index}`);
+                if (!row) return;
+                const select = row.querySelector('.designation');
+                const customInput = row.querySelector('.custom-designation');
+                const unitPriceInput = row.querySelector('.unitPrice');
+                if (select.value === 'custom') {
+                    customInput.style.display = 'block';
+                    unitPriceInput.value = '';
+                } else {
+                    customInput.style.display = 'none';
+                    const selectedOption = select.options[select.selectedIndex];
+                    unitPriceInput.value = selectedOption.dataset.price || '';
+                }
+                updateRow(index);
+            } catch (e) {
+                console.error('Erreur dans updateDesignation :', e);
+            }
+        }
+
+        function updateRow(index) {
+            try {
+                const row = document.getElementById(`row-${index}`);
+                if (!row) return;
+                const select = row.querySelector('.designation');
+                const customDesignation = row.querySelector('.custom-designation');
+                const quantityInput = row.querySelector('.quantity');
+                const unitPriceInput = row.querySelector('.unitPrice');
+                const totalInput = row.querySelector('.total');
+                const designationError = document.getElementById(`designation-error-${index}`);
+                const quantityError = document.getElementById(`quantity-error-${index}`);
+                const unitPriceError = document.getElementById(`unitPrice-error-${index}`);
+                const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value.trim()) : select.value;
+                const quantity = parseFloat(quantityInput.value) || 0;
+                const unitPrice = parseFloat(unitPriceInput.value) || 0;
+
+                let isValid = true;
+
+                if (!designation) {
+                    (select.value === 'custom' ? customDesignation : select).classList.add('error');
+                    designationError.style.display = 'block';
+                    isValid = false;
+                } else {
+                    (select.value === 'custom' ? customDesignation : select).classList.remove('error');
+                    designationError.style.display = 'none';
+                }
+
+                if (quantity <= 0) {
+                    quantityInput.value = 1;
+                    quantityInput.classList.add('error');
+                    quantityError.style.display = 'block';
+                    isValid = false;
+                } else {
+                    quantityInput.classList.remove('error');
+                    quantityError.style.display = 'none';
+                }
+
+                if (unitPrice <= 0) {
+                    unitPriceInput.classList.add('error');
+                    unitPriceError.style.display = 'block';
+                    isValid = false;
+                } else {
+                    unitPriceInput.classList.remove('error');
+                    unitPriceError.style.display = 'none';
+                }
+
+                totalInput.value = (quantity * unitPrice).toFixed(2);
+                row.querySelector(`#validate-${index}`).disabled = !isValid;
+                row.querySelector(`#edit-${index}`).disabled = !isValid;
+
+                savePrestations();
+                updateTotals();
+            } catch (e) {
+                console.error('Erreur dans updateRow :', e);
+            }
+        }
+
+        function validateRow(index) {
+            try {
+                const row = document.getElementById(`row-${index}`);
+                if (!row) return;
+                const select = row.querySelector('.designation');
+                const customDesignation = row.querySelector('.custom-designation');
+                const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value.trim()) : select.value;
+                const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
+                const unitPrice = parseFloat(row.querySelector('.unitPrice').value) || 0;
+                if (!designation || quantity <= 0 || unitPrice <= 0) {
+                    alert('Remplir tous les champs correctement.');
+                    return;
+                }
+                row.querySelectorAll('input, select').forEach(input => input.disabled = true);
                 row.classList.add('active');
                 row.onclick = () => editRow(index);
-                tbody.appendChild(row);
-                $(row.querySelector('.design CONCEPT: 1px solid #ddd;
-    border-radius: 8px;
-    width: 100%;
-    height: 150px;
-}
+                savePrestations();
+                updateTotals();
+            } catch (e) {
+                console.error('Erreur dans validateRow :', e);
+            }
+        }
 
-/* Styles responsives */
-@media (max-width: 600px) {
-    .container {
-        padding: 15px;
-        margin: 15px;
-    }
+        function editRow(index) {
+            try {
+                const row = document.getElementById(`row-${index}`);
+                if (!row) return;
+                row.querySelectorAll('input, select').forEach(input => input.disabled = false);
+                row.querySelector('.action-buttons').style.display = 'flex';
+                row.classList.remove('active');
+                row.onclick = null;
+            } catch (e) {
+                console.error('Erreur dans editRow :', e);
+            }
+        }
 
-    h1 {
-        font-size: 26px;
-    }
+        function removeRow(index) {
+            try {
+                const row = document.getElementById(`row-${index}`);
+                if (row) row.remove();
+                savePrestations();
+                updateTotals();
+            } catch (e) {
+                console.error('Erreur dans removeRow :', e);
+            }
+        }
 
-    h2 {
-        font-size: 20px;
-    }
+        function savePrestations() {
+            try {
+                const prestationsData = [];
+                document.querySelectorAll('#prestationsBody tr').forEach(row => {
+                    const select = row.querySelector('.designation');
+                    const customDesignation = row.querySelector('.custom-designation');
+                    const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value) : select.value;
+                    const quantity = row.querySelector('.quantity').value;
+                    const unitPrice = row.querySelector('.unitPrice').value;
+                    const total = row.querySelector('.total').value;
+                    if (designation && quantity && unitPrice && total) {
+                        prestationsData.push({ designation, quantity, unitPrice, total });
+                    }
+                });
+                localStorage.setItem('prestationsData', JSON.stringify(prestationsData));
+                saveDraft();
+            } catch (e) {
+                console.error('Erreur dans savePrestations :', e);
+            }
+        }
 
-    h3 {
-        font-size: 16px;
-    }
+        function loadPrestations() {
+            try {
+                const prestationsData = JSON.parse(localStorage.getItem('prestationsData') || '[]');
+                const tbody = document.getElementById('prestationsBody');
+                if (!tbody) {
+                    console.error('Erreur : #prestationsBody non trouvé');
+                    return;
+                }
+                tbody.innerHTML = ''; // Vider le tableau pour éviter les doublons
+                prestationsData.forEach((item, index) => {
+                    const isCustom = !articlesDB.some(article => article.name === item.designation);
+                    const row = document.createElement('tr');
+                    row.id = `row-${index}`;
+                    row.innerHTML = `
+                        <td data-label="Désignation">
+                            <select class="designation" onchange="updateDesignation(${index})" disabled>
+                                <option value="">Choisir un article</option>
+                                ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}" ${article.name === item.designation ? 'selected' : ''}>${article.name}</option>`).join('')}
+                                <option value="custom" ${isCustom ? 'selected' : ''}>Saisie libre</option>
+                            </select>
+                            <input type="text" class="custom-designation" value="${isCustom ? item.designation : ''}" style="display:${isCustom ? 'block' : 'none'};" disabled>
+                            <div class="error-message" id="designation-error-${index}">Veuillez sélectionner ou saisir une désignation</div>
+                        </td>
+                        <td data-label="Qté">
+                            <input type="number" class="quantity" value="${item.quantity || ''}" min="1" required disabled>
+                            <div class="error-message" id="quantity-error-${index}">Quantité doit être > 0</div>
+                        </td>
+                        <td data-label="PU HT">
+                            <input type="number" class="unitPrice" value="${item.unitPrice || ''}" step="0.01" required disabled>
+                            <div class="error-message" id="unitPrice-error-${index}">Prix unitaire doit être > 0</div>
+                        </td>
+                        <td data-label="Prix Total HT">
+                            <div class="prestations-row">
+                                <input type="number" class="total" value="${item.total || ''}" readonly>
+                                <div class="action-buttons">
+                                    <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" disabled title="Valider"><i class="fas fa-check-circle"></i></button>
+                                    <button class="edit-btn" id="edit-${index}" onclick="editRow(${index})" disabled title="Modifier"><i class="fas fa-pencil-alt"></i></button>
+                                    <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>
+                                </div>
+                            </div>
+                        </td>`;
+                    row.classList.add('active');
+                    row.onclick = () => editRow(index);
+                    tbody.appendChild(row);
+                    try {
+                        $(row.querySelector('.designation')).select2({ width: '100%' });
+                    } catch (e) {
+                        console.error('Erreur lors de l’initialisation de Select2 :', e);
+                    }
+                });
+                updateTotals();
+                if (!prestationsData.length) addPrestation(); // Ajouter une ligne vide si aucune donnée
+            } catch (e) {
+                console.error('Erreur dans loadPrestations :', e);
+                addPrestation(); // Essayer d’ajouter une ligne en cas d’erreur
+            }
+        }
 
-    button {
-        font-size: 12px;
-        padding: 8px 16px;
-    }
+        function updateTotals() {
+            try {
+                let totalHT = 0;
+                document.querySelectorAll('#prestationsBody tr').forEach(row => {
+                    const totalInput = row.querySelector('.total');
+                    if (totalInput) { // Vérification pour éviter TypeError
+                        const total = parseFloat(totalInput.value) || 0;
+                        totalHT += total;
+                    }
+                });
+                const tva = totalHT * 0.2;
+                const totalTTC = totalHT + tva;
+                document.getElementById('totalHT').textContent = totalHT.toFixed(2) + ' €';
+                document.getElementById('tva').textContent = tva.toFixed(2) + ' €';
+                document.getElementById('totalTTC').textContent = totalTTC.toFixed(2) + ' €';
+            } catch (e) {
+                console.error('Erreur dans updateTotals :', e);
+            }
+        }
 
-    button.primary {
-        font-size: 14px;
-        padding: 10px 20px;
-    }
+        function toggleDelaiInput() {
+            const select = document.getElementById('delaiReglement');
+            document.getElementById('delaiCustom').style.display = select.value === 'custom' ? 'block' : 'none';
+        }
 
-    input, select, textarea {
-        font-size: 14px;
-        padding: 10px;
-    }
+        function toggleMoyenInput() {
+            const select = document.getElementById('moyenReglement');
+            document.getElementById('moyenCustom').style.display = select.value === 'custom' ? 'block' : 'none';
+        }
 
-    th, td {
-        padding: 10px;
-    }
+        function sanitizeInput(input) {
+            return DOMPurify.sanitize(input);
+        }
 
-    .nav-buttons {
-        gap: 10px;
-    }
+        function loadClientInfo() {
+            try {
+                const intervention = JSON.parse(localStorage.getItem('currentIntervention') || {});
+                if (!intervention.client) {
+                    alert('Aucun client sélectionné.');
+                    window.location.href = 'intervention.html';
+                    return;
+                }
+                document.getElementById('clientName').textContent = intervention.client || 'Non sélectionné';
+                document.getElementById('adresse').textContent = intervention.adresse || 'Non sélectionnée';
+                document.getElementById('email').textContent = intervention.email || 'Non sélectionné';
+                document.getElementById('locationAddress').textContent = intervention.locationAddress && intervention.locationAddress !== intervention.adresse ? intervention.locationAddress : 'Même adresse';
+                const clients = JSON.parse(localStorage.getItem('clients') || '[]');
+                const client = clients.find(c => c.name === intervention.client);
+                if (client) {
+                    document.getElementById('moyenReglement').value = client.moyenReglement || 'Chèque';
+                    document.getElementById('delaiReglement').value = client.delaiReglement || 'Immédiat à l’intervention';
+                    toggleMoyenInput();
+                    toggleDelaiInput();
+                }
+            } catch (e) {
+                console.error('Erreur dans loadClientInfo :', e);
+            }
+        }
 
-    .grid {
-        grid-template-columns: 1fr;
-    }
+        function loadCrmExtincteurs() {
+            try {
+                const extincteursData = JSON.parse(localStorage.getItem('extincteursData') || '[]');
+                const tbody = document.getElementById('crmExtincteursBody');
+                tbody.innerHTML = extincteursData.length ? '' : '<tr><td colspan="4">Aucun extincteur.</td></tr>';
+                extincteursData.forEach(item => {
+                    tbody.innerHTML += `<tr><td>${item.id || 'N/A'}</td><td>${item.type || 'N/A'}</td><td>${item.etat || 'N/A'}</td><td>${item.abreviation || 'N/A'}</td></tr>`;
+                });
+            } catch (e) {
+                console.error('Erreur dans loadCrmExtincteurs :', e);
+            }
+        }
 
-    #prestationsTable {
-        margin: 0;
-    }
+        function saveDraft() {
+            try {
+                const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
+                drafts['bon_intervention'] = {
+                    client: sanitizeInput(document.getElementById('clientName').textContent),
+                    adresse: sanitizeInput(document.getElementById('adresse').textContent),
+                    locationAddress: sanitizeInput(document.getElementById('locationAddress').textContent),
+                    email: sanitizeInput(document.getElementById('email').textContent),
+                    interventionDate: document.getElementById('interventionDate').value,
+                    technician: sanitizeInput(document.getElementById('technician').value),
+                    duration: document.getElementById('duration').value,
+                    delaiReglement: document.getElementById('delaiReglement').value === 'custom' ? sanitizeInput(document.getElementById('delaiCustom').value) : document.getElementById('delaiReglement').value,
+                    moyenReglement: document.getElementById('moyenReglement').value === 'custom' ? sanitizeInput(document.getElementById('moyenCustom').value) : document.getElementById('moyenReglement').value,
+                    observations: sanitizeInput(document.getElementById('observations').value),
+                    prestations: JSON.parse(localStorage.getItem('prestationsData') || '[]'),
+                    summary: `Bon d'intervention pour ${sanitizeInput(document.getElementById('clientName').textContent)}`,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('drafts', JSON.stringify(drafts));
+            } catch (e) {
+                console.error('Erreur dans saveDraft :', e);
+                alert('Stockage plein.');
+            }
+        }
 
-    #prestationsTable th {
-        display: none;
-    }
-
-    #prestationsTable tr {
-        display: block;
-        margin-bottom: 12px;
-        border: 1px solid #ddd;
-        padding: 8px;
-        border-radius: 5px;
-        background: #fff;
-        width: 100%;
-    }
-
-    #prestationsTable td {
-        display: block;
-        width: 100%;
-        padding: 4px 0;
-    }
-
-    #prestationsTable td select, #prestationsTable td input {
-        font-size: 15px;
-        padding: 8px;
-        height: 32px;
-    }
-
-    #prestationsTable td:before {
-        content: attr(data-label);
-        display: block;
-        font-size: 14px;
-        font-weight: bold;
-        color: #555;
-        margin-bottom: 4px;
-    }
-
-    #prestationsTable td:nth-child(1):before { content: "Désignation"; }
-    #prestationsTable td:nth-child(2):before { content: "Qté"; }
-    #prestationsTable td:nth-child(3):before { content: "PU HT (€)"; }
-    #prestationsTable td:nth-child(4):before { content: "Total HT (€)"; }
-    #prestationsTable td:nth-child(5):before { content: "Actions"; }
-
-    .prestations-row {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        flex-wrap: nowrap;
-    }
-
-    #prestationsTable td:nth-child(2) input { width: 50px; }
-    #prestationsTable td:nth-child(3) input { width: 70px; }
-    #prestationsTable td:nth-child(4) input { width: 70px; }
-    #prestationsTable td:nth-child(4) .prestations-row { flex-grow: 1; justify-content: space-between; }
-
-    .action-buttons {
-        margin-left: 8px;
-    }
-
-    .action-buttons button {
-        font-size: 16px;
-        padding: 8px;
-    }
-
-    .floating-btn {
-        bottom: 75px;
-        width: 45px;
-        height: 45px;
-        font-size: 20px;
-    }
-
-    .modal-content {
-        margin: 20% auto;
-        width: 95%;
-    }
-}
+        function loadDraft() {
+            try {
+                const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
+                const draft = drafts['bon_intervention'];
+                if (draft) {
+                    document.getElementById('interventionDate').value = draft.interventionDate || '';
+                    document.getElementById('technician').value = draft.technician || '';
+                    document.getElementById('duration').value = draft.duration || '';
+                    document.getElementById('delaiReglement').value = draft.delaiReglement === draft.delaiCustom ? 'custom' : draft.delaiReglement || 'Immédiat à l’intervention';
+                    document.getElementById('moyenReglement').value = draft.moyenReglement === draft.moyenCustom ? 'custom' : draft.moyenReglement || 'Chèque';
+                    document.getElementById('delaiCustom').value = draft.delaiReglement === 'custom' ? draft.delaiCustom : '';
+                    document.getElementById('moyenCustom').value = draft.moyenReglement === 'custom' ? draft.moyenCustom : '';
+                    document.getElementById('observations').value = draft.observations || '';
+                    toggleDelaiInput();
+                    toggleMoyenInput();
+                }
+            } catch (e) {
+                console.error('Erreur dans loadDraft :', e);
+            }
