@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             unitPrice: parseFloat(row.querySelector('.unit-price').value)
         }));
         localStorage.setItem('brouillon_billing', JSON.stringify(data));
+        alert('Brouillon sauvegardé !');
     });
 
     const draftData = JSON.parse(localStorage.getItem('brouillon_billing') || '[]');
@@ -72,5 +73,44 @@ document.addEventListener('DOMContentLoaded', () => {
             margin: { top: 20 }
         });
         doc.save('bon_intervention.pdf');
+    });
+
+    // Validation avant soumission
+    document.getElementById('validate-btn').addEventListener('click', () => {
+        if (!document.getElementById('intervention-date').value) {
+            alert('Veuillez saisir la date d’intervention.');
+            return;
+        }
+        if (!document.getElementById('technician-name').value) {
+            alert('Veuillez saisir le nom du technicien.');
+            return;
+        }
+        if (!document.getElementById('billing-rows').children.length) {
+            alert('Ajoutez au moins une ligne de facturation.');
+            return;
+        }
+        alert('Intervention validée !');
+        // À implémenter : envoi au backend ou Dolibarr
+    });
+
+    // Base pour EmailJS (à configurer avec ton service ID)
+    document.getElementById('send-email-btn').addEventListener('click', () => {
+        alert('Fonctionnalité EmailJS à configurer. Contactez le développeur avec votre service ID EmailJS.');
+        // Exemple (décommenter après configuration) :
+        /*
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.autoTable({
+            html: '#billing-table',
+            theme: 'striped',
+            styles: { fontSize: 10 },
+            margin: { top: 20 }
+        });
+        const pdfBlob = doc.output('blob');
+        emailjs.send('ton_service_id', 'ton_template_id', {
+            to_email: document.getElementById('client-email').textContent,
+            attachment: pdfBlob
+        }).then(() => alert('Email envoyé !'), (error) => alert('Erreur : ' + error.text));
+        */
     });
 });
