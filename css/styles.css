@@ -1,3 +1,5 @@
+/* styles.css - Ton code original avec ajustements pour le tableau */
+
 /* Importation d'une police moderne */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
@@ -153,40 +155,50 @@ td {
 }
 
 #prestationsTable th, #prestationsTable td {
-    padding: 8px;
+    padding: 12px;
     font-size: 15px;
     border: 1px solid #ddd;
-    line-height: 1.2;
+    line-height: 1.4;
 }
 
 #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { width: 40%; } /* Désignation */
 #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { width: 15%; } /* Qté */
-#prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) { width: 15%; } /* PU HT */
-#prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) { width: 20%; } /* Total HT */
-#prestationsTable th:nth-child(5), #prestationsTable td:nth-child(5) { width: 10%; } /* Actions */
+#prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) { width: 20%; } /* PU HT */
+#prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) { width: 25%; } /* Total HT */
 
-#prestationsTable input, #prestationsTable select {
+#prestationsTable input {
     padding: 8px;
     font-size: 15px;
-    height: 32px;
+    height: 36px;
     width: 100%;
     box-sizing: border-box;
     border: 1px solid #ddd;
     border-radius: 4px;
 }
 
-#prestationsTable input:focus, #prestationsTable select:focus {
+#prestationsTable input:focus {
     border-color: #e63946;
 }
 
 #totalsTable {
-    max-width: 220px;
+    max-width: 300px;
     margin: 10px 0;
+    border-collapse: collapse;
 }
 
 #totalsTable th, #totalsTable td {
-    padding: 6px;
-    font-size: 13px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+}
+
+#totalsTable th {
+    background-color: #9ca3af;
+    color: #ffffff;
+}
+
+#totalsTable td {
+    background-color: #fafafa;
 }
 
 /* Boutons */
@@ -220,16 +232,6 @@ button.primary:hover {
     background-color: #d00000;
 }
 
-/* Boutons d'action */
-button.action {
-    background-color: #10b981; /* Vert émeraude */
-    color: #ffffff;
-}
-
-button.action:hover {
-    background-color: #059669;
-}
-
 /* Boutons secondaires */
 button.secondary {
     background-color: #9ca3af; /* Gris plus clair */
@@ -251,54 +253,6 @@ button.neutral, a.neutral {
 
 button.neutral:hover, a.neutral:hover {
     background-color: #e0e0e0;
-}
-
-/* Boutons spécifiques pour le tableau */
-.validate-btn {
-    color: #008000; /* Vert */
-    background: none;
-    border: none;
-    font-size: 16px;
-    padding: 8px;
-    margin: 0 8px 0 0;
-}
-
-.validate-btn i {
-    font-size: 16px;
-}
-
-.edit-btn {
-    color: #555;
-    background: none;
-    border: none;
-    font-size: 14px;
-    padding: 8px;
-    margin: 0 8px 0 0;
-}
-
-.edit-btn i {
-    font-size: 14px;
-}
-
-.delete-btn {
-    color: #ff0000; /* Rouge */
-    background: none;
-    border: none;
-    font-size: 14px;
-    padding: 8px;
-}
-
-.delete-btn i {
-    font-size: 14px;
-}
-
-.action-buttons {
-    display: flex;
-    align-items: center;
-}
-
-.action-buttons button:disabled {
-    opacity: 0.5;
 }
 
 /* Bouton flottant */
@@ -338,19 +292,6 @@ button.neutral:hover, a.neutral:hover {
     font-size: 12px;
     margin-top: 2px;
     display: none;
-}
-
-/* Select2 */
-.select2-container {
-    width: 100% !important;
-}
-
-.select2-selection {
-    height: 32px !important;
-    font-size: 15px !important;
-    padding: 6px !important;
-    border: 1px solid #ddd !important;
-    border-radius: 5px !important;
 }
 
 /* Navigation */
@@ -397,52 +338,6 @@ button.neutral:hover, a.neutral:hover {
     z-index: 1000;
 }
 
-/* Modale */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1002;
-}
-
-.modal-content {
-    background: #fff;
-    margin: 10% auto;
-    padding: 20px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 500px;
-}
-
-.modal-content canvas {
-    width: 100%;
-    height: 200px;
-    border: 1px solid #ddd;
-}
-
-.modal-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-}
-
-/* Signature */
-.signature-pad {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-top: 6px;
-    width: 100%;
-    height: 100px;
-}
-
-.signature-block {
-    margin-bottom: 45px;
-}
-
 /* Styles responsives */
 @media (max-width: 600px) {
     .container {
@@ -485,10 +380,6 @@ button.neutral:hover, a.neutral:hover {
         gap: 10px;
     }
 
-    .grid {
-        grid-template-columns: 1fr;
-    }
-
     #prestationsTable {
         margin: 0;
     }
@@ -510,13 +401,8 @@ button.neutral:hover, a.neutral:hover {
     #prestationsTable td {
         display: block;
         width: 100%;
-        padding: 4px 0;
-    }
-
-    #prestationsTable td select, #prestationsTable td input {
-        font-size: 15px;
-        padding: 8px;
-        height: 32px;
+        padding: 6px 0;
+        font-size: 14px;
     }
 
     #prestationsTable td:before {
@@ -532,27 +418,16 @@ button.neutral:hover, a.neutral:hover {
     #prestationsTable td:nth-child(2):before { content: "Qté"; }
     #prestationsTable td:nth-child(3):before { content: "PU HT (€)"; }
     #prestationsTable td:nth-child(4):before { content: "Total HT (€)"; }
-    #prestationsTable td:nth-child(5):before { content: "Actions"; }
 
-    .prestations-row {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        flex-wrap: nowrap;
-    }
-
-    #prestationsTable td:nth-child(2) input { width: 50px; }
-    #prestationsTable td:nth-child(3) input { width: 70px; }
-    #prestationsTable td:nth-child(4) input { width: 70px; }
-    #prestationsTable td:nth-child(4) .prestations-row { flex-grow: 1; justify-content: space-between; }
-
-    .action-buttons {
-        margin-left: 8px;
-    }
-
-    .action-buttons button {
-        font-size: 16px;
+    #prestationsTable input {
+        font-size: 14px;
         padding: 8px;
+        height: 34px;
+        width: 100%;
+    }
+
+    #totalsTable {
+        max-width: 100%;
     }
 
     .floating-btn {
@@ -560,10 +435,5 @@ button.neutral:hover, a.neutral:hover {
         width: 45px;
         height: 45px;
         font-size: 20px;
-    }
-
-    .modal-content {
-        margin: 20% auto;
-        width: 95%;
     }
 }
