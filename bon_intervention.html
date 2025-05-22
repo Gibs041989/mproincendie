@@ -5,130 +5,166 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bon d'Intervention - MPro Incendie</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
-    <header>
-        <img src="assets/logo.png" alt="Logo MPro Incendie" class="logo">
-        <h1>🔥 Bon d'Intervention</h1>
-    </header>
-    <main>
-        <section class="client-section">
-            <h2>🧾 Client</h2>
-            <p><strong>Client :</strong> <input type="text" placeholder="Nom du client"></p>
-            <p><strong>Adresse :</strong> <input type="text" placeholder="Adresse"></p>
-            <p><strong>Lieu d’intervention :</strong> <input type="text" placeholder="Lieu"></p>
-            <p><strong>Email :</strong> <input type="email" placeholder="Email"></p>
-        </section>
+    <div class="container">
+        <header>
+            <img src="assets/logo.png" alt="Logo MPro Incendie" class="logo">
+            <h1>🔥 Bon d'Intervention</h1>
+            <a href="intervention.html" class="neutral">Retour</a>
+        </header>
+        <main>
+            <section class="section client-section">
+                <h2>🧾 Client</h2>
+                <p><strong>Client :</strong> <input type="text" placeholder="Nom du client"></p>
+                <p><strong>Adresse :</strong> <input type="text" placeholder="Adresse"></p>
+                <p><strong>Lieu d’intervention :</strong> <input type="text" placeholder="Lieu"></p>
+                <p><strong>Email :</strong> <input type="email" placeholder="Email"></p>
+            </section>
 
-        <section class="crm-summary">
-            <h2>📋 Résumé CRM Extincteurs</h2>
-            <table id="crm-extincteurs">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Type</th>
-                        <th>État</th>
-                        <th>Abréviation</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><input type="text" placeholder="ID"></td>
-                        <td><input type="text" placeholder="Type"></td>
-                        <td><input type="text" placeholder="État"></td>
-                        <td><input type="text" placeholder="Abréviation"></td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
+            <section class="section crm-summary">
+                <h2>📋 Résumé CRM Extincteurs</h2>
+                <div class="table-container">
+                    <table id="crm-extincteurs">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Type</th>
+                                <th>État</th>
+                                <th>Abréviation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="ID"><input type="text" placeholder="ID"></td>
+                                <td data-label="Type"><input type="text" placeholder="Type"></td>
+                                <td data-label="État"><input type="text" placeholder="État"></td>
+                                <td data-label="Abréviation"><input type="text" placeholder="Abréviation"></td>
+                            </tr>
+                            <tr>
+                                <td data-label="ID"><input type="text" placeholder="ID"></td>
+                                <td data-label="Type"><input type="text" placeholder="Type"></td>
+                                <td data-label="État"><input type="text" placeholder="État"></td>
+                                <td data-label="Abréviation"><input type="text" placeholder="Abréviation"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
-        <section class="intervention-details">
-            <h2>📅 Détails de l’intervention</h2>
-            <p><strong>Date d’intervention :</strong> <input type="date"></p>
-            <p><strong>Technicien :</strong> <input type="text" placeholder="Nom du technicien"></p>
-            <p><strong>Durée (heures) :</strong> <input type="number" min="0" step="0.5"></p>
-        </section>
+            <section class="section intervention-details">
+                <h2>📅 Détails de l’intervention</h2>
+                <label>Date d’intervention : <input type="date"></label>
+                <label>Technicien : <input type="text" placeholder="Nom du technicien"></label>
+                <label>Durée (heures) : <input type="number" min="0" step="0.5" placeholder="0.0"></label>
+            </section>
 
-        <section class="billing-section">
-            <h2>📋 Prestations & Matériel</h2>
-            <div class="table-container">
-                <table id="billing-table">
-                    <thead>
+            <section class="section billing-section">
+                <h2>📋 Prestations & Matériel</h2>
+                <div class="table-container">
+                    <table id="prestationsTable">
+                        <thead>
+                            <tr>
+                                <th>Désignation</th>
+                                <th>Qté</th>
+                                <th>PU HT (€)</th>
+                                <th>Prix Total HT (€)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="Désignation"><input type="text" placeholder="Ex. Vérification extincteur"></td>
+                                <td data-label="Qté"><input type="number" min="1" value="1"></td>
+                                <td data-label="PU HT (€)"><input type="number" min="0" step="0.01"></td>
+                                <td data-label="Prix Total HT (€)"><input type="text" readonly></td>
+                            </tr>
+                            <tr>
+                                <td data-label="Désignation"><input type="text" placeholder="Ex. Recharge extincteur"></td>
+                                <td data-label="Qté"><input type="number" min="1" value="1"></td>
+                                <td data-label="PU HT (€)"><input type="number" min="0" step="0.01"></td>
+                                <td data-label="Prix Total HT (€)"><input type="text" readonly></td>
+                            </tr>
+                            <tr>
+                                <td data-label="Désignation"><input type="text" placeholder="Ex. Installation RIA"></td>
+                                <td data-label="Qté"><input type="number" min="1" value="1"></td>
+                                <td data-label="PU HT (€)"><input type="number" min="0" step="0.01"></td>
+                                <td data-label="Prix Total HT (€)"><input type="text" readonly></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="totals">
+                    <table id="totalsTable">
                         <tr>
-                            <th>Désignation</th>
-                            <th>Qté</th>
-                            <th>PU HT (€)</th>
-                            <th>Prix Total HT (€)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><input type="text" placeholder="Ex. Vérification extincteur"></td>
-                            <td><input type="number" min="1" value="1"></td>
-                            <td><input type="number" min="0" step="0.01"></td>
-                            <td><input type="text" readonly></td>
+                            <th>Total HT</th>
+                            <td><input type="text" readonly value="0.00 €"></td>
                         </tr>
                         <tr>
-                            <td><input type="text" placeholder="Ex. Recharge extincteur"></td>
-                            <td><input type="number" min="1" value="1"></td>
-                            <td><input type="number" min="0" step="0.01"></td>
-                            <td><input type="text" readonly></td>
+                            <th>TVA 20%</th>
+                            <td><input type="text" readonly value="0.00 €"></td>
                         </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="totals">
-                <p><strong>Total HT :</strong> <input type="text" readonly value="0.00"></p>
-                <p><strong>TVA 20% :</strong> <input type="text" readonly value="0.00"></p>
-                <p><strong>Total TTC :</strong> <input type="text" readonly value="0.00"></p>
-            </div>
-        </section>
+                        <tr>
+                            <th>Total TTC</th>
+                            <td><input type="text" readonly value="0.00 €"></td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
 
-        <section class="payment-terms">
-            <h2>💳 Modalités de règlement</h2>
-            <p><strong>Délais de règlement :</strong></p>
-            <label><input type="radio" name="payment-term" value="immediate"> Immédiat à l’intervention</label><br>
-            <label><input type="radio" name="payment-term" value="on-invoice"> À réception de facture</label><br>
-            <label><input type="radio" name="payment-term" value="30-days"> Sous 30 jours à réception de facture</label><br>
-            <label><input type="radio" name="payment-term" value="custom"> Saisie libre</label>
-            <input type="text" disabled>
+            <section class="section payment-terms">
+                <h2>💳 Modalités de règlement</h2>
+                <label>Délais de règlement :
+                    <select>
+                        <option value="immediate">Immédiat à l’intervention</option>
+                        <option value="on-invoice">À réception de facture</option>
+                        <option value="30-days">Sous 30 jours à réception de facture</option>
+                        <option value="custom">Saisie libre</option>
+                    </select>
+                    <input type="text" style="display:none;" placeholder="Délais personnalisé">
+                </label>
+                <label>Moyen de règlement :
+                    <select>
+                        <option value="cheque">Chèque</option>
+                        <option value="virement">Virement</option>
+                        <option value="especes">Espèces</option>
+                        <option value="custom">Saisie libre</option>
+                    </select>
+                    <input type="text" style="display:none;" placeholder="Moyen personnalisé">
+                </label>
+                <label>Observations :
+                    <textarea rows="3" placeholder="Notes supplémentaires"></textarea>
+                </label>
+            </section>
 
-            <p><strong>Moyen de règlement :</strong></p>
-            <label><input type="radio" name="payment-method" value="cheque"> Chèque</label><br>
-            <label><input type="radio" name="payment-method" value="virement"> Virement</label><br>
-            <label><input type="radio" name="payment-method" value="especes"> Espèces</label><br>
-            <label><input type="radio" name="payment-method" value="custom"> Saisie libre</label>
-            <input type="text" disabled>
+            <section class="section signatures">
+                <h2>✍️ Signatures</h2>
+                <div class="signature-block">
+                    <h3>Client</h3>
+                    <input type="text" placeholder="Signature client">
+                </div>
+                <div class="signature-block">
+                    <h3>Technicien</h3>
+                    <input type="text" placeholder="Signature technicien">
+                </div>
+            </section>
 
-            <p><strong>Observations :</strong></p>
-            <textarea placeholder="Notes"></textarea>
-        </section>
+            <section class="section nav-buttons">
+                <button class="primary">✅ Valider</button>
+                <a href="intervention.html" class="neutral">⬅️ Retour</a>
+            </section>
+        </main>
+    </div>
 
-        <section class="signatures">
-            <h2>✍️ Signatures</h2>
-            <div class="signature-block">
-                <p><strong>Client :</strong></p>
-                <input type="text" placeholder="Signature client">
-            </div>
-            <div class="signature-block">
-                <p><strong>Technicien :</strong></p>
-                <input type="text" placeholder="Signature technicien">
-            </div>
-        </section>
-
-        <section class="actions">
-            <button>✅ Valider</button>
-            <button>⬅️ Retour</button>
-        </section>
-    </main>
-
-    <nav class="bottom-nav">
-        <a href="index.html">🏠</a>
-        <a href="client.html">📁</a>
-        <a href="intervention.html">🛠️</a>
-        <a href="settings.html">⚙️</a>
+    <nav class="footer-nav">
+        <div class="nav-buttons">
+            <a href="index.html">🏠</a>
+            <a href="client.html">📁</a>
+            <a href="intervention.html">🛠️</a>
+            <a href="parametres.html">⚙️</a>
+        </div>
     </nav>
 
-    <button class="fab">➕</button>
+    <button class="floating-btn">➕</button>
 </body>
 </html>
