@@ -80,6 +80,9 @@
         .action-buttons button:disabled { 
             opacity: 0.5; 
         }
+        .btn-validate { color: #10b981; } /* Vert */
+        .btn-edit { color: #f59e0b; } /* Jaune */
+        .btn-delete { color: #ef4444; } /* Rouge */
         .floating-btn { 
             position: fixed; 
             bottom: 70px; 
@@ -150,10 +153,12 @@
         }
         @media (max-width: 600px) {
             .section { 
-                padding: 10px; 
+                padding: 0; /* Supprime les paddings pour pleine largeur */
             }
             #prestationsTable { 
                 margin: 0; 
+                width: 100%; 
+                box-sizing: border-box; 
             }
             #prestationsTable th { 
                 display: none; 
@@ -162,16 +167,18 @@
                 display: block; 
                 margin-bottom: 12px; 
                 border: 1px solid #ddd; 
-                padding: 8px; 
+                padding: 8px 0; /* Padding interne uniquement vertical */
                 border-radius: 5px; 
                 background: #fff; 
                 width: 100%; 
+                box-sizing: border-box; 
             }
             #prestationsTable td { 
                 display: block; 
                 width: 100%; 
-                padding: 6px 0; 
+                padding: 6px 8px; /* Padding horizontal réduit */
                 font-size: 14px; 
+                box-sizing: border-box; 
             }
             #prestationsTable td:nth-child(1) { /* Désignation */
                 margin-bottom: 8px;
@@ -179,15 +186,29 @@
             #prestationsTable td:nth-child(2), /* Qté */
             #prestationsTable td:nth-child(3), /* PU HT */
             #prestationsTable td:nth-child(4) { /* Total HT */
-                display: inline-block;
-                width: 33.33%;
+                display: inline-flex;
+                flex: 1;
                 padding: 6px 4px;
+                min-width: 0; /* Évite le débordement */
+            }
+            #prestationsTable td:nth-child(2)::before,
+            #prestationsTable td:nth-child(3)::before,
+            #prestationsTable td:nth-child(4)::before {
+                display: none; /* Supprime data-label pour la 2e ligne */
+            }
+            #prestationsTable .numeric-row {
+                display: flex;
+                flex-wrap: nowrap;
+                gap: 8px;
+                width: 100%;
+                margin-top: 4px;
             }
             #prestationsTable td select, #prestationsTable td input { 
                 font-size: 14px; 
                 padding: 8px; 
                 height: 34px; 
                 width: 100%; 
+                box-sizing: border-box; 
             }
             #prestationsTable td:before { 
                 content: attr(data-label); 
@@ -205,7 +226,7 @@
                 display: flex; 
                 gap: 8px; 
                 justify-content: flex-start; 
-                padding: 8px 0; 
+                padding: 8px 8px; 
                 margin-top: 4px; 
             }
             .action-buttons button { 
@@ -478,9 +499,9 @@
             actionDiv.className = 'action-buttons';
             actionDiv.id = `action-buttons-${index}`;
             actionDiv.innerHTML = `
-                <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" disabled title="Valider"><i class="fas fa-check-circle"></i></button>
-                <button class="edit-btn" id="edit-${index}" onclick="editRow(${index})" disabled title="Modifier"><i class="fas fa-pencil-alt"></i></button>
-                <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>`;
+                <button class="btn-validate validate-btn" id="validate-${index}" onclick="validateRow(${index})" disabled title="Valider"><i class="fas fa-check-circle"></i></button>
+                <button class="btn-edit edit-btn" id="edit-${index}" onclick="editRow(${index})" disabled title="Modifier"><i class="fas fa-pencil-alt"></i></button>
+                <button class="btn-delete delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>`;
             tbody.appendChild(row);
             tbody.appendChild(actionDiv);
             $(row.querySelector('.designation')).select2({ width: '100%' });
@@ -643,9 +664,9 @@
                 actionDiv.className = 'action-buttons';
                 actionDiv.id = `action-buttons-${index}`;
                 actionDiv.innerHTML = `
-                    <button class="validate-btn" id="validate-${index}" onclick="validateRow(${index})" disabled title="Valider"><i class="fas fa-check-circle"></i></button>
-                    <button class="edit-btn" id="edit-${index}" onclick="editRow(${index})" disabled title="Modifier"><i class="fas fa-pencil-alt"></i></button>
-                    <button class="delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>`;
+                    <button class="btn-validate validate-btn" id="validate-${index}" onclick="validateRow(${index})" disabled title="Valider"><i class="fas fa-check-circle"></i></button>
+                    <button class="btn-edit edit-btn" id="edit-${index}" onclick="editRow(${index})" disabled title="Modifier"><i class="fas fa-pencil-alt"></i></button>
+                    <button class="btn-delete delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>`;
                 row.classList.add('active');
                 row.onclick = () => editRow(index);
                 tbody.appendChild(row);
@@ -958,3 +979,4 @@
     </script>
 </body>
 </html>
+</xaiArtifact>
