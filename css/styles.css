@@ -1,6 +1,6 @@
-/* styles.css - Fichier CSS complet pour MPro Incendie */
+/* styles.css - Version simplifiée pour MPro Incendie */
 
-/* Réinitialisation et styles de base */
+/* Réinitialisation */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -9,32 +9,42 @@
 
 body {
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: #f9f9f9;
+    background-color: #f5f5f5;
+    padding: 10px;
 }
 
-/* Titres */
+/* En-tête et logo */
+header {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.logo {
+    max-width: 120px;
+    height: auto;
+}
+
 h1, h2 {
     color: #f44336; /* Rouge MPro Incendie */
-    margin-bottom: 10px;
 }
 
 h1 {
-    font-size: 24px;
+    font-size: 22px;
+    margin-top: 5px;
 }
 
 h2 {
-    font-size: 20px;
+    font-size: 18px;
+    margin: 10px 0;
 }
 
 /* Sections */
 section {
-    margin: 20px 0;
-    padding: 15px;
+    margin-bottom: 15px;
+    padding: 10px;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    border-radius: 4px;
 }
 
 /* Tableau de facturation */
@@ -42,56 +52,47 @@ section {
     overflow-x: auto;
 }
 
-#billing-table {
+#billing-table, #crm-extincteurs {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 10px;
 }
 
-#billing-table th,
-#billing-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
+#billing-table th, #billing-table td, #crm-extincteurs th, #crm-extincteurs td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    font-size: 14px;
 }
 
-#billing-table th {
+#billing-table th, #crm-extincteurs th {
     background-color: #f44336;
     color: white;
 }
 
 #billing-table input {
     width: 100%;
-    padding: 5px;
+    padding: 4px;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 3px;
     font-size: 14px;
 }
 
-#billing-table .total-price {
-    font-weight: bold;
-}
-
-/* Totaux */
 .totals {
     text-align: right;
+    font-size: 15px;
     margin-top: 10px;
 }
 
 .totals p {
-    margin: 5px 0;
-    font-size: 16px;
-    font-weight: bold;
+    margin: 3px 0;
 }
 
 /* Boutons */
 .btn {
-    padding: 8px 16px;
+    padding: 6px 12px;
     border: none;
-    border-radius: 4px;
+    border-radius: 3px;
     cursor: pointer;
     font-size: 14px;
-    transition: background-color 0.2s;
 }
 
 .btn-primary {
@@ -104,59 +105,62 @@ section {
 }
 
 .btn-secondary {
-    background-color: #555;
+    background-color: #666;
     color: white;
 }
 
 .btn-secondary:hover {
-    background-color: #666;
+    background-color: #777;
 }
 
 /* Signatures */
 .signature-block {
-    margin: 20px 0;
+    margin: 15px 0;
 }
 
 .signature-block canvas {
     border: 1px solid #ccc;
-    border-radius: 4px;
-    background: #fff;
+    border-radius: 3px;
+    width: 100%;
+    max-width: 280px;
+    height: 80px;
 }
 
 /* Modal de signature */
 dialog#signature-modal {
-    border: none;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 dialog#signature-modal canvas {
     border: 1px solid #ccc;
-    margin-bottom: 10px;
+    width: 100%;
+    max-width: 280px;
+    height: 120px;
 }
 
 .modal-actions {
     display: flex;
     gap: 10px;
     justify-content: flex-end;
+    margin-top: 10px;
 }
 
 /* Navigation inférieure */
 .bottom-nav {
     display: flex;
     justify-content: space-around;
-    padding: 10px;
-    background: #f0f0f0;
+    padding: 8px;
+    background: #e0e0e0;
     position: sticky;
     bottom: 0;
-    border-top: 1px solid #ddd;
 }
 
 .bottom-nav a {
     color: #f44336;
+    font-size: 20px;
     text-decoration: none;
-    font-size: 24px;
 }
 
 .bottom-nav a:hover {
@@ -166,17 +170,16 @@ dialog#signature-modal canvas {
 /* Bouton flottant (FAB) */
 .fab {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 15px;
+    right: 15px;
     background: #f44336;
     color: white;
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     border: none;
     cursor: pointer;
 }
@@ -185,18 +188,18 @@ dialog#signature-modal canvas {
     background: #d32f2f;
 }
 
-/* Autres éléments */
-textarea, input[type="text"], input[type="number"], input[type="date"] {
+/* Champs de saisie */
+input[type="text"], input[type="number"], input[type="date"], textarea {
     width: 100%;
-    padding: 8px;
+    padding: 6px;
     border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-top: 5px;
+    border-radius: 3px;
+    font-size: 14px;
 }
 
 label {
+    margin: 5px 0;
     display: block;
-    margin: 10px 0 5px;
 }
 
 input[type="radio"] {
@@ -206,25 +209,24 @@ input[type="radio"] {
 /* Responsivité */
 @media (max-width: 600px) {
     body {
-        padding: 10px;
+        padding: 5px;
     }
 
     h1 {
-        font-size: 20px;
-    }
-
-    h2 {
         font-size: 18px;
     }
 
-    #billing-table th,
-    #billing-table td {
-        font-size: 14px;
-        padding: 6px;
+    h2 {
+        font-size: 16px;
     }
 
-    .totals {
-        text-align: left;
+    .logo {
+        max-width: 100px;
+    }
+
+    #billing-table th, #billing-table td, #crm-extincteurs th, #crm-extincteurs td {
+        font-size: 12px;
+        padding: 4px;
     }
 
     .btn {
@@ -232,13 +234,11 @@ input[type="radio"] {
         margin: 5px 0;
     }
 
-    .bottom-nav {
-        padding: 5px;
+    .signature-block canvas, dialog#signature-modal canvas {
+        max-width: 100%;
     }
 
-    .fab {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
+    .totals {
+        text-align: left;
     }
 }
