@@ -14,15 +14,15 @@
     <main>
         <section class="client-section">
             <h2>🧾 Client</h2>
-            <p><strong>Client :</strong> <span id="client-name">Non sélectionné</span></p>
-            <p><strong>Adresse :</strong> <span id="client-address">Non sélectionnée</span></p>
-            <p><strong>Lieu d’intervention :</strong> <span id="intervention-location">Non sélectionné</span></p>
-            <p><strong>Email :</strong> <span id="client-email">Non sélectionné</span></p>
+            <p><strong>Client :</strong> <input type="text" placeholder="Nom du client"></p>
+            <p><strong>Adresse :</strong> <input type="text" placeholder="Adresse"></p>
+            <p><strong>Lieu d’intervention :</strong> <input type="text" placeholder="Lieu"></p>
+            <p><strong>Email :</strong> <input type="email" placeholder="Email"></p>
         </section>
 
         <section class="crm-summary">
             <h2>📋 Résumé CRM Extincteurs</h2>
-            <table>
+            <table id="crm-extincteurs">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -31,15 +31,22 @@
                         <th>Abréviation</th>
                     </tr>
                 </thead>
-                <tbody id="crm-extincteurs"></tbody>
+                <tbody>
+                    <tr>
+                        <td><input type="text" placeholder="ID"></td>
+                        <td><input type="text" placeholder="Type"></td>
+                        <td><input type="text" placeholder="État"></td>
+                        <td><input type="text" placeholder="Abréviation"></td>
+                    </tr>
+                </tbody>
             </table>
         </section>
 
         <section class="intervention-details">
             <h2>📅 Détails de l’intervention</h2>
-            <p><strong>Date d’intervention :</strong> <input type="date" id="intervention-date"></p>
-            <p><strong>Technicien :</strong> <input type="text" id="technician-name"></p>
-            <p><strong>Durée (heures) :</strong> <input type="number" id="duration" min="0" step="0.5"></p>
+            <p><strong>Date d’intervention :</strong> <input type="date"></p>
+            <p><strong>Technicien :</strong> <input type="text" placeholder="Nom du technicien"></p>
+            <p><strong>Durée (heures) :</strong> <input type="number" min="0" step="0.5"></p>
         </section>
 
         <section class="billing-section">
@@ -52,17 +59,28 @@
                             <th>Qté</th>
                             <th>PU HT (€)</th>
                             <th>Prix Total HT (€)</th>
-                            <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody id="billing-rows"></tbody>
+                    <tbody>
+                        <tr>
+                            <td><input type="text" placeholder="Ex. Vérification extincteur"></td>
+                            <td><input type="number" min="1" value="1"></td>
+                            <td><input type="number" min="0" step="0.01"></td>
+                            <td><input type="text" readonly></td>
+                        </tr>
+                        <tr>
+                            <td><input type="text" placeholder="Ex. Recharge extincteur"></td>
+                            <td><input type="number" min="1" value="1"></td>
+                            <td><input type="number" min="0" step="0.01"></td>
+                            <td><input type="text" readonly></td>
+                        </tr>
+                    </tbody>
                 </table>
-                <button id="add-row-btn" class="btn btn-secondary">➕ Ajouter une ligne</button>
             </div>
             <div class="totals">
-                <p><strong>Total HT :</strong> <span id="total-ht">0.00</span> €</p>
-                <p><strong>TVA 20% :</strong> <span id="tva">0.00</span> €</p>
-                <p><strong>Total TTC :</strong> <span id="total-ttc">0.00</span> €</p>
+                <p><strong>Total HT :</strong> <input type="text" readonly value="0.00"></p>
+                <p><strong>TVA 20% :</strong> <input type="text" readonly value="0.00"></p>
+                <p><strong>Total TTC :</strong> <input type="text" readonly value="0.00"></p>
             </div>
         </section>
 
@@ -73,39 +91,34 @@
             <label><input type="radio" name="payment-term" value="on-invoice"> À réception de facture</label><br>
             <label><input type="radio" name="payment-term" value="30-days"> Sous 30 jours à réception de facture</label><br>
             <label><input type="radio" name="payment-term" value="custom"> Saisie libre</label>
-            <input type="text" id="custom-term" disabled>
+            <input type="text" disabled>
 
             <p><strong>Moyen de règlement :</strong></p>
             <label><input type="radio" name="payment-method" value="cheque"> Chèque</label><br>
             <label><input type="radio" name="payment-method" value="virement"> Virement</label><br>
             <label><input type="radio" name="payment-method" value="especes"> Espèces</label><br>
             <label><input type="radio" name="payment-method" value="custom"> Saisie libre</label>
-            <input type="text" id="custom-method" disabled>
+            <input type="text" disabled>
 
             <p><strong>Observations :</strong></p>
-            <textarea id="observations"></textarea>
+            <textarea placeholder="Notes"></textarea>
         </section>
 
         <section class="signatures">
             <h2>✍️ Signatures</h2>
             <div class="signature-block">
-                <p><strong>Client</strong></p>
-                <canvas id="client-signature-canvas" width="300" height="100"></canvas>
-                <button class="sign-btn btn">Signer</button>
+                <p><strong>Client :</strong></p>
+                <input type="text" placeholder="Signature client">
             </div>
             <div class="signature-block">
-                <p><strong>Technicien</strong></p>
-                <canvas id="technician-signature-canvas" width="300" height="100"></canvas>
-                <button class="sign-btn btn">Signer</button>
+                <p><strong>Technicien :</strong></p>
+                <input type="text" placeholder="Signature technicien">
             </div>
         </section>
 
         <section class="actions">
-            <button class="btn btn-primary" id="validate-btn">✅ Valider</button>
-            <button class="btn btn-secondary" id="save-draft-btn">💾 Brouillon</button>
-            <button class="btn btn-secondary" id="generate-pdf-btn">📄 PDF</button>
-            <button class="btn btn-secondary" id="send-email-btn">📧 Email</button>
-            <button class="btn btn-secondary" id="back-btn">⬅️ Retour</button>
+            <button>✅ Valider</button>
+            <button>⬅️ Retour</button>
         </section>
     </main>
 
@@ -116,20 +129,6 @@
         <a href="settings.html">⚙️</a>
     </nav>
 
-    <dialog id="signature-modal">
-        <h2>Signature</h2>
-        <canvas id="signature-canvas" width="300" height="150"></canvas>
-        <div class="modal-actions">
-            <button id="clear-signature">Effacer</button>
-            <button id="cancel-signature">Annuler</button>
-            <button id="validate-signature">Valider</button>
-        </div>
-    </dialog>
-
     <button class="fab">➕</button>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.5/dist/signature_pad.umd.min.js"></script>
-    <script src="js/scripts.js"></script>
 </body>
 </html>
