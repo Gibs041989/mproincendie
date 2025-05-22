@@ -1,166 +1,569 @@
-/* styles.css - Mise en page simple pour MPro Incendie */
+/* Importation d'une police moderne */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
+/* Reset des marges et paddings pour une base cohérente */
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
+/* Styles généraux pour le corps */
 body {
-    font-family: Arial, sans-serif;
-    background-color: white;
-    padding: 10px;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f8f8f8;
+    color: #333;
+    line-height: 1.6;
 }
 
+/* Conteneur principal */
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 30px 30px 80px; /* Padding-bottom pour bouton flottant */
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Header */
 header {
-    text-align: center;
-    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
 }
 
-.logo {
-    max-width: 100px;
-    height: auto;
+header a {
+    text-decoration: none;
+    color: #555;
+    font-size: 16px;
 }
 
+header a:hover {
+    color: #e63946;
+}
+
+/* Titres */
 h1 {
-    font-size: 20px;
-    color: #f44336; /* Rouge MPro Incendie */
+    font-size: 32px;
+    font-weight: 700;
+    color: #e63946; /* Rouge du logo */
+    margin-bottom: 30px;
+    text-align: center;
 }
 
 h2 {
-    font-size: 16px;
-    color: #f44336;
-    margin: 8px 0;
+    font-size: 24px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e63946; /* Rouge pour cohérence */
 }
 
-section {
+h3 {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+/* Paragraphes pour client */
+p {
+    font-size: 15px;
     margin-bottom: 10px;
-    padding: 8px;
 }
 
-.table-container {
-    overflow-x: auto;
+p strong {
+    font-weight: 500;
+    color: #555;
 }
 
+/* Labels */
+label {
+    font-weight: normal;
+    font-size: 14px;
+    color: #555;
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* Inputs, selects et textarea */
+input, select, textarea {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    transition: border-color 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #e63946;
+    box-shadow: 0 0 5px rgba(230, 57, 70, 0.2);
+}
+
+textarea {
+    resize: vertical;
+}
+
+/* Sections */
+.section {
+    margin-bottom: 40px;
+    padding: 15px;
+}
+
+/* Tableaux */
 table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+th, td {
+    padding: 15px;
+    border: 1px solid #eee;
+    text-align: left;
+}
+
+th {
+    background-color: #9ca3af; /* Gris plus clair */
+    color: #ffffff;
+    font-weight: 500;
+}
+
+td {
+    background-color: #fafafa;
+}
+
+/* Styles spécifiques pour le tableau de facturation */
+.table-container {
+    width: 100%;
+}
+
+#prestationsTable {
     width: 100%;
     border-collapse: collapse;
 }
 
-th, td {
-    border: 1px solid #ccc;
-    padding: 5px;
-    font-size: 13px;
+#prestationsTable th, #prestationsTable td {
+    padding: 8px;
+    font-size: 15px;
+    border: 1px solid #ddd;
+    line-height: 1.2;
 }
 
-th {
-    background-color: #f44336;
-    color: white;
-}
+#prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { width: 40%; } /* Désignation */
+#prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { width: 15%; } /* Qté */
+#prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) { width: 15%; } /* PU HT */
+#prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) { width: 20%; } /* Total HT */
+#prestationsTable th:nth-child(5), #prestationsTable td:nth-child(5) { width: 10%; } /* Actions */
 
-input, textarea {
+#prestationsTable input, #prestationsTable select {
+    padding: 8px;
+    font-size: 15px;
+    height: 32px;
     width: 100%;
-    padding: 4px;
-    border: 1px solid #ccc;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#prestationsTable input:focus, #prestationsTable select:focus {
+    border-color: #e63946;
+}
+
+#totalsTable {
+    max-width: 220px;
+    margin: 10px 0;
+}
+
+#totalsTable th, #totalsTable td {
+    padding: 6px;
     font-size: 13px;
 }
 
-.totals {
-    text-align: right;
-    font-size: 14px;
-    margin-top: 5px;
-}
-
+/* Boutons */
 button {
-    padding: 5px 10px;
+    font-size: 14px;
+    padding: 10px 20px;
     border: none;
-    border-radius: 2px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 13px;
-    background-color: #f44336;
-    color: white;
+    transition: background-color 0.3s ease, transform 0.1s ease;
 }
 
 button:hover {
-    background-color: #d32f2f;
+    transform: translateY(-1px);
 }
 
-.bottom-nav {
-    display: flex;
-    justify-content: space-around;
-    padding: 5px;
-    background: #f0f0f0;
-    position: sticky;
-    bottom: 0;
+button:active {
+    transform: translateY(0);
 }
 
-.bottom-nav a {
-    color: #f44336;
-    font-size: 18px;
+/* Boutons principaux */
+button.primary {
+    background-color: #e63946; /* Rouge du logo */
+    color: #ffffff;
+    font-size: 16px;
+    padding: 12px 24px;
+    font-weight: 500;
+}
+
+button.primary:hover {
+    background-color: #d00000;
+}
+
+/* Boutons d'action */
+button.action {
+    background-color: #10b981; /* Vert émeraude */
+    color: #ffffff;
+}
+
+button.action:hover {
+    background-color: #059669;
+}
+
+/* Boutons secondaires */
+button.secondary {
+    background-color: #9ca3af; /* Gris plus clair */
+    color: #ffffff;
+}
+
+button.secondary:hover {
+    background-color: #8b929e;
+}
+
+/* Boutons neutres */
+button.neutral, a.neutral {
+    background-color: #f1f1f1;
+    color: #555;
+    border: 1px solid #ddd;
     text-decoration: none;
+    display: inline-block;
 }
 
-.bottom-nav a:hover {
-    color: #d32f2f;
+button.neutral:hover, a.neutral:hover {
+    background-color: #e0e0e0;
 }
 
-.fab {
+/* Boutons spécifiques pour le tableau */
+.validate-btn {
+    color: #008000; /* Vert */
+    background: none;
+    border: none;
+    font-size: 16px;
+    padding: 8px;
+    margin: 0 8px 0 0;
+}
+
+.validate-btn i {
+    font-size: 16px;
+}
+
+.edit-btn {
+    color: #555;
+    background: none;
+    border: none;
+    font-size: 14px;
+    padding: 8px;
+    margin: 0 8px 0 0;
+}
+
+.edit-btn i {
+    font-size: 14px;
+}
+
+.delete-btn {
+    color: #ff0000; /* Rouge */
+    background: none;
+    border: none;
+    font-size: 14px;
+    padding: 8px;
+}
+
+.delete-btn i {
+    font-size: 14px;
+}
+
+.action-buttons {
+    display: flex;
+    align-items: center;
+}
+
+.action-buttons button:disabled {
+    opacity: 0.5;
+}
+
+/* Bouton flottant */
+.floating-btn {
     position: fixed;
-    bottom: 10px;
+    bottom: 70px;
     right: 10px;
-    background: #f44336;
+    background: #10b981; /* Vert */
     color: white;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none;
-    cursor: pointer;
 }
 
-.fab:hover {
-    background: #d32f2f;
+.floating-btn:hover::after {
+    content: "Ajouter prestation";
+    position: absolute;
+    right: 60px;
+    background: #333;
+    color: white;
+    padding: 4px 8px;
+    font-size: 12px;
 }
 
-label {
-    margin: 5px 0;
-    font-size: 13px;
+/* Erreurs */
+.error {
+    border: 1px solid red !important;
 }
 
-input[type="radio"] {
-    margin-right: 5px;
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 2px;
+    display: none;
 }
 
+/* Select2 */
+.select2-container {
+    width: 100% !important;
+}
+
+.select2-selection {
+    height: 32px !important;
+    font-size: 15px !important;
+    padding: 6px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 5px !important;
+}
+
+/* Navigation */
+.nav-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.nav-buttons a, .nav-buttons button {
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+.navigation.nav-buttons {
+    margin-top: 40px;
+    padding: 15px;
+    background-color: #fafafa;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.navigation.nav-buttons a {
+    background-color: #9ca3af;
+    color: #ffffff;
+    padding: 10px 15px;
+    font-size: 18px;
+}
+
+.navigation.nav-buttons a:hover {
+    background-color: #8b929e;
+}
+
+/* Footer navigation */
+.footer-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #fff;
+    padding: 10px 0;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+/* Modale */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1002;
+}
+
+.modal-content {
+    background: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+}
+
+.modal-content canvas {
+    width: 100%;
+    height: 200px;
+    border: 1px solid #ddd;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+/* Signature */
+.signature-pad {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-top: 6px;
+    width: 100%;
+    height: 100px;
+}
+
+.signature-block {
+    margin-bottom: 45px;
+}
+
+/* Styles responsives */
 @media (max-width: 600px) {
-    body {
-        padding: 5px;
+    .container {
+        padding: 15px;
+        margin: 15px;
     }
 
     h1 {
-        font-size: 18px;
+        font-size: 26px;
     }
 
     h2 {
-        font-size: 14px;
+        font-size: 20px;
     }
 
-    .logo {
-        max-width: 80px;
-    }
-
-    th, td {
-        font-size: 11px;
-        padding: 3px;
+    h3 {
+        font-size: 16px;
     }
 
     button {
-        width: 100%;
-        margin: 3px 0;
+        font-size: 12px;
+        padding: 8px 16px;
     }
 
-    .totals {
-        text-align: left;
+    button.primary {
+        font-size: 14px;
+        padding: 10px 20px;
+    }
+
+    input, select, textarea {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    th, td {
+        padding: 10px;
+    }
+
+    .nav-buttons {
+        gap: 10px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    #prestationsTable {
+        margin: 0;
+    }
+
+    #prestationsTable th {
+        display: none;
+    }
+
+    #prestationsTable tr {
+        display: block;
+        margin-bottom: 12px;
+        border: 1px solid #ddd;
+        padding: 8px;
+        border-radius: 5px;
+        background: #fff;
+        width: 100%;
+    }
+
+    #prestationsTable td {
+        display: block;
+        width: 100%;
+        padding: 4px 0;
+    }
+
+    #prestationsTable td select, #prestationsTable td input {
+        font-size: 15px;
+        padding: 8px;
+        height: 32px;
+    }
+
+    #prestationsTable td:before {
+        content: attr(data-label);
+        display: block;
+        font-size: 14px;
+        font-weight: bold;
+        color: #555;
+        margin-bottom: 4px;
+    }
+
+    #prestationsTable td:nth-child(1):before { content: "Désignation"; }
+    #prestationsTable td:nth-child(2):before { content: "Qté"; }
+    #prestationsTable td:nth-child(3):before { content: "PU HT (€)"; }
+    #prestationsTable td:nth-child(4):before { content: "Total HT (€)"; }
+    #prestationsTable td:nth-child(5):before { content: "Actions"; }
+
+    .prestations-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+
+    #prestationsTable td:nth-child(2) input { width: 50px; }
+    #prestationsTable td:nth-child(3) input { width: 70px; }
+    #prestationsTable td:nth-child(4) input { width: 70px; }
+    #prestationsTable td:nth-child(4) .prestations-row { flex-grow: 1; justify-content: space-between; }
+
+    .action-buttons {
+        margin-left: 8px;
+    }
+
+    .action-buttons button {
+        font-size: 16px;
+        padding: 8px;
+    }
+
+    .floating-btn {
+        bottom: 75px;
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+
+    .modal-content {
+        margin: 20% auto;
+        width: 95%;
     }
 }
