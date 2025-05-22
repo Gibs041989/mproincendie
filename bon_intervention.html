@@ -154,6 +154,12 @@
         @media (max-width: 600px) {
             .section { 
                 padding: 0; /* Supprime les paddings pour pleine largeur */
+                margin: 0 0 40px 0; /* Garde la marge verticale */
+            }
+            .table-container { 
+                width: 100%; 
+                margin: 0; 
+                padding: 0; 
             }
             #prestationsTable { 
                 margin: 0; 
@@ -165,9 +171,9 @@
             }
             #prestationsTable tr { 
                 display: block; 
-                margin-bottom: 12px; 
+                margin: 0 0 12px 0; 
+                padding: 8px 0; 
                 border: 1px solid #ddd; 
-                padding: 8px 0; /* Padding interne uniquement vertical */
                 border-radius: 5px; 
                 background: #fff; 
                 width: 100%; 
@@ -176,7 +182,7 @@
             #prestationsTable td { 
                 display: block; 
                 width: 100%; 
-                padding: 6px 8px; /* Padding horizontal réduit */
+                padding: 6px 8px; 
                 font-size: 14px; 
                 box-sizing: border-box; 
             }
@@ -189,26 +195,22 @@
                 display: inline-flex;
                 flex: 1;
                 padding: 6px 4px;
-                min-width: 0; /* Évite le débordement */
+                min-width: 0;
             }
-            #prestationsTable td:nth-child(2)::before,
-            #prestationsTable td:nth-child(3)::before,
-            #prestationsTable td:nth-child(4)::before {
-                display: none; /* Supprime data-label pour la 2e ligne */
-            }
-            #prestationsTable .numeric-row {
-                display: flex;
-                flex-wrap: nowrap;
-                gap: 8px;
-                width: 100%;
-                margin-top: 4px;
+            #prestationsTable .numeric-row { 
+                display: flex; 
+                flex-wrap: nowrap; 
+                gap: 8px; 
+                width: 100%; 
+                margin-top: 4px; 
             }
             #prestationsTable td select, #prestationsTable td input { 
                 font-size: 14px; 
                 padding: 8px; 
-                height: 34px; 
+                height: 38px; /* Augmenté pour lisibilité */
                 width: 100%; 
                 box-sizing: border-box; 
+                border-radius: 4px; 
             }
             #prestationsTable td:before { 
                 content: attr(data-label); 
@@ -219,15 +221,19 @@
                 margin-bottom: 4px; 
             }
             #prestationsTable td:nth-child(1):before { content: "Désignation"; }
-            #prestationsTable td:nth-child(2):before { content: "Qté"; }
-            #prestationsTable td:nth-child(3):before { content: "PU HT (€)"; }
-            #prestationsTable td:nth-child(4):before { content: "Total HT (€)"; }
+            #prestationsTable td:nth-child(2):before,
+            #prestationsTable td:nth-child(3):before,
+            #prestationsTable td:nth-child(4):before { 
+                display: none; /* Supprime data-label pour la 2e ligne */
+            }
             .action-buttons { 
                 display: flex; 
                 gap: 8px; 
                 justify-content: flex-start; 
                 padding: 8px 8px; 
-                margin-top: 4px; 
+                margin: 4px 0 0 0; 
+                width: 100%; 
+                box-sizing: border-box; 
             }
             .action-buttons button { 
                 font-size: 14px; 
@@ -237,9 +243,11 @@
                 width: 100% !important; 
             }
             .select2-selection { 
-                height: 34px !important; 
+                height: 38px !important; 
                 font-size: 14px !important; 
                 padding: 6px !important; 
+                border: 1px solid #ddd !important; 
+                border-radius: 4px !important; 
             }
             #crmExtincteursTable th { 
                 display: none; 
@@ -251,6 +259,7 @@
                 padding: 6px; 
                 border-radius: 5px; 
                 background: #fff; 
+                width: 100%; 
             }
             #crmExtincteursTable td { 
                 display: block; 
@@ -979,4 +988,3 @@
     </script>
 </body>
 </html>
-</xaiArtifact>
