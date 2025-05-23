@@ -17,7 +17,7 @@
             overflow-x: hidden; /* Empêche le débordement horizontal */
         }
         .container { 
-            padding-bottom: 100px; /* Espace pour éviter coupure par footer-nav */
+            padding-bottom: 140px; /* Espace pour éviter coupure par footer-nav */
             width: 100%; 
             max-width: 1200px; 
             margin: 0 auto; 
@@ -153,23 +153,25 @@
             display: none; 
         }
         .nav-buttons { 
-            margin-bottom: 140px; /* Espace pour éviter chevauchement */
+            margin-bottom: 160px; /* Espace pour éviter chevauchement */
+            z-index: 1000; /* Au-dessus de footer-nav */
+            position: relative; 
         }
         .footer-nav { 
             position: fixed; 
             bottom: 0; 
             width: 100%; 
             background: #fff; 
-            padding: 5px 10px; /* Hauteur minimale pour icônes */
+            padding: 3px 10px; /* Hauteur minimale ~20px */
             box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); 
-            z-index: 998; 
+            z-index: 999; 
             box-sizing: border-box; 
-            height: auto; 
+            max-height: 25px; /* Limite hauteur */
             overflow: hidden; 
         }
         .footer-nav a { 
-            font-size: 16px; /* Icônes plus petites */
-            margin: 0 15px; /* Espacement entre icônes */
+            font-size: 14px; /* Icônes petites */
+            margin: 0 12px; /* Espacement réduit */
         }
         @media (max-width: 600px) {
             body { 
@@ -180,7 +182,7 @@
                 margin: 0 !important; 
                 width: 100% !important; 
                 max-width: none !important; 
-                padding-bottom: 120px !important; /* Espace accru */
+                padding-bottom: 140px !important; /* Espace accru */
             }
             .section { 
                 padding: 10px !important; 
@@ -314,11 +316,13 @@
                 width: 95%; 
             }
             .nav-buttons { 
-                margin-bottom: 160px; /* Espace accru sur mobile */
+                margin-bottom: 180px; /* Espace accru sur mobile */
+                z-index: 1000; 
             }
             .footer-nav { 
-                padding: 5px 10px; /* Bandeau encore plus fin */
-                z-index: 998; 
+                padding: 3px 10px; /* Bandeau ultra-fin */
+                max-height: 25px; 
+                z-index: 999; 
             }
             #totalsTable { 
                 margin: 10px 0 10px auto; 
@@ -591,7 +595,7 @@
             const totalInput = row.querySelector('.total');
             const designationError = document.getElementById(`designation-error-${index}`);
             const quantityError = document.getElementById(`quantity-error-${index}`);
-            const unitPriceError = document.getElementById(`quantity-error-${index}`);
+            const unitPriceError = document.getElementById(`unitPrice-error-${index}`);
             const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value.trim()) : select.value;
             const quantity = parseFloat(quantityInput.value) || 0;
             const unitPrice = parseFloat(unitPriceInput.value) || 0;
@@ -792,16 +796,19 @@
             const extincteursData = JSON.parse(localStorage.getItem('extincteursData') || '[]');
             const tbody = document.getElementById('crmExtincteursBody');
             const crmSection = document.getElementById('crmSection');
-            console.log('extincteursData:', extincteursData); // Débogage
+            console.log('loadCrmExtincteurs called, extincteursData:', extincteursData); // Débogage
             tbody.innerHTML = ''; // Réinitialiser
             if (!Array.isArray(extincteursData) || extincteursData.length === 0) {
                 crmSection.style.display = 'none';
                 tbody.innerHTML = '<tr><td colspan="4">Aucun extincteur</td></tr>';
+                console.log('No valid extincteursData, hiding crmSection');
                 return;
             }
             crmSection.style.display = 'block';
-            extincteursData.forEach(item => {
+            let hasValidData = false;
+            extincteursData.forEach((item, index) => {
                 if (item && typeof item === 'object') {
+                    hasValidData = true;
                     tbody.innerHTML += `
                         <tr>
                             <td>${item.numero || 'N/A'}</td>
@@ -810,12 +817,15 @@
                             <td>${item.operations || 'N/A'}</td>
                         </tr>`;
                 } else {
-                    console.warn('Donnée CRM invalide:', item);
+                    console.warn(`Invalid CRM data at index ${index}:`, item);
                 }
             });
-            if (tbody.innerHTML === '') {
+            if (!hasValidData) {
                 crmSection.style.display = 'none';
                 tbody.innerHTML = '<tr><td colspan="4">Données CRM mal formées</td></tr>';
+                console.log('No valid CRM entries, hiding crmSection');
+            } else {
+                console.log('Valid CRM data found, showing crmSection');
             }
         }
 
