@@ -25,9 +25,7 @@
             vertical-align: middle;
         }
         #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { width: 40%; } /* Désignation */
-        #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { width: 15%; } /* Qté */
-        #prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) { width: 20%; } /* PU HT */
-        #prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) { width: 25%; } /* Total HT */
+        #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { width: 60%; } /* Numeric Row */
         #prestationsTable input, #prestationsTable select { 
             padding: 8px; 
             font-size: 15px; 
@@ -195,25 +193,28 @@
             #prestationsTable td:nth-child(1) { /* Désignation */
                 margin-bottom: 8px;
             }
-            #prestationsTable td:nth-child(2), /* Qté */
-            #prestationsTable td:nth-child(3), /* PU HT */
-            #prestationsTable td:nth-child(4) { /* Total HT */
-                display: inline-flex;
-                flex: 1;
-                padding: 6px 4px;
-                min-width: 0;
+            #prestationsTable td:nth-child(2) { /* Numeric Row */
+                padding: 0 8px;
             }
             #prestationsTable .numeric-row { 
                 display: flex; 
                 flex-wrap: nowrap; 
-                gap: 4px; /* Réduit pour plus d’espace */
+                gap: 4px; 
                 width: 100%; 
-                margin-top: 4px; 
             }
-            #prestationsTable td select, #prestationsTable td input { 
+            #prestationsTable .numeric-row .quantity-cell,
+            #prestationsTable .numeric-row .unitPrice-cell,
+            #prestationsTable .numeric-row .total-cell { 
+                flex: 1; 
+                min-width: 0; 
+                padding: 0; 
+            }
+            #prestationsTable td select, 
+            #prestationsTable td input,
+            #prestationsTable .numeric-row input { 
                 font-size: 14px; 
                 padding: 8px; 
-                height: 40px; /* Augmenté pour lisibilité */
+                height: 40px; 
                 width: 100%; 
                 box-sizing: border-box; 
                 border-radius: 4px; 
@@ -227,11 +228,7 @@
                 margin-bottom: 4px; 
             }
             #prestationsTable td:nth-child(1):before { content: "Désignation"; }
-            #prestationsTable td:nth-child(2):before,
-            #prestationsTable td:nth-child(3):before,
-            #prestationsTable td:nth-child(4):before { 
-                display: none; /* Supprime data-label pour la 2e ligne */
-            }
+            #prestationsTable td:nth-child(2):before { content: ""; } /* Pas de label pour numeric-row */
             .action-buttons { 
                 display: flex; 
                 gap: 8px; 
@@ -326,9 +323,7 @@
                     <thead>
                         <tr>
                             <th>Désignation</th>
-                            <th>Qté</th>
-                            <th>PU HT (€)</th>
-                            <th>Prix Total HT (€)</th>
+                            <th>Qté / PU HT / Total HT</th>
                         </tr>
                     </thead>
                     <tbody id="prestationsBody"></tbody>
@@ -486,7 +481,7 @@
 
         function addPrestation() {
             const tbody = document.getElementById('prestationsBody');
-            const index = tbody.children.length; // Chaque prestation = 1 ligne
+            const index = tbody.children.length;
             const row = document.createElement('tr');
             row.id = `row-${index}`;
             row.innerHTML = `
@@ -499,16 +494,20 @@
                     <input type="text" class="custom-designation" style="display:none;" placeholder="Désignation manuelle" oninput="updateRow(${index})">
                     <div class="error-message" id="designation-error-${index}">Veuillez sélectionner ou saisir une désignation</div>
                 </td>
-                <td data-label="Qté">
-                    <input type="number" class="quantity" placeholder="Qté" min="1" required oninput="updateRow(${index})">
-                    <div class="error-message" id="quantity-error-${index}">Quantité doit être > 0</div>
-                </td>
-                <td data-label="PU HT">
-                    <input type="number" class="unitPrice" placeholder="PU HT" step="0.01" required oninput="updateRow(${index})">
-                    <div class="error-message" id="unitPrice-error-${index}">Prix unitaire doit être > 0</div>
-                </td>
-                <td data-label="Prix Total HT">
-                    <input type="number" class="total" readonly>
+                <td data-label="Qté / PU HT / Total HT">
+                    <div class="numeric-row">
+                        <div class="quantity-cell">
+                            <input type="number" class="quantity" placeholder="Qté" min="1" required oninput="updateRow(${index})">
+                            <div class="error-message" id="quantity-error-${index}">Quantité doit être > 0</div>
+                        </div>
+                        <div class="unitPrice-cell">
+                            <input type="number" class="unitPrice" placeholder="PU HT" step="0.01" required oninput="updateRow(${index})">
+                            <div class="error-message" id="unitPrice-error-${index}">Prix unitaire doit être > 0</div>
+                        </div>
+                        <div class="total-cell">
+                            <input type="number" class="total" readonly>
+                        </div>
+                    </div>
                 </td>`;
             const actionDiv = document.createElement('div');
             actionDiv.className = 'action-buttons';
@@ -664,16 +663,20 @@
                         <input type="text" class="custom-designation" value="${isCustom ? item.designation : ''}" style="display:${isCustom ? 'block' : 'none'};" disabled>
                         <div class="error-message" id="designation-error-${index}">Veuillez sélectionner ou saisir une désignation</div>
                     </td>
-                    <td data-label="Qté">
-                        <input type="number" class="quantity" value="${item.quantity || ''}" min="1" required disabled>
-                        <div class="error-message" id="quantity-error-${index}">Quantité doit être > 0</div>
-                    </td>
-                    <td data-label="PU HT">
-                        <input type="number" class="unitPrice" value="${item.unitPrice || ''}" step="0.01" required disabled>
-                        <div class="error-message" id="unitPrice-error-${index}">Prix unitaire doit être > 0</div>
-                    </td>
-                    <td data-label="Prix Total HT">
-                        <input type="number" class="total" value="${item.total || ''}" readonly>
+                    <td data-label="Qté / PU HT / Total HT">
+                        <div class="numeric-row">
+                            <div class="quantity-cell">
+                                <input type="number" class="quantity" value="${item.quantity || ''}" min="1" required disabled>
+                                <div class="error-message" id="quantity-error-${index}">Quantité doit être > 0</div>
+                            </div>
+                            <div class="unitPrice-cell">
+                                <input type="number" class="unitPrice" value="${item.unitPrice || ''}" step="0.01" required disabled>
+                                <div class="error-message" id="unitPrice-error-${index}">Prix unitaire doit être > 0</div>
+                            </div>
+                            <div class="total-cell">
+                                <input type="number" class="total" value="${item.total || ''}" readonly>
+                            </div>
+                        </div>
                     </td>`;
                 const actionDiv = document.createElement('div');
                 actionDiv.className = 'action-buttons';
