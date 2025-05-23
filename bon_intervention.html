@@ -83,20 +83,20 @@
         }
         .action-buttons { 
             display: flex; 
-            justify-content: flex-end; /* Aligné à droite */
-            gap: 12px; /* Espacement accru */
+            justify-content: flex-end; 
+            gap: 12px; 
             padding: 8px 0; 
             margin-top: 4px; 
         }
         .action-buttons button { 
-            font-size: 18px; /* Boutons plus grands */
-            padding: 8px; /* Padding accru */
+            font-size: 18px; 
+            padding: 8px; 
             border: none; 
             background: none; 
             cursor: pointer; 
         }
         .action-buttons .validate-btn { 
-            font-size: 20px; /* Valider encore plus grand */
+            font-size: 20px; 
         }
         .action-buttons button:disabled { 
             opacity: 0.5; 
@@ -153,16 +153,18 @@
             display: none; 
         }
         .nav-buttons { 
-            margin-bottom: 120px; /* Espacement accru */
+            margin-bottom: 130px; /* Espacement pour éviter chevauchement */
         }
         .footer-nav { 
             position: fixed; 
             bottom: 0; 
             width: 100%; 
             background: #fff; 
-            padding: 15px 10px; /* Padding ajusté */
+            padding: 8px 10px; /* Réduit pour bandeau plus fin */
             box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); 
             z-index: 998; 
+            box-sizing: border-box; 
+            height: auto; /* Évite grossissement */
         }
         @media (max-width: 600px) {
             body { 
@@ -249,19 +251,19 @@
             #prestationsTable td:nth-child(2):before { content: ""; }
             .action-buttons { 
                 display: flex; 
-                justify-content: flex-end; /* Aligné à droite */
-                gap: 10px; /* Espacement accru */
+                justify-content: flex-end; 
+                gap: 10px; 
                 padding: 8px 8px; 
                 margin: 4px 0 0 0; 
                 width: 100% !important; 
                 box-sizing: border-box; 
             }
             .action-buttons button { 
-                font-size: 16px; /* Boutons plus grands */
+                font-size: 16px; 
                 padding: 6px; 
             }
             .action-buttons .validate-btn { 
-                font-size: 18px; /* Valider encore plus grand */
+                font-size: 18px; 
             }
             .select2-container { 
                 width: 100% !important; 
@@ -306,14 +308,14 @@
                 width: 95%; 
             }
             .nav-buttons { 
-                margin-bottom: 140px; /* Encore plus d’espace */
+                margin-bottom: 150px; /* Plus d’espace sur mobile */
             }
             .footer-nav { 
-                padding: 15px 10px; 
+                padding: 8px 10px; /* Bandeau plus fin */
                 z-index: 998; 
             }
             #totalsTable { 
-                margin: 10px 0 10px auto; /* Aligné à droite */
+                margin: 10px 0 10px auto; 
             }
         }
     </style>
@@ -321,13 +323,6 @@
 <body>
     <div class="container">
         <h1>🔥 Bon d'Intervention</h1>
-        <section class="section">
-            <h2>🧾 Client</h2>
-            <p><strong>Client :</strong> <span id="clientName">Non sélectionné</span></p>
-            <p><strong>Adresse :</strong> <span id="adresse">Non sélectionnée</span></p>
-            <p><strong>Lieu d’intervention :</strong> <span id="locationAddress">Non sélectionné</span></p>
-            <p><strong>Email :</strong> <span id="email">Non sélectionné</span></p>
-        </section>
         <section class="section" id="crmSection">
             <h2>📋 Résumé CRM Extincteurs</h2>
             <table id="crmExtincteursTable">
@@ -782,6 +777,7 @@
             const extincteursData = JSON.parse(localStorage.getItem('extincteursData') || '[]');
             const tbody = document.getElementById('crmExtincteursBody');
             const crmSection = document.getElementById('crmSection');
+            console.log('extincteursData:', extincteursData); // Débogage
             if (extincteursData.length === 0) {
                 crmSection.style.display = 'none';
                 tbody.innerHTML = '';
