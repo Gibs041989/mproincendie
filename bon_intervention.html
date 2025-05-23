@@ -17,7 +17,7 @@
             overflow-x: hidden; /* Empêche le débordement horizontal */
         }
         .container { 
-            padding-bottom: 80px; 
+            padding-bottom: 100px; /* Espace pour éviter coupure par footer-nav */
             width: 100%; 
             max-width: 1200px; 
             margin: 0 auto; 
@@ -153,18 +153,23 @@
             display: none; 
         }
         .nav-buttons { 
-            margin-bottom: 130px; /* Espacement pour éviter chevauchement */
+            margin-bottom: 140px; /* Espace pour éviter chevauchement */
         }
         .footer-nav { 
             position: fixed; 
             bottom: 0; 
             width: 100%; 
             background: #fff; 
-            padding: 8px 10px; /* Réduit pour bandeau plus fin */
+            padding: 5px 10px; /* Hauteur minimale pour icônes */
             box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); 
             z-index: 998; 
             box-sizing: border-box; 
-            height: auto; /* Évite grossissement */
+            height: auto; 
+            overflow: hidden; 
+        }
+        .footer-nav a { 
+            font-size: 16px; /* Icônes plus petites */
+            margin: 0 15px; /* Espacement entre icônes */
         }
         @media (max-width: 600px) {
             body { 
@@ -175,6 +180,7 @@
                 margin: 0 !important; 
                 width: 100% !important; 
                 max-width: none !important; 
+                padding-bottom: 120px !important; /* Espace accru */
             }
             .section { 
                 padding: 10px !important; 
@@ -210,10 +216,10 @@
                 font-size: 14px; 
                 box-sizing: border-box; 
             }
-            #prestationsTable td:nth-child(1) { /* Désignation */
+            #prestationsTable td:nth-child(1) { 
                 margin-bottom: 8px;
             }
-            #prestationsTable td:nth-child(2) { /* Numeric Row */
+            #prestationsTable td:nth-child(2) { 
                 padding: 0 8px;
             }
             #prestationsTable .numeric-row { 
@@ -308,10 +314,10 @@
                 width: 95%; 
             }
             .nav-buttons { 
-                margin-bottom: 150px; /* Plus d’espace sur mobile */
+                margin-bottom: 160px; /* Espace accru sur mobile */
             }
             .footer-nav { 
-                padding: 8px 10px; /* Bandeau plus fin */
+                padding: 5px 10px; /* Bandeau encore plus fin */
                 z-index: 998; 
             }
             #totalsTable { 
@@ -323,6 +329,13 @@
 <body>
     <div class="container">
         <h1>🔥 Bon d'Intervention</h1>
+        <section class="section">
+            <h2>🧾 Client</h2>
+            <p><strong>Client :</strong> <span id="clientName">Non sélectionné</span></p>
+            <p><strong>Adresse :</strong> <span id="adresse">Non sélectionnée</span></p>
+            <p><strong>Lieu d’intervention :</strong> <span id="locationAddress">Non sélectionné</span></p>
+            <p><strong>Email :</strong> <span id="email">Non sélectionné</span></p>
+        </section>
         <section class="section" id="crmSection">
             <h2>📋 Résumé CRM Extincteurs</h2>
             <table id="crmExtincteursTable">
@@ -334,7 +347,9 @@
                         <th>Opérations</th>
                     </tr>
                 </thead>
-                <tbody id="crmExtincteursBody"></tbody>
+                <tbody id="crmExtincteursBody">
+                    <!-- Rempli dynamiquement ou message si vide -->
+                </tbody>
             </table>
         </section>
         <section class="section">
@@ -576,7 +591,7 @@
             const totalInput = row.querySelector('.total');
             const designationError = document.getElementById(`designation-error-${index}`);
             const quantityError = document.getElementById(`quantity-error-${index}`);
-            const unitPriceError = document.getElementById(`unitPrice-error-${index}`);
+            const unitPriceError = document.getElementById(`quantity-error-${index}`);
             const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value.trim()) : select.value;
             const quantity = parseFloat(quantityInput.value) || 0;
             const unitPrice = parseFloat(unitPriceInput.value) || 0;
@@ -778,22 +793,30 @@
             const tbody = document.getElementById('crmExtincteursBody');
             const crmSection = document.getElementById('crmSection');
             console.log('extincteursData:', extincteursData); // Débogage
-            if (extincteursData.length === 0) {
+            tbody.innerHTML = ''; // Réinitialiser
+            if (!Array.isArray(extincteursData) || extincteursData.length === 0) {
                 crmSection.style.display = 'none';
-                tbody.innerHTML = '';
+                tbody.innerHTML = '<tr><td colspan="4">Aucun extincteur</td></tr>';
                 return;
             }
             crmSection.style.display = 'block';
-            tbody.innerHTML = '';
             extincteursData.forEach(item => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${item.numero || 'N/A'}</td>
-                        <td>${item.type || 'N/A'}</td>
-                        <td>${item.emplacement || 'N/A'}</td>
-                        <td>${item.operations || 'N/A'}</td>
-                    </tr>`;
+                if (item && typeof item === 'object') {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${item.numero || 'N/A'}</td>
+                            <td>${item.type || 'N/A'}</td>
+                            <td>${item.emplacement || 'N/A'}</td>
+                            <td>${item.operations || 'N/A'}</td>
+                        </tr>`;
+                } else {
+                    console.warn('Donnée CRM invalide:', item);
+                }
             });
+            if (tbody.innerHTML === '') {
+                crmSection.style.display = 'none';
+                tbody.innerHTML = '<tr><td colspan="4">Données CRM mal formées</td></tr>';
+            }
         }
 
         function saveDraft() {
