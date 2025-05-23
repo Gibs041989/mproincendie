@@ -18,7 +18,7 @@
         .container { padding-bottom: 140px; width: 100%; max-width: 1200px; margin: 0 auto; }
         .section { margin-bottom: 40px; padding: 15px; }
         .table-container { width: 100%; }
-        #prestationsTable, #crmExtincteursTable { width: 100%; border-collapse: collapse; }
+        #prestationsTable, #crmExtincteursTable { width: 100%; border-collapse: collapse; display: block !important; visibility: visible !important; }
         #prestationsTable th, #prestationsTable td { padding: 12px; font-size: 15px; border: 1px solid #ddd; line-height: 1.4; vertical-align: middle; }
         #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { width: 40%; }
         #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { width: 60%; }
@@ -27,8 +27,8 @@
         #prestationsTable .select2-selection { height: 36px !important; font-size: 15px !important; padding: 6px !important; border: 1px solid #ddd !important; border-radius: 4px !important; }
         #totalsTable { max-width: 300px; margin: 10px 0 10px auto; border-collapse: collapse; }
         #totalsTable th, #totalsTable td { padding: 8px; font-size: 14px; border: 1px solid #ddd; }
+        #crmExtincteursSection, #crmExtincteursTable { display: block !important; visibility: visible !important; }
         #crmExtincteursTable th, #crmExtincteursTable td { padding: 10px; font-size: 15px; border: 1px solid #ddd; }
-        #crmExtincteursSection.show { display: block !important; }
         .action-buttons { display: flex; justify-content: flex-end; gap: 12px; padding: 8px 0; margin-top: 4px; }
         .action-buttons button { font-size: 18px; padding: 8px; border: none; background: none; cursor: pointer; }
         .action-buttons .validate-btn { font-size: 20px; }
@@ -45,7 +45,7 @@
         .error { border: 1px solid red !important; }
         .error-message { color: red; font-size: 12px; margin-top: 2px; display: none; }
         .nav-buttons { margin-bottom: 160px; z-index: 1000; position: relative; }
-        .footer-nav { position: fixed; bottom: 0; width: 100%; background: #fff; padding: 4px 10px; box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); z-index: 999; box-sizing: border-box; display: flex; align-items: center; justify-content: center; }
+        .footer-nav { position: fixed; bottom: 0; width: 100%; background: #fff; padding: 4px 10px; box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); z-index: 999; box-sizing: border-box; display: flex !important; align-items: center; justify-content: center; }
         .footer-nav a { font-size: 14px; margin: 0 12px; color: #333; text-decoration: none; }
         @media (max-width: 600px) {
             body { overflow-x: hidden; }
@@ -105,7 +105,9 @@
                         <th>Opérations</th>
                     </tr>
                 </thead>
-                <tbody id="crmExtincteursBody"></tbody>
+                <tbody id="crmExtincteursBody">
+                    <tr><td colspan="4">Chargement des données...</td></tr>
+                </tbody>
             </table>
         </section>
         <section class="section">
@@ -278,6 +280,7 @@
         ];
 
         function addPrestation() {
+            console.log('addPrestation: Adding new row');
             const tbody = document.getElementById('prestationsBody');
             const index = tbody.children.length;
             const row = document.createElement('tr');
@@ -446,6 +449,7 @@
         }
 
         function loadPrestations() {
+            console.log('loadPrestations: Loading prestations');
             const prestationsData = JSON.parse(localStorage.getItem('prestationsData') || '[]');
             const tbody = document.getElementById('prestationsBody');
             prestationsData.forEach((item, index) => {
@@ -525,6 +529,7 @@
         }
 
         function loadClientInfo() {
+            console.log('loadClientInfo: Loading client info');
             const intervention = JSON.parse(localStorage.getItem('currentIntervention') || '{}');
             if (!intervention.client) {
                 alert('Aucun client sélectionné.');
@@ -547,38 +552,35 @@
 
         function loadCrmExtincteurs() {
             console.log('loadCrmExtincteurs: Starting at', new Date().toISOString());
-            let extincteursData = [];
-            const possibleKeys = ['extincteursData', 'crmData', 'extincteurs', 'crmExtincteurs'];
-            let rawData = null;
-
-            for (const key of possibleKeys) {
-                try {
-                    rawData = localStorage.getItem(key);
-                    if (rawData) {
-                        console.log(`loadCrmExtincteurs: Found data in localStorage key "${key}":`, rawData);
-                        extincteursData = JSON.parse(rawData);
-                        if (Array.isArray(extincteursData)) {
-                            console.log(`loadCrmExtincteurs: Successfully parsed data from key "${key}":`, extincteursData);
-                            break;
-                        } else {
-                            console.warn(`loadCrmExtincteurs: Data in key "${key}" is not an array:`, extincteursData);
-                        }
-                    }
-                } catch (e) {
-                    console.error(`loadCrmExtincteurs: Error parsing data from key "${key}":`, e);
-                }
-            }
-
-            console.log('loadCrmExtincteurs: Full localStorage contents:', Object.fromEntries(Object.entries(localStorage)));
-
-            const tbody = document.getElementById('crmExtincteursBody');
             const crmSection = document.getElementById('crmExtincteursSection');
+            const tbody = document.getElementById('crmExtincteursBody');
+            console.log('loadCrmExtincteurs: crmSection found:', !!crmSection, 'tbody found:', !!tbody);
+
+            // Forcer la visibilité
+            crmSection.style.display = 'block';
+            crmSection.style.visibility = 'visible';
             tbody.innerHTML = '';
 
+            let extincteursData = [];
+            try {
+                const rawData = localStorage.getItem('extincteursData');
+                console.log('loadCrmExtincteurs: Raw data from localStorage:', rawData);
+                if (rawData) {
+                    extincteursData = JSON.parse(rawData);
+                    console.log('loadCrmExtincteurs: Parsed extincteursData:', extincteursData);
+                } else {
+                    console.log('loadCrmExtincteurs: No data found in localStorage for key "extincteursData"');
+                }
+            } catch (e) {
+                console.error('loadCrmExtincteurs: Error parsing extincteursData:', e);
+                extincteursData = [];
+            }
+
+            // Loguer tout le localStorage
+            console.log('loadCrmExtincteurs: Full localStorage contents:', Object.fromEntries(Object.entries(localStorage)));
+
             if (!Array.isArray(extincteursData) || extincteursData.length === 0) {
-                console.log('loadCrmExtincteurs: No valid data or empty array, hiding crmSection');
-                crmSection.style.display = 'none';
-                crmSection.classList.remove('show');
+                console.log('loadCrmExtincteurs: No valid data or empty array');
                 tbody.innerHTML = '<tr><td colspan="4">Aucun extincteur</td></tr>';
                 return;
             }
@@ -601,16 +603,14 @@
                 }
             });
 
-            if (hasValidData) {
-                console.log('loadCrmExtincteurs: Valid data rendered, showing crmSection');
-                crmSection.style.display = 'block';
-                crmSection.classList.add('show');
-            } else {
-                console.log('loadCrmExtincteurs: No valid entries, hiding crmSection');
-                crmSection.style.display = 'none';
-                crmSection.classList.remove('show');
+            if (!hasValidData) {
+                console.log('loadCrmExtincteurs: No valid entries');
                 tbody.innerHTML = '<tr><td colspan="4">Données CRM mal formées</td></tr>';
             }
+
+            // Vérifier les styles appliqués
+            const computedStyle = window.getComputedStyle(crmSection);
+            console.log('loadCrmExtincteurs: crmSection computed styles - display:', computedStyle.display, 'visibility:', computedStyle.visibility);
         }
 
         function saveCrmData(data) {
@@ -821,13 +821,8 @@
             if (!clientSignaturePad.isEmpty()) {
                 doc.setFontSize(10);
                 doc.text('Client:', 20, y + 10);
-                doc.addImage(clientSignaturePad.toDataURL('image/png', 1.0), 'PNG', 20, y + 15, 60, 30);
-            }
-            if (!technicianSignaturePad.isEmpty()) {
-                doc.setFontSize(10);
-                doc.text('Technicien:', 110, y + 10);
-                doc.addImage(technicianSignaturePad.toDataURL('image/png', 1.0), 'PNG', 110, y + 15, 60, 30);
-            }
+                doc.addImage(clientSignaturePad.toDataURL('image/png', 1.0), 'PNG', 20, y +][...]
+
             doc.setFontSize(10);
             doc.text('MPro Incendie - SIRET: 123456789', 20, 280);
             doc.save(`bon_intervention_${new Date().toISOString().slice(0,10)}.pdf`);
@@ -854,10 +849,17 @@
 
         window.onload = () => {
             console.log('window.onload: Initializing at', new Date().toISOString());
+            console.log('jQuery loaded:', typeof $ !== 'undefined' ? 'Yes' : 'No');
+            // Mesurer la hauteur de .footer-nav
+            const footerNav = document.querySelector('.footer-nav');
+            if (footerNav) {
+                const height = footerNav.getBoundingClientRect().height;
+                console.log('Footer-nav height:', height, 'px');
+            } else {
+                console.error('Footer-nav element not found');
+            }
             loadClientInfo();
-            setTimeout(() => {
-                loadCrmExtincteurs();
-            }, 500);
+            loadCrmExtincteurs();
             loadPrestations();
             loadSignatures();
             loadDraft();
