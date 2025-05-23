@@ -13,19 +13,39 @@
     <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
     <style>
-        .container { padding-bottom: 80px; }
-        .section { margin-bottom: 40px; padding: 15px; }
-        .table-container { width: 100%; }
-        #prestationsTable, #crmExtincteursTable { width: 100%; border-collapse: collapse; }
+        body { 
+            overflow-x: hidden; /* Empêche le débordement horizontal */
+        }
+        .container { 
+            padding-bottom: 80px; 
+            width: 100%; /* Remplace 100vw pour éviter débordement */
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+        .section { 
+            margin-bottom: 40px; 
+            padding: 15px; 
+        }
+        .table-container { 
+            width: 100%; 
+        }
+        #prestationsTable, #crmExtincteursTable { 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
         #prestationsTable th, #prestationsTable td { 
             padding: 12px; 
             font-size: 15px; 
             border: 1px solid #ddd; 
             line-height: 1.4; 
-            vertical-align: middle;
+            vertical-align: middle; 
         }
-        #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { width: 40%; } /* Désignation */
-        #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { width: 60%; } /* Numeric Row */
+        #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { 
+            width: 40%; 
+        } /* Désignation */
+        #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { 
+            width: 60%; 
+        } /* Numeric Row */
         #prestationsTable input, #prestationsTable select { 
             padding: 8px; 
             font-size: 15px; 
@@ -92,6 +112,7 @@
             height: 50px; 
             font-size: 24px; 
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
+            z-index: 1000; 
         }
         .floating-btn:hover::after { 
             content: "Ajouter prestation"; 
@@ -108,6 +129,7 @@
             margin-top: 6px; 
             width: 100%; 
             height: 100px; 
+            pointer-events: none; /* Désactive la signature directe */
         }
         .signature-block { 
             margin-bottom: 45px; 
@@ -149,25 +171,40 @@
             margin-top: 2px; 
             display: none; 
         }
+        .nav-buttons { 
+            margin-bottom: 80px; /* Espacement pour éviter chevauchement avec footer-nav */
+        }
+        .footer-nav { 
+            position: fixed; 
+            bottom: 0; 
+            width: 100%; 
+            background: #fff; 
+            padding: 10px; 
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); 
+            z-index: 999; 
+        }
         @media (max-width: 600px) {
+            body { 
+                overflow-x: hidden; 
+            }
             .container { 
                 padding: 0 !important; 
                 margin: 0 !important; 
-                width: 100vw !important; 
+                width: 100% !important; 
                 max-width: none !important; 
             }
             .section { 
-                padding: 0 !important; 
+                padding: 10px !important; 
                 margin: 0 0 40px 0 !important; 
             }
             .table-container { 
-                width: 100vw !important; 
+                width: 100% !important; 
                 margin: 0 !important; 
                 padding: 0 !important; 
             }
             #prestationsTable { 
                 margin: 0 !important; 
-                width: 100vw !important; 
+                width: 100% !important; 
                 box-sizing: border-box; 
             }
             #prestationsTable th { 
@@ -180,7 +217,7 @@
                 border: 1px solid #ddd; 
                 border-radius: 5px; 
                 background: #fff; 
-                width: 100vw !important; 
+                width: 100% !important; 
                 box-sizing: border-box; 
             }
             #prestationsTable td { 
@@ -235,7 +272,7 @@
                 justify-content: flex-start; 
                 padding: 8px 8px; 
                 margin: 4px 0 0 0; 
-                width: 100vw !important; 
+                width: 100% !important; 
                 box-sizing: border-box; 
             }
             .action-buttons button { 
@@ -276,10 +313,10 @@
                 color: #555; 
                 margin-bottom: 4px; 
             }
-            #crmExtincteursTable td:nth-child(1):before { content: "ID"; }
+            #crmExtincteursTable td:nth-child(1):before { content: "N° Extincteur"; }
             #crmExtincteursTable td:nth-child(2):before { content: "Type"; }
-            #crmExtincteursTable td:nth-child(3):before { content: "État"; }
-            #crmExtincteursTable td:nth-child(4):before { content: "Abréviation"; }
+            #crmExtincteursTable td:nth-child(3):before { content: "Emplacement"; }
+            #crmExtincteursTable td:nth-child(4):before { content: "Opérations"; }
             .floating-btn { 
                 bottom: 75px; 
                 width: 45px; 
@@ -289,6 +326,13 @@
             .modal-content { 
                 margin: 20% auto; 
                 width: 95%; 
+            }
+            .nav-buttons { 
+                margin-bottom: 100px; /* Plus d’espace pour éviter chevauchement */
+            }
+            .footer-nav { 
+                padding: 10px; 
+                z-index: 998; /* Sous floating-btn */
             }
         }
     </style>
@@ -303,10 +347,17 @@
             <p><strong>Lieu d’intervention :</strong> <span id="locationAddress">Non sélectionné</span></p>
             <p><strong>Email :</strong> <span id="email">Non sélectionné</span></p>
         </section>
-        <section class="section">
+        <section class="section" id="crmSection" style="display: none;">
             <h2>📋 Résumé CRM Extincteurs</h2>
             <table id="crmExtincteursTable">
-                <thead><tr><th>ID</th><th>Type</th><th>État</th><th>Abréviation</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>N° Extincteur</th>
+                        <th>Type</th>
+                        <th>Emplacement</th>
+                        <th>Opérations</th>
+                    </tr>
+                </thead>
                 <tbody id="crmExtincteursBody"></tbody>
             </table>
         </section>
@@ -451,8 +502,8 @@
         }
 
         function validateModalSignature() {
-            if (modalSignaturePad.isEmpty() || modalSignaturePad.toData().length < 5) {
-                alert('Signature vide ou trop simple.');
+            if (modalSignaturePad.isEmpty()) {
+                alert('Veuillez apposer une signature.');
                 return;
             }
             const dataURL = modalSignaturePad.toDataURL('image/png', 0.7);
@@ -497,7 +548,7 @@
                 <td data-label="Qté / PU HT / Total HT">
                     <div class="numeric-row">
                         <div class="quantity-cell">
-                            <input type="number" class="quantity" placeholder="Qté" min="1" required oninput="updateRow(${index})">
+                            <input type="number" class="quantity" value="1" min="1" required oninput="updateRow(${index})">
                             <div class="error-message" id="quantity-error-${index}">Quantité doit être > 0</div>
                         </div>
                         <div class="unitPrice-cell">
@@ -528,6 +579,7 @@
             const select = row.querySelector('.designation');
             const customInput = row.querySelector('.custom-designation');
             const unitPriceInput = row.querySelector('.unitPrice');
+            const quantityInput = row.querySelector('.quantity');
             if (select.value === 'custom') {
                 customInput.style.display = 'block';
                 unitPriceInput.value = '';
@@ -536,6 +588,7 @@
                 const selectedOption = select.options[select.selectedIndex];
                 unitPriceInput.value = selectedOption.dataset.price || '';
             }
+            quantityInput.value = 1; // Force la quantité à 1 lors de la sélection
             updateRow(index);
         }
 
@@ -564,8 +617,7 @@
                 designationError.style.display = 'none';
             }
 
-            if (quantity <= 0) {
-                quantityInput.value = 1;
+            if (quantity <= 0 || isNaN(quantity)) {
                 quantityInput.classList.add('error');
                 quantityError.style.display = 'block';
                 isValid = false;
@@ -574,7 +626,7 @@
                 quantityError.style.display = 'none';
             }
 
-            if (unitPrice <= 0) {
+            if (unitPrice <= 0 || isNaN(unitPrice)) {
                 unitPriceInput.classList.add('error');
                 unitPriceError.style.display = 'block';
                 isValid = false;
@@ -666,7 +718,7 @@
                     <td data-label="Qté / PU HT / Total HT">
                         <div class="numeric-row">
                             <div class="quantity-cell">
-                                <input type="number" class="quantity" value="${item.quantity || ''}" min="1" required disabled>
+                                <input type="number" class="quantity" value="${item.quantity || '1'}" min="1" required disabled>
                                 <div class="error-message" id="quantity-error-${index}">Quantité doit être > 0</div>
                             </div>
                             <div class="unitPrice-cell">
@@ -749,9 +801,22 @@
         function loadCrmExtincteurs() {
             const extincteursData = JSON.parse(localStorage.getItem('extincteursData') || '[]');
             const tbody = document.getElementById('crmExtincteursBody');
-            tbody.innerHTML = extincteursData.length ? '' : '<tr><td colspan="4">Aucun extincteur.</td></tr>';
+            const crmSection = document.getElementById('crmSection');
+            if (extincteursData.length === 0) {
+                crmSection.style.display = 'none';
+                tbody.innerHTML = '';
+                return;
+            }
+            crmSection.style.display = 'block';
+            tbody.innerHTML = '';
             extincteursData.forEach(item => {
-                tbody.innerHTML += `<tr><td>${item.id || 'N/A'}</td><td>${item.type || 'N/A'}</td><td>${item.etat || 'N/A'}</td><td>${item.abreviation || 'N/A'}</td></tr>`;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.numero || 'N/A'}</td>
+                        <td>${item.type || 'N/A'}</td>
+                        <td>${item.emplacement || 'N/A'}</td>
+                        <td>${item.operations || 'N/A'}</td>
+                    </tr>`;
             });
         }
 
@@ -873,12 +938,12 @@
             if (extincteursData.length > 0) {
                 doc.autoTable({
                     startY: y,
-                    head: [['ID', 'Type', 'État', 'Abréviation']],
+                    head: [['N° Extincteur', 'Type', 'Emplacement', 'Opérations']],
                     body: extincteursData.map(item => [
-                        item.id || 'N/A',
+                        item.numero || 'N/A',
                         item.type || 'N/A',
-                        item.etat || 'N/A',
-                        item.abreviation || 'N/A'
+                        item.emplacement || 'N/A',
+                        item.operations || 'N/A'
                     ]),
                     styles: { fontSize: 10, cellPadding: 2 },
                     headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0] },
@@ -886,8 +951,6 @@
                 });
                 y = doc.lastAutoTable.finalY + 10;
             } else {
-                doc.setFontSize(10);
-                doc.text("Aucun extincteur.", 20, y);
                 y += 10;
             }
             doc.setFontSize(14);
