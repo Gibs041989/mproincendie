@@ -300,7 +300,6 @@
                 document.getElementById('signature-modal').style.display = 'block';
                 modalSignaturePad = new SignaturePad(modalCanvas, { penColor: 'black' });
                 resizeCanvas(modalCanvas);
-                // Charger la signature existante
                 const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
                 if (type === 'client' && signatures.client) {
                     modalSignaturePad.fromDataURL(signatures.client);
@@ -329,7 +328,6 @@
                     modalSignaturePad.clear();
                     console.log('clearModalSignature: Signature cleared');
                 }
-                // Supprimer la signature correspondante
                 const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
                 if (currentSignatureType === 'client') {
                     delete signatures.client;
@@ -696,7 +694,7 @@
                 document.getElementById('clientName').textContent = intervention.client || 'Non sélectionné';
                 document.getElementById('adresse').textContent = intervention.adresse || 'Non sélectionnée';
                 document.getElementById('email').textContent = intervention.email || 'Non sélectionné';
-                document.getElementById('locationAddress').textContent = intervention.locationAddress && intervention.locationAddress !== intervention.adresse ? intervention.locationAddress : 'Même adresse';
+                document.getElementById('locationAddress').textContent = intervention.lieu && intervention.lieu !== intervention.adresse ? intervention.lieu : 'Même adresse';
                 const clients = JSON.parse(localStorage.getItem('clients') || '[]');
                 const client = clients.find(c => c.name === intervention.client);
                 if (client) {
@@ -723,26 +721,17 @@
             if (tbody) tbody.innerHTML = '';
 
             let extincteursData = [];
-            const possibleKeys = ['extincteursData', 'crmData', 'extincteurs', 'crmExtincteurs'];
-            let foundKey = null;
-
-            for (const key of possibleKeys) {
-                try {
-                    const rawData = localStorage.getItem(key);
-                    if (rawData) {
-                        console.log(`loadCrmExtincteurs: Found data in localStorage key "${key}":`, rawData);
-                        extincteursData = JSON.parse(rawData);
-                        if (Array.isArray(extincteursData)) {
-                            foundKey = key;
-                            console.log(`loadCrmExtincteurs: Successfully parsed data from key "${key}":`, extincteursData);
-                            break;
-                        } else {
-                            console.warn(`loadCrmExtincteurs: Data in key "${key}" is not an array:`, extincteursData);
-                        }
-                    }
-                } catch (e) {
-                    console.error(`loadCrmExtincteurs: Error parsing data from key "${key}":`, e);
+            try {
+                const intervention = JSON.parse(localStorage.getItem('currentIntervention') || '{}');
+                console.log('loadCrmExtincteurs: currentIntervention:', intervention);
+                if (intervention.crm_extincteurs && Array.isArray(intervention.crm_extincteurs.extincteurs)) {
+                    extincteursData = intervention.crm_extincteurs.extincteurs;
+                    console.log('loadCrmExtincteurs: Found extincteurs data:', extincteursData);
+                } else {
+                    console.log('loadCrmExtincteurs: No extincteurs data in currentIntervention.crm_extincteurs');
                 }
+            } catch (e) {
+                console.error('loadCrmExtincteurs: Error parsing currentIntervention:', e);
             }
 
             console.log('loadCrmExtincteurs: Full localStorage contents:', Object.fromEntries(Object.entries(localStorage)));
@@ -753,7 +742,7 @@
                 return;
             }
 
-            console.log('loadCrmExtincteurs: Processing data from key', foundKey);
+            console.log('loadCrmExtincteurs: Processing data...');
             let hasValidData = false;
             extincteursData.forEach((item, index) => {
                 if (item && typeof item === 'object') {
@@ -761,10 +750,10 @@
                     console.log(`loadCrmExtincteurs: Rendering item ${index}:`, item);
                     tbody.innerHTML += `
                         <tr>
-                            <td>${item.numero || item.id || 'N/A'}</td>
+                            <td>${item.num || item.id || 'N/A'}</td>
                             <td>${item.type || item.typeExtincteur || 'N/A'}</td>
                             <td>${item.emplacement || item.location || 'N/A'}</td>
-                            <td>${item.operations || item.operation || 'N/A'}</td>
+                            <td>${item.operations || item.operation || 'N/A'}${item.pp ? ` [${item.pp}]` : ''}</td>
                         </tr>`;
                 } else {
                     console.warn(`loadCrmExtincteurs: Invalid item at index ${index}:`, item);
@@ -782,8 +771,10 @@
 
         function saveCrmData(data) {
             try {
-                console.log('saveCrmData: Saving data to extincteursData:', data);
-                localStorage.setItem('extincteursData', JSON.stringify(data));
+                console.log('saveCrmData: Saving data to currentIntervention.crm_extincteurs:', data);
+                const intervention = JSON.parse(localStorage.getItem('currentIntervention') || '{}');
+                intervention.crm_extincteurs = { extincteurs: data };
+                localStorage.setItem('currentIntervention', JSON.stringify(intervention));
             } catch (e) {
                 console.error('saveCrmData: Error saving data:', e);
                 alert('Erreur lors de la sauvegarde des données CRM.');
@@ -909,17 +900,25 @@
                 doc.setFontSize(14);
                 doc.setFont("helvetica", "bold");
                 doc.text("Résumé CRM Extincteurs", 20, 75);
-                const extincteursData = JSON.parse(localStorage.getItem('extincteursData') || '[]');
+                let extincteursData = [];
+                try {
+                    const intervention = JSON.parse(localStorage.getItem('currentIntervention') || '{}');
+                    if (intervention.crm_extincteurs && Array.isArray(intervention.crm_extincteurs.extincteurs)) {
+                        extincteursData = intervention.crm_extincteurs.extincteurs;
+                    }
+                } catch (e) {
+                    console.error('generatePDF: Error parsing extincteurs data:', e);
+                }
                 let y = 80;
                 if (extincteursData.length > 0) {
                     doc.autoTable({
                         startY: y,
                         head: [['N° Extincteur', 'Type', 'Emplacement', 'Opérations']],
                         body: extincteursData.map(item => [
-                            item.numero || item.id || 'N/A',
+                            item.num || item.id || 'N/A',
                             item.type || item.typeExtincteur || 'N/A',
                             item.emplacement || item.location || 'N/A',
-                            item.operations || item.operation || 'N/A'
+                            (item.operations || item.operation || 'N/A') + (item.pp ? ` [${item.pp}]` : '')
                         ]),
                         styles: { fontSize: 10, cellPadding: 2 },
                         headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0] },
