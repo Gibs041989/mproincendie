@@ -45,7 +45,6 @@
         .error { border: 1px solid red !important; }
         .error-message { color: red; font-size: 12px; margin-top: 2px; display: none; }
         .nav-buttons { margin-bottom: 160px; z-index: 1000; position: relative; }
-        /* Bouton flottant et fenêtre rétractable */
         .floating-btn {
             position: fixed;
             bottom: 20px;
@@ -227,8 +226,7 @@
             <a href="intervention.html"><button class="neutral">⬅️ Retour</button></a>
         </section>
     </div>
-    <!-- Bouton flottant et fenêtre rétractable -->
-    <div class="floating-btn" onclick="toggleShortcutPanel()">
+    <div class="floating-btn" onclick="toggleShortcutPanel()" title="Menu">
         <i class="fas fa-bars"></i>
     </div>
     <div class="shortcut-panel" id="shortcutPanel">
@@ -268,9 +266,21 @@
         }
 
         function loadSignatures() {
-            const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
-            if (signatures.client) clientSignaturePad.fromDataURL(signatures.client);
-            if (signatures.technician) technicianSignaturePad.fromDataURL(signatures.technician);
+            try {
+                const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
+                if (signatures.client) {
+                    clientSignaturePad.fromDataURL(signatures.client);
+                } else {
+                    clientSignaturePad.clear();
+                }
+                if (signatures.technician) {
+                    technicianSignaturePad.fromDataURL(signatures.technician);
+                } else {
+                    technicianSignaturePad.clear();
+                }
+            } catch (e) {
+                console.error('loadSignatures: Error:', e);
+            }
         }
 
         window.addEventListener('resize', () => {
@@ -284,42 +294,78 @@
         resizeCanvas(technicianCanvas);
 
         function openSignatureModal(type) {
-            currentSignatureType = type;
-            document.getElementById('signature-modal').style.display = 'block';
-            modalSignaturePad = new SignaturePad(modalCanvas, { penColor: 'black' });
-            resizeCanvas(modalCanvas);
+            console.log('openSignatureModal: Opening for type', type);
+            try {
+                currentSignatureType = type;
+                document.getElementById('signature-modal').style.display = 'block';
+                modalSignaturePad = new SignaturePad(modalCanvas, { penColor: 'black' });
+                resizeCanvas(modalCanvas);
+                // Charger la signature existante
+                const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
+                if (type === 'client' && signatures.client) {
+                    modalSignaturePad.fromDataURL(signatures.client);
+                } else if (type === 'technician' && signatures.technician) {
+                    modalSignaturePad.fromDataURL(signatures.technician);
+                } else {
+                    modalSignaturePad.clear();
+                }
+            } catch (e) {
+                console.error('openSignatureModal: Error:', e);
+            }
         }
 
         function closeSignatureModal() {
-            document.getElementById('signature-modal').style.display = 'none';
-            modalSignaturePad = null;
+            try {
+                document.getElementById('signature-modal').style.display = 'none';
+                modalSignaturePad = null;
+            } catch (e) {
+                console.error('closeSignatureModal: Error:', e);
+            }
         }
 
         function clearModalSignature() {
-            modalSignaturePad.clear();
+            try {
+                if (modalSignaturePad) {
+                    modalSignaturePad.clear();
+                    console.log('clearModalSignature: Signature cleared');
+                }
+                // Supprimer la signature correspondante
+                const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
+                if (currentSignatureType === 'client') {
+                    delete signatures.client;
+                    clientSignaturePad.clear();
+                } else if (currentSignatureType === 'technician') {
+                    delete signatures.technician;
+                    technicianSignaturePad.clear();
+                }
+                localStorage.setItem('signatures', JSON.stringify(signatures));
+            } catch (e) {
+                console.error('clearModalSignature: Error:', e);
+            }
         }
 
         function validateModalSignature() {
-            if (modalSignaturePad.isEmpty()) {
-                alert('Veuillez apposer une signature.');
-                return;
-            }
-            const dataURL = modalSignaturePad.toDataURL('image/png', 0.7);
-            const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
-            if (currentSignatureType === 'client') {
-                clientSignaturePad.fromDataURL(dataURL);
-                signatures.client = dataURL;
-            } else {
-                technicianSignaturePad.fromDataURL(dataURL);
-                signatures.technician = dataURL;
-            }
             try {
+                if (modalSignaturePad.isEmpty()) {
+                    alert('Veuillez apposer une signature.');
+                    return;
+                }
+                const dataURL = modalSignaturePad.toDataURL('image/png', 0.7);
+                const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
+                if (currentSignatureType === 'client') {
+                    clientSignaturePad.fromDataURL(dataURL);
+                    signatures.client = dataURL;
+                } else {
+                    technicianSignaturePad.fromDataURL(dataURL);
+                    signatures.technician = dataURL;
+                }
                 localStorage.setItem('signatures', JSON.stringify(signatures));
-            } catch {
-                alert('Stockage plein.');
+                saveDraft();
+                closeSignatureModal();
+                console.log('validateModalSignature: Signature saved for', currentSignatureType);
+            } catch (e) {
+                console.error('validateModalSignature: Error:', e);
             }
-            saveDraft();
-            closeSignatureModal();
         }
 
         const articlesDB = [
@@ -670,7 +716,6 @@
             const tbody = document.getElementById('crmExtincteursBody');
             console.log('loadCrmExtincteurs: crmSection found:', !!crmSection, 'tbody found:', !!tbody);
 
-            // Forcer la visibilité
             if (crmSection) {
                 crmSection.style.display = 'block';
                 crmSection.style.visibility = 'visible';
@@ -678,18 +723,26 @@
             if (tbody) tbody.innerHTML = '';
 
             let extincteursData = [];
-            try {
-                const rawData = localStorage.getItem('extincteursData');
-                console.log('loadCrmExtincteurs: Raw data from localStorage:', rawData);
-                if (rawData) {
-                    extincteursData = JSON.parse(rawData);
-                    console.log('loadCrmExtincteurs: Parsed extincteursData:', extincteursData);
-                } else {
-                    console.log('loadCrmExtincteurs: No data found in localStorage for key "extincteursData"');
+            const possibleKeys = ['extincteursData', 'crmData', 'extincteurs', 'crmExtincteurs'];
+            let foundKey = null;
+
+            for (const key of possibleKeys) {
+                try {
+                    const rawData = localStorage.getItem(key);
+                    if (rawData) {
+                        console.log(`loadCrmExtincteurs: Found data in localStorage key "${key}":`, rawData);
+                        extincteursData = JSON.parse(rawData);
+                        if (Array.isArray(extincteursData)) {
+                            foundKey = key;
+                            console.log(`loadCrmExtincteurs: Successfully parsed data from key "${key}":`, extincteursData);
+                            break;
+                        } else {
+                            console.warn(`loadCrmExtincteurs: Data in key "${key}" is not an array:`, extincteursData);
+                        }
+                    }
+                } catch (e) {
+                    console.error(`loadCrmExtincteurs: Error parsing data from key "${key}":`, e);
                 }
-            } catch (e) {
-                console.error('loadCrmExtincteurs: Error parsing extincteursData:', e);
-                extincteursData = [];
             }
 
             console.log('loadCrmExtincteurs: Full localStorage contents:', Object.fromEntries(Object.entries(localStorage)));
@@ -700,7 +753,7 @@
                 return;
             }
 
-            console.log('loadCrmExtincteurs: Processing data...');
+            console.log('loadCrmExtincteurs: Processing data from key', foundKey);
             let hasValidData = false;
             extincteursData.forEach((item, index) => {
                 if (item && typeof item === 'object') {
@@ -979,7 +1032,6 @@
             }
         }
 
-        // Gestion de la fenêtre rétractable
         function toggleShortcutPanel() {
             const panel = document.getElementById('shortcutPanel');
             panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
@@ -989,6 +1041,10 @@
         window.onload = () => {
             console.log('window.onload: Initializing at', new Date().toISOString());
             console.log('jQuery loaded:', typeof $ !== 'undefined' ? 'Yes' : 'No');
+            // Réinitialiser les signatures pour un nouveau bon
+            localStorage.removeItem('signatures');
+            clientSignaturePad.clear();
+            technicianSignaturePad.clear();
             loadClientInfo();
             loadCrmExtincteurs();
             loadPrestations();
