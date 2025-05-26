@@ -28,7 +28,8 @@
         #totalsTable { max-width: 300px; margin: 10px 0 10px auto; border-collapse: collapse; }
         #totalsTable th, #totalsTable td { padding: 8px; font-size: 14px; border: 1px solid #ddd; }
         #crmExtincteursSection, #crmExtincteursTable { display: block !important; visibility: visible !important; }
-        #crmExtincteursTable th, #crmExtincteursTable td { padding: 10px; font-size: 15px; border: 1px solid #ddd; }
+        #crmExtincteursTable th, #crmExtincteursTable td { padding: 8px; font-size: 14px; border: 1px solid #ddd; text-align: left; }
+        #crmExtincteursTable th { background-color: #f5f5f5; font-weight: bold; }
         .action-buttons { display: flex; justify-content: flex-end; gap: 12px; padding: 8px 0; margin-top: 4px; }
         .action-buttons button { font-size: 18px; padding: 8px; border: none; background: none; cursor: pointer; }
         .action-buttons .validate-btn { font-size: 20px; }
@@ -62,6 +63,7 @@
             z-index: 1001;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
+        .floating-btn::before, .floating-btn::after { content: none; }
         .shortcut-panel {
             display: none;
             position: fixed;
@@ -73,21 +75,24 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
             z-index: 1001;
             width: 150px;
-            text-align: center;
         }
         .shortcut-panel a {
-            display: block;
-            padding: 8px;
-            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 8px;
+            padding: 8px 12px;
+            font-size: 16px;
             color: #333;
             text-decoration: none;
-            margin: 5px 0;
+            margin: 2px 0;
+            border-radius: 4px;
         }
         .shortcut-panel a:hover { background: #f0f0f0; }
         .shortcut-panel .close-btn {
             position: absolute;
-            top: 5px;
-            right: 5px;
+            top: 8px;
+            right: 8px;
             cursor: pointer;
             font-size: 16px;
             color: #333;
@@ -118,10 +123,10 @@
             #crmExtincteursTable tr { display: block; margin-bottom: 8px; border: 1px solid #ddd; padding: 6px; border-radius: 5px; background: #fff; width: 100%; }
             #crmExtincteursTable td { display: block; width: 100%; padding: 6px 0; font-size: 14px; }
             #crmExtincteursTable td:before { font-size: 14px; font-weight: bold; color: #555; margin-bottom: 4px; }
-            #crmExtincteursTable td:nth-child(1):before { content: "N° Extincteur"; }
-            #crmExtincteursTable td:nth-child(2):before { content: "Type"; }
-            #crmExtincteursTable td:nth-child(3):before { content: "Emplacement"; }
-            #crmExtincteursTable td:nth-child(4):before { content: "Opérations"; }
+            #crmExtincteursTable td:nth-child(1):before { content: "Nº"; }
+            #crmExtincteursTable td:nth-child(2):before { content: "Type Ext."; }
+            #crmExtincteursTable td:nth-child(3):before { content: "Sect."; }
+            #crmExtincteursTable td:nth-child(4):before { content: "Opé."; }
             .modal-content { margin: 20% auto; width: 95%; }
             .nav-buttons { margin-bottom: 180px; z-index: 1000; }
             .floating-btn { bottom: 15px; right: 15px; }
@@ -144,15 +149,13 @@
             <table id="crmExtincteursTable">
                 <thead>
                     <tr>
-                        <th>N° Extincteur</th>
-                        <th>Type</th>
-                        <th>Emplacement</th>
-                        <th>Opérations</th>
+                        <th>Nº</th>
+                        <th>Type Ext.</th>
+                        <th>Sect.</th>
+                        <th>Opé.</th>
                     </tr>
                 </thead>
-                <tbody id="crmExtincteursBody">
-                    <tr><td colspan="4">Chargement des données...</td></tr>
-                </tbody>
+                <tbody id="crmExtincteursBody"></tbody>
             </table>
         </section>
         <section class="section">
@@ -226,15 +229,15 @@
             <a href="intervention.html"><button class="neutral">⬅️ Retour</button></a>
         </section>
     </div>
-    <div class="floating-btn" onclick="toggleShortcutPanel()" title="Menu">
+    <div class="floating-btn" onclick="toggleShortcutPanel()">
         <i class="fas fa-bars"></i>
     </div>
     <div class="shortcut-panel" id="shortcutPanel">
         <span class="close-btn" onclick="toggleShortcutPanel()">✖</span>
-        <a href="index.html">🏠 Accueil</a>
-        <a href="client.html">📁 Clients</a>
-        <a href="intervention.html">🛠️ Interventions</a>
-        <a href="parametres.html">⚙️ Paramètres</a>
+        <a href="index.html"><i class="fas fa-home"></i> Accueil</a>
+        <a href="client.html"><i class="fas fa-folder"></i> Clients</a>
+        <a href="intervention.html"><i class="fas fa-tools"></i> Interventions</a>
+        <a href="parametres.html"><i class="fas fa-cog"></i> Paramètres</a>
     </div>
     <div id="signature-modal" class="modal">
         <div class="modal-content">
@@ -748,11 +751,12 @@
                 if (item && typeof item === 'object') {
                     hasValidData = true;
                     console.log(`loadCrmExtincteurs: Rendering item ${index}:`, item);
+                    const emplacementAbbr = (item.emplacement || '').substring(0, 4) || 'N/A';
                     tbody.innerHTML += `
                         <tr>
                             <td>${item.num || item.id || 'N/A'}</td>
                             <td>${item.type || item.typeExtincteur || 'N/A'}</td>
-                            <td>${item.emplacement || item.location || 'N/A'}</td>
+                            <td>${emplacementAbbr}</td>
                             <td>${item.operations || item.operation || 'N/A'}${item.pp ? ` [${item.pp}]` : ''}</td>
                         </tr>`;
                 } else {
@@ -913,11 +917,11 @@
                 if (extincteursData.length > 0) {
                     doc.autoTable({
                         startY: y,
-                        head: [['N° Extincteur', 'Type', 'Emplacement', 'Opérations']],
+                        head: [['Nº', 'Type Ext.', 'Sect.', 'Opé.']],
                         body: extincteursData.map(item => [
                             item.num || item.id || 'N/A',
                             item.type || item.typeExtincteur || 'N/A',
-                            item.emplacement || item.location || 'N/A',
+                            (item.emplacement || '').substring(0, 4) || 'N/A',
                             (item.operations || item.operation || 'N/A') + (item.pp ? ` [${item.pp}]` : '')
                         ]),
                         styles: { fontSize: 10, cellPadding: 2 },
@@ -1040,7 +1044,6 @@
         window.onload = () => {
             console.log('window.onload: Initializing at', new Date().toISOString());
             console.log('jQuery loaded:', typeof $ !== 'undefined' ? 'Yes' : 'No');
-            // Réinitialiser les signatures pour un nouveau bon
             localStorage.removeItem('signatures');
             clientSignaturePad.clear();
             technicianSignaturePad.clear();
