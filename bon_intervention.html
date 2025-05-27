@@ -98,7 +98,7 @@
             </div>
         </div>
         
-        <div class="nav-buttons">
+        <div>
             <p><a href="#" onclick="validerIntervention()">✅ Valider</a></p>
             <p><a href="#" onclick="saveBrouillon()">💾 Brouillon</a></p>
             <p><a href="#" onclick="genererPDF()">📄 PDF</a></p>
@@ -107,22 +107,23 @@
         </div>
         
         <div>
-            <p><a href="index.html">🏠</a></p>
-            <p><a href="client.html">📁</a></p>
-            <p><a href="bon_intervention.html">🛠️</a></p>
-            <p><a href="#">⚙️</a></p>
+            <p><a href="#">✖</a></p>
+            <p><a href="index.html">Accueil</a></p>
+            <p><a href="client.html">Clients</a></p>
+            <p><a href="bon_intervention.html">Interventions</a></p>
+            <p><a href="#">Paramètres</a></p>
         </div>
         
-        <div id="signatureDialog" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000;">
+        <div id="signatureDialog" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000;">
             <p>Signature</p>
             <canvas id="signatureCanvas" width="300" height="150" style="border: 1px solid #ddd;"></canvas>
             <p><a href="#" onclick="clearSignature()">Effacer</a></p>
-            <p><a href="#" onclick="cancelSignature()">Annuler</a></p>
+            <p><a href="#" onclick="closeSignatureDialog()">Annuler</a></p>
             <p><a href="#" onclick="validateSignature()">Valider</a></p>
         </div>
         <div id="signatureOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999;"></div>
         
-        <p><a class="floating-btn" onclick="addPrestation()">➕</a></p>
+        <p><a class="floating-btn" href="#" onclick="addPrestation()">➕</a></p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
@@ -133,6 +134,7 @@
         let signaturePad, currentSignatureType;
         const { jsPDF } = window.jspdf;
 
+        // Initialisation
         window.onload = () => {
             loadInterventionData();
             updatePrestationsTable();
@@ -140,6 +142,7 @@
             saveBrouillon();
         };
 
+        // Charger les données de l'intervention depuis localStorage
         function loadInterventionData() {
             const intervention = JSON.parse(localStorage.getItem('currentIntervention')) || {};
             document.getElementById('clientName').textContent = intervention.client || 'Non sélectionné';
@@ -151,14 +154,16 @@
             document.getElementById('duree').value = intervention.duree || '';
             document.getElementById('reglementObservations').value = intervention.reglementObservations || '';
             if (intervention.delaiPaiement) {
-                document.querySelector(`input[name="delaiPaiement"][value="${intervention.delaiPaiement}"]`)?.setAttribute('checked', true);
+                const radio = document.querySelector(`input[name="delaiPaiement"][value="${intervention.delaiPaiement}"]`);
+                if (radio) radio.checked = true;
                 if (intervention.delaiPaiement === 'custom') {
                     document.getElementById('customDelai').value = intervention.customDelai || '';
                     document.getElementById('customDelai').style.display = 'block';
                 }
             }
             if (intervention.moyenPaiement) {
-                document.querySelector(`input[name="moyenPaiement"][value="${intervention.moyenPaiement}"]`)?.setAttribute('checked', true);
+                const radio = document.querySelector(`input[name="moyenPaiement"][value="${intervention.moyenPaiement}"]`);
+                if (radio) radio.checked = true;
                 if (intervention.moyenPaiement === 'custom') {
                     document.getElementById('customMoyen').value = intervention.customMoyen || '';
                     document.getElementById('customMoyen').style.display = 'block';
@@ -174,6 +179,7 @@
             }
         }
 
+        // Charger le résumé des extincteurs depuis CRM_extincteurs
         function loadExtincteurSummary() {
             const intervention = JSON.parse(localStorage.getItem('currentIntervention'));
             const tableBody = document.getElementById('extincteurSummaryList');
@@ -192,11 +198,13 @@
             }
         }
 
+        // Ajouter une prestation
         function addPrestation() {
             prestations.push({ designation: '', quantite: 1, puHT: 0, totalHT: 0 });
             updatePrestationsTable();
         }
 
+        // Mettre à jour le tableau des prestations
         function updatePrestationsTable() {
             const tableBody = document.getElementById('prestationsList');
             tableBody.innerHTML = '';
@@ -215,17 +223,20 @@
             saveBrouillon();
         }
 
+        // Mettre à jour une prestation
         function updatePrestation(index, field, value) {
             prestations[index][field] = field === 'designation' ? value : parseFloat(value) || 0;
             prestations[index].totalHT = prestations[index].quantite * prestations[index].puHT;
             updatePrestationsTable();
         }
 
+        // Supprimer une prestation
         function removePrestation(index) {
             prestations.splice(index, 1);
             updatePrestationsTable();
         }
 
+        // Calculer les totaux
         function calculateTotals() {
             const totalHT = prestations.reduce((sum, p) => sum + p.totalHT, 0);
             const tva = totalHT * 0.2;
@@ -235,18 +246,21 @@
             document.getElementById('totalTTC').textContent = totalTTC.toFixed(2) + ' €';
         }
 
+        // Afficher/masquer le champ personnalisé pour délai
         function toggleCustomDelai() {
             document.getElementById('customDelai').style.display = 
                 document.querySelector('input[name="delaiPaiement"][value="custom"]').checked ? 'block' : 'none';
             saveBrouillon();
         }
 
+        // Afficher/masquer le champ personnalisé pour moyen
         function toggleCustomMoyen() {
             document.getElementById('customMoyen').style.display = 
                 document.querySelector('input[name="moyenPaiement"][value="custom"]').checked ? 'block' : 'none';
             saveBrouillon();
         }
 
+        // Ouvrir le dialogue de signature
         function openSignatureDialog(type) {
             currentSignatureType = type;
             document.getElementById('signatureDialog').style.display = 'block';
@@ -255,16 +269,19 @@
             signaturePad = new SignaturePad(canvas);
         }
 
+        // Effacer la signature
         function clearSignature() {
             signaturePad.clear();
         }
 
-        function cancelSignature() {
+        // Fermer le dialogue de signature
+        function closeSignatureDialog() {
             signaturePad.clear();
             document.getElementById('signatureDialog').style.display = 'none';
             document.getElementById('signatureOverlay').style.display = 'none';
         }
 
+        // Valider la signature
         function validateSignature() {
             if (!signaturePad.isEmpty()) {
                 const img = document.getElementById(currentSignatureType + 'Signature');
@@ -273,9 +290,10 @@
                 document.getElementById(currentSignatureType + 'SignatureError').style.display = 'none';
                 saveBrouillon();
             }
-            cancelSignature();
+            closeSignatureDialog();
         }
 
+        // Sauvegarder le brouillon
         function saveBrouillon() {
             const interventionData = {
                 client: document.getElementById('clientName').textContent,
@@ -302,6 +320,7 @@
             localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
         }
 
+        // Valider l'intervention
         function validerIntervention() {
             const client = document.getElementById('clientName').textContent;
             const date = document.getElementById('dateIntervention').value;
@@ -380,6 +399,7 @@
             }
         }
 
+        // Générer le PDF
         function genererPDF() {
             const doc = new jsPDF();
             doc.setFontSize(20);
@@ -407,8 +427,8 @@
 
             // Détails Intervention
             doc.text('Détails de l’intervention', 20, y + 10);
-            doc.text(`Date: ${document.getElementById('dateIntervention').value}`, 20, y + 20);
-            doc.text(`Technicien: ${document.getElementById('technician').value}`, 20, y + 30);
+            doc.text(`Date: ${document.getElementById('dateIntervention').value || 'Non spécifiée'}`, 20, y + 20);
+            doc.text(`Technicien: ${document.getElementById('technician').value || 'Non spécifié'}`, 20, y + 30);
             doc.text(`Durée: ${document.getElementById('duree').value || '0'} heures`, 20, y + 40);
             y += 50;
 
@@ -431,22 +451,22 @@
             // Modalités
             doc.text('Modalités de règlement', 20, y + 50);
             const delai = document.querySelector('input[name="delaiPaiement"]:checked')?.value === 'custom' ? 
-                document.getElementById('customDelai').value : document.querySelector('input[name="delaiPaiement"]:checked')?.value || '';
+                document.getElementById('customDelai').value : document.querySelector('input[name="delaiPaiement"]:checked')?.value || 'Non spécifié';
             const moyen = document.querySelector('input[name="moyenPaiement"]:checked')?.value === 'custom' ? 
-                document.getElementById('customMoyen').value : document.querySelector('input[name="moyenPaiement"]:checked')?.value || '';
+                document.getElementById('customMoyen').value : document.querySelector('input[name="moyenPaiement"]:checked')?.value || 'Non spécifié';
             doc.text(`Délai: ${delai}`, 20, y + 60);
             doc.text(`Moyen: ${moyen}`, 20, y + 70);
-            doc.text(`Observations: ${document.getElementById('reglementObservations').value}`, 20, y + 80);
+            doc.text(`Observations: ${document.getElementById('reglementObservations').value || 'Aucune'}`, 20, y + 80);
             y += 90;
 
             // Signatures
             const clientSignature = document.getElementById('clientSignature').src;
             const technicienSignature = document.getElementById('technicienSignature').src;
-            if (clientSignature) {
+            if (clientSignature && clientSignature !== '') {
                 doc.addImage(clientSignature, 'PNG', 20, y, 80, 40);
                 doc.text('Signature Client', 20, y + 50);
             }
-            if (technicienSignature) {
+            if (technicienSignature && technicienSignature !== '') {
                 doc.addImage(technicienSignature, 'PNG', 110, y, 80, 40);
                 doc.text('Signature Technicien', 110, y + 50);
             }
@@ -454,19 +474,20 @@
             doc.save('bon_intervention.pdf');
         }
 
+        // Envoyer l'email
         function envoyerEmail() {
             const clientEmail = document.getElementById('clientEmail').textContent;
-            if (clientEmail === 'Non sélectionné') {
+            if (clientEmail === 'Non sélectionné' || !clientEmail.includes('@')) {
                 alert('Veuillez sélectionner un client avec un email valide.');
                 return;
             }
-            emailjs.init('VOTRE_USER_ID');
+            emailjs.init('VOTRE_USER_ID'); // Remplacer par votre user_id EmailJS
             const templateParams = {
                 to_email: clientEmail,
                 subject: 'Bon d’Intervention - MPro Incendie',
                 message: `Bonjour,\nVeuillez trouver ci-joint le bon d’intervention.\nTotal TTC: ${document.getElementById('totalTTC').textContent}\nCordialement,\nMPro Incendie`
             };
-            emailjs.send('VOTRE_SERVICE_ID', 'VOTRE_TEMPLATE_ID', templateParams)
+            emailjs.send('VOTRE_SERVICE_ID', 'VOTRE_TEMPLATE_ID', templateParams) // Remplacer par service_id et template_id
                 .then(() => alert('Email envoyé avec succès !'))
                 .catch(() => alert('Erreur lors de l’envoi de l’email.'));
         }
