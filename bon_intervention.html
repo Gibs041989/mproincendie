@@ -6,1141 +6,470 @@
     <title>Bon d'Intervention - MPro Incendie</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
-    <style>
-        body { overflow-x: hidden; }
-        .container { padding-bottom: 140px; width: 100%; max-width: 1200px; margin: 0 auto; }
-        .section { margin-bottom: 40px; padding: 15px; }
-        .table-container { width: 100%; }
-        #prestationsTable, #crmExtincteursTable { width: 100%; border-collapse: collapse; display: block !important; visibility: visible !important; }
-        #prestationsTable th, #prestationsTable td { padding: 12px; font-size: 15px; border: 1px solid #ddd; line-height: 1.4; vertical-align: middle; }
-        #prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { width: 40%; }
-        #prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { width: 60%; }
-        #prestationsTable input, #prestationsTable select { padding: 8px; font-size: 15px; height: 36px; width: 100%; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
-        #prestationsTable .select2-container { width: 100% !important; max-width: 100%; }
-        #prestationsTable .select2-selection { height: 36px !important; font-size: 15px !important; padding: 6px !important; border: 1px solid #ddd !important; border-radius: 4px !important; }
-        #totalsTable { max-width: 300px; margin: 10px 0 10px auto; border-collapse: collapse; }
-        #totalsTable th, #totalsTable td { padding: 8px; font-size: 14px; border: 1px solid #ddd; }
-        #crmExtincteursSection, #crmExtincteursTable { display: block !important; visibility: visible !important; }
-        #crmExtincteursTable th, #crmExtincteursTable td { padding: 8px; font-size: 14px; border: 1px solid #ddd; text-align: left; }
-        #crmExtincteursTable th { background-color: #f5f5f5; font-weight: bold; }
-        .action-buttons { display: flex; justify-content: flex-end; gap: 12px; padding: 8px 0; margin-top: 4px; }
-        .action-buttons button { font-size: 18px; padding: 8px; border: none; background: none; cursor: pointer; }
-        .action-buttons .validate-btn { font-size: 20px; }
-        .action-buttons button:disabled { opacity: 0.5; }
-        .btn-validate { color: #10b981; }
-        .btn-edit { color: #f59e0b; }
-        .btn-delete { color: #ef4444; }
-        .signature-pad { border: 1px solid #ddd; border-radius: 5px; margin-top: 6px; width: 100%; height: 100px; pointer-events: none; }
-        .signature-block { margin-bottom: 45px; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1002; }
-        .modal-content { background: #fff; margin: 10% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px; }
-        .modal-content canvas { width: 100%; height: 200px; border: 1px solid #ddd; }
-        .modal-buttons { display: flex; justify-content: space-between; margin-top: 10px; }
-        .error { border: 1px solid red !important; }
-        .error-message { color: red; font-size: 12px; margin-top: 2px; display: none; }
-        .nav-buttons { margin-bottom: 160px; z-index: 1000; position: relative; }
-        .floating-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            background: #e63946;
-            color: #fff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            cursor: pointer;
-            z-index: 1001;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-        .floating-btn::before, .floating-btn::after { content: none; }
-        .shortcut-panel {
-            display: none;
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            background: #fff;
-            border-radius: 8px;
-            padding: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            z-index: 1001;
-            width: 150px;
-        }
-        .shortcut-panel a {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 8px;
-            padding: 8px 12px;
-            font-size: 16px;
-            color: #333;
-            text-decoration: none;
-            margin: 2px 0;
-            border-radius: 4px;
-        }
-        .shortcut-panel a:hover { background: #f0f0f0; }
-        .shortcut-panel .close-btn {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            color: #333;
-        }
-        @media (max-width: 600px) {
-            body { overflow-x: hidden; }
-            .container { padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: none !important; padding-bottom: 140px !important; }
-            .section { padding: 10px !important; margin: 0 0 40px 0 !important; }
-            .table-container { width: 100% !important; margin: 0 !important; padding: 0 !important; }
-            #prestationsTable { margin: 0 !important; width: 100% !important; box-sizing: border-box; }
-            #prestationsTable th { display: none; }
-            #prestationsTable tr { display: block; margin: 0 0 12px 0 !important; padding: 8px 0; border: 1px solid #ddd; border-radius: 5px; background: #fff; width: 100% !important; box-sizing: border-box; }
-            #prestationsTable td { display: block; width: 100% !important; padding: 6px 8px; font-size: 14px; box-sizing: border-box; }
-            #prestationsTable td:nth-child(1) { margin-bottom: 8px; }
-            #prestationsTable td:nth-child(2) { padding: 0 8px; }
-            #prestationsTable .numeric-row { display: flex; flex-wrap: nowrap; gap: 4px; width: 100%; }
-            #prestationsTable .numeric-row .quantity-cell, #prestationsTable .numeric-row .unitPrice-cell, #prestationsTable .numeric-row .total-cell { flex: 1; min-width: 0; padding: 0; }
-            #prestationsTable td select, #prestationsTable td input, #prestationsTable .numeric-row input { font-size: 14px; padding: 8px; height: 40px; width: 100%; box-sizing: border-box; border-radius: 4px; }
-            #prestationsTable td:before { content: attr(data-label); display: block; font-size: 14px; font-weight: bold; color: #555; margin-bottom: 4px; }
-            #prestationsTable td:nth-child(1):before { content: "Désignation"; }
-            #prestationsTable td:nth-child(2):before { content: ""; }
-            .action-buttons { display: flex; justify-content: flex-end; gap: 10px; padding: 8px 8px; margin: 4px 0 0 0; width: 100% !important; box-sizing: border-box; }
-            .action-buttons button { font-size: 16px; padding: 6px; }
-            .action-buttons .validate-btn { font-size: 18px; }
-            .select2-container { width: 100% !important; }
-            .select2-selection { height: 40px !important; font-size: 14px !important; padding: 6px !important; border: 1px solid #ddd !important; border-radius: 4px !important; }
-            #crmExtincteursTable { overflow-x: auto; display: block !important; }
-            #crmExtincteursTable th { display: none; }
-            #crmExtincteursTable tr { display: block; margin-bottom: 8px; padding: 4px; border-radius: 5px; background: #fff; width: 100%; box-sizing: border-box; }
-            #crmExtincteursTable td { display: block; width: 100% !important; padding: 4px; font-size: 12px; box-sizing: border-box; border: none; }
-            #crmExtincteursTable td:before { content: attr(data-label); display: block; font-size: 12px; font-weight: bold; color: #555; margin-bottom: 2px; }
-            #crmExtincteursTable td:nth-child(1):before { content: "Nº"; }
-            #crmExtincteursTable td:nth-child(2):before { content: "Type"; }
-            #crmExtincteursTable td:nth-child(3):before { content: "Sect."; }
-            #crmExtincteursTable td:nth-child(4):before { content: "Opé."; }
-            .modal-content { margin: 20% auto; width: 95%; }
-            .nav-buttons { margin-bottom: 180px; z-index: 1000; }
-            .floating-btn { bottom: 15px; right: 15px; }
-            .shortcut-panel { bottom: 70px; right: 15px; width: 120px; }
-        }
-    </style>
 </head>
 <body>
     <div class="container">
         <h1>🔥 Bon d'Intervention</h1>
-        <section class="section">
+        
+        <div>
             <h2>🧾 Client</h2>
-            <p><strong>Client :</strong> <span id="clientName">Non sélectionné</span></p>
-            <p><strong>Adresse :</strong> <span id="adresse">Non sélectionnée</span></p>
-            <p><strong>Lieu d’intervention :</strong> <span id="locationAddress">Non sélectionné</span></p>
-            <p><strong>Email :</strong> <span id="email">Non sélectionné</span></p>
-        </section>
-        <section class="section" id="crmExtincteursSection">
+            <p>Client : <span id="clientName">Non sélectionné</span></p>
+            <p>Adresse : <span id="clientAdresse">Non sélectionnée</span></p>
+            <p>Lieu d’intervention : <span id="lieu">Non sélectionné</span></p>
+            <p>Email : <span id="clientEmail">Non sélectionné</span></p>
+        </div>
+        
+        <div>
             <h2>📋 Résumé CRM Extincteurs</h2>
-            <table id="crmExtincteursTable">
-                <thead>
-                    <tr>
-                        <th>Nº</th>
-                        <th>Type</th>
-                        <th>Sect.</th>
-                        <th>Opé.</th>
-                    </tr>
-                </thead>
-                <tbody id="crmExtincteursBody"></tbody>
+            <table id="extincteurSummaryTable">
+                <tr>
+                    <th>Nº</th>
+                    <th>Type</th>
+                    <th>Sect.</th>
+                    <th>Opé.</th>
+                </tr>
+                <tbody id="extincteurSummaryList"></tbody>
             </table>
-        </section>
-        <section class="section">
+        </div>
+        
+        <div>
             <h2>📅 Détails de l’intervention</h2>
-            <label>Date d’intervention : <input type="date" id="interventionDate" required oninput="saveDraft()"></label>
-            <label>Technicien : <input type="text" id="technician" placeholder="Nom du technicien" required oninput="saveDraft()"></label>
-            <label>Durée (heures) : <input type="number" id="duration" min="0" step="0.5" oninput="saveDraft()"></label>
-        </section>
-        <section class="section">
+            <p>Date d’intervention : <input type="date" id="dateIntervention"></p>
+            <p class="error-message" id="dateError">Veuillez indiquer une date</p>
+            <p>Technicien : <input type="text" id="technician" placeholder="Nom du technicien"></p>
+            <p class="error-message" id="technicienError">Veuillez indiquer un technicien</p>
+            <p>Durée (heures) : <input type="number" id="duree" min="0" step="0.5"></p>
+        </div>
+        
+        <div>
             <h2>📋 Prestations & Matériel</h2>
-            <div class="table-container">
-                <table id="prestationsTable">
-                    <thead>
-                        <tr>
-                            <th>Désignation</th>
-                            <th>Qté / PU HT / Total HT</th>
-                        </tr>
-                    </thead>
-                    <tbody id="prestationsBody"></tbody>
-                </table>
-                <button class="primary" onclick="addPrestation()" style="margin-top: 10px;">➕ Ajouter une ligne</button>
-            </div>
+            <table id="prestationsTable">
+                <tr>
+                    <th>Désignation</th>
+                    <th>Qté</th>
+                    <th>PU HT</th>
+                    <th>Prix Total HT</th>
+                </tr>
+                <tbody id="prestationsList"></tbody>
+            </table>
+            <p><a href="#" onclick="addPrestation()">➕ Ajouter une ligne</a></p>
             <table id="totalsTable">
                 <tr><th>Total HT</th><td id="totalHT">0.00 €</td></tr>
                 <tr><th>TVA 20%</th><td id="tva">0.00 €</td></tr>
                 <tr><th>Total TTC</th><td id="totalTTC">0.00 €</td></tr>
             </table>
-        </section>
-        <section class="section">
+        </div>
+        
+        <div>
             <h2>💳 Modalités de règlement</h2>
-            <label>Délais de règlement :
-                <select id="delaiReglement" onchange="toggleDelaiInput(); saveDraft()">
-                    <option value="Immédiat à l’intervention">Immédiat à l’intervention</option>
-                    <option value="À réception de facture">À réception de facture</option>
-                    <option value="Sous 30 jours à réception de facture">Sous 30 jours à réception de facture</option>
-                    <option value="custom">Saisie libre</option>
-                </select>
-                <input type="text" id="delaiCustom" style="display:none;" placeholder="Délais personnalisé" oninput="saveDraft()">
-            </label>
-            <label>Moyen de règlement :
-                <select id="moyenReglement" onchange="toggleMoyenInput(); saveDraft()">
-                    <option value="Chèque">Chèque</option>
-                    <option value="Virement">Virement</option>
-                    <option value="Espèces">Espèces</option>
-                    <option value="custom">Saisie libre</option>
-                </select>
-                <input type="text" id="moyenCustom" style="display:none;" placeholder="Moyen personnalisé" oninput="saveDraft()">
-            </label>
-            <label>Observations :
-                <textarea id="observations" rows="3" placeholder="Notes supplémentaires" oninput="saveDraft()"></textarea>
-            </label>
-        </section>
-        <section class="section">
+            <p>Délais de règlement :</p>
+            <ul>
+                <li><label><input type="radio" name="delaiPaiement" value="Immédiat à l’intervention" onchange="saveBrouillon()"> Immédiat à l’intervention</label></li>
+                <li><label><input type="radio" name="delaiPaiement" value="À réception de facture" onchange="saveBrouillon()"> À réception de facture</label></li>
+                <li><label><input type="radio" name="delaiPaiement" value="Sous 30 jours à réception de facture" onchange="saveBrouillon()"> Sous 30 jours à réception de facture</label></li>
+                <li><label><input type="radio" name="delaiPaiement" value="custom" onchange="toggleCustomDelai()"> Saisie libre</label>
+                    <input type="text" id="customDelai" style="display: none;" placeholder="Délai personnalisé" oninput="saveBrouillon()"></li>
+            </ul>
+            <p>Moyen de règlement :</p>
+            <ul>
+                <li><label><input type="radio" name="moyenPaiement" value="Chèque" onchange="saveBrouillon()"> Chèque</label></li>
+                <li><label><input type="radio" name="moyenPaiement" value="Virement" onchange="saveBrouillon()"> Virement</label></li>
+                <li><label><input type="radio" name="moyenPaiement" value="Espèces" onchange="saveBrouillon()"> Espèces</label></li>
+                <li><label><input type="radio" name="moyenPaiement" value="custom" onchange="toggleCustomMoyen()"> Saisie libre</label>
+                    <input type="text" id="customMoyen" style="display: none;" placeholder="Moyen personnalisé" oninput="saveBrouillon()"></li>
+            </ul>
+            <p>Observations :</p>
+            <textarea id="reglementObservations" oninput="saveBrouillon()"></textarea>
+        </div>
+        
+        <div>
             <h2>✍️ Signatures</h2>
-            <div class="signature-block">
-                <h3>Client</h3>
-                <button class="action" onclick="openSignatureModal('client')">Signer</button>
-                <canvas id="client-signature-pad" class="signature-pad"></canvas>
+            <div>
+                <p>Client</p>
+                <p><a href="#" onclick="openSignatureDialog('client')">Signer</a></p>
+                <img id="clientSignature" style="display: none; width: 300px; height: 150px;">
+                <p class="error-message" id="clientSignatureError">Veuillez signer</p>
             </div>
-            <div class="signature-block">
-                <h3>Technicien</h3>
-                <button class="action" onclick="openSignatureModal('technician')">Signer</button>
-                <canvas id="technician-signature-pad" class="signature-pad"></canvas>
-            </div>
-        </section>
-        <section class="section nav-buttons">
-            <button class="primary" onclick="validateBonIntervention()">✅ Valider</button>
-            <button class="secondary" onclick="saveDraft()">💾 Brouillon</button>
-            <button class="secondary" onclick="generatePDF()">📄 PDF</button>
-            <button class="secondary" onclick="sendEmail()">📧 Email</button>
-            <a href="intervention.html"><button class="neutral">⬅️ Retour</button></a>
-        </section>
-    </div>
-    <div class="floating-btn" onclick="toggleShortcutPanel()">
-        <i class="fas fa-bars"></i>
-    </div>
-    <div class="shortcut-panel" id="shortcutPanel">
-        <span class="close-btn" onclick="toggleShortcutPanel()">✖</span>
-        <a href="index.html"><i class="fas fa-home"></i> Accueil</a>
-        <a href="client.html"><i class="fas fa-folder"></i> Clients</a>
-        <a href="intervention.html"><i class="fas fa-tools"></i> Interventions</a>
-        <a href="parametres.html"><i class="fas fa-cog"></i> Paramètres</a>
-    </div>
-    <div id="signature-modal" class="modal">
-        <div class="modal-content">
-            <h3 id="modal-title">Signature</h3>
-            <canvas id="modal-signature-pad"></canvas>
-            <div class="modal-buttons">
-                <button class="secondary" onclick="clearModalSignature()">Effacer</button>
-                <button class="secondary" onclick="closeSignatureModal()">Annuler</button>
-                <button class="action" onclick="validateModalSignature()">Valider</button>
+            <div>
+                <p>Technicien</p>
+                <p><a href="#" onclick="openSignatureDialog('technicien')">Signer</a></p>
+                <img id="technicienSignature" style="display: none; width: 300px; height: 150px;">
+                <p class="error-message" id="technicienSignatureError">Veuillez signer</p>
             </div>
         </div>
+        
+        <div class="nav-buttons">
+            <p><a href="#" onclick="validerIntervention()">✅ Valider</a></p>
+            <p><a href="#" onclick="saveBrouillon()">💾 Brouillon</a></p>
+            <p><a href="#" onclick="genererPDF()">📄 PDF</a></p>
+            <p><a href="#" onclick="envoyerEmail()">📧 Email</a></p>
+            <p><a href="index.html">⬅️ Retour</a></p>
+        </div>
+        
+        <div>
+            <p><a href="index.html">🏠</a></p>
+            <p><a href="client.html">📁</a></p>
+            <p><a href="bon_intervention.html">🛠️</a></p>
+            <p><a href="#">⚙️</a></p>
+        </div>
+        
+        <div id="signatureDialog" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000;">
+            <p>Signature</p>
+            <canvas id="signatureCanvas" width="300" height="150" style="border: 1px solid #ddd;"></canvas>
+            <p><a href="#" onclick="clearSignature()">Effacer</a></p>
+            <p><a href="#" onclick="cancelSignature()">Annuler</a></p>
+            <p><a href="#" onclick="validateSignature()">Valider</a></p>
+        </div>
+        <div id="signatureOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999;"></div>
+        
+        <p><a class="floating-btn" onclick="addPrestation()">➕</a></p>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
     <script>
-        console.log('jQuery loaded:', typeof $ !== 'undefined' ? 'Yes' : 'No');
-        emailjs.init("YOUR_EMAILJS_USER_ID");
-        let currentSignatureType = '';
-        const clientCanvas = document.getElementById('client-signature-pad');
-        const technicianCanvas = document.getElementById('technician-signature-pad');
-        const modalCanvas = document.getElementById('modal-signature-pad');
-        const clientSignaturePad = new SignaturePad(clientCanvas, { penColor: 'black' });
-        const technicianSignaturePad = new SignaturePad(technicianCanvas, { penColor: 'black' });
-        let modalSignaturePad;
-
-        function resizeCanvas(canvas) {
-            const ratio = Math.max(window.devicePixelRatio || 1, 1);
-            canvas.width = canvas.offsetWidth * ratio;
-            canvas.height = canvas.offsetHeight * ratio;
-            canvas.getContext('2d').scale(ratio, ratio);
-        }
-
-        function loadSignatures() {
-            try {
-                const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
-                if (signatures.client) {
-                    clientSignaturePad.fromDataURL(signatures.client);
-                } else {
-                    clientSignaturePad.clear();
-                }
-                if (signatures.technician) {
-                    technicianSignaturePad.fromDataURL(signatures.technician);
-                } else {
-                    technicianSignaturePad.clear();
-                }
-            } catch (e) {
-                console.error('loadSignatures: Error:', e);
-            }
-        }
-
-        window.addEventListener('resize', () => {
-            resizeCanvas(clientCanvas);
-            resizeCanvas(technicianCanvas);
-            loadSignatures();
-            if (modalSignaturePad) resizeCanvas(modalCanvas);
-        });
-
-        resizeCanvas(clientCanvas);
-        resizeCanvas(technicianCanvas);
-
-        function openSignatureModal(type) {
-            console.log('openSignatureModal: Opening for type', type);
-            try {
-                currentSignatureType = type;
-                document.getElementById('signature-modal').style.display = 'block';
-                modalSignaturePad = new SignaturePad(modalCanvas, { penColor: 'black' });
-                resizeCanvas(modalCanvas);
-                const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
-                if (type === 'client' && signatures.client) {
-                    modalSignaturePad.fromDataURL(signatures.client);
-                } else if (type === 'technician' && signatures.technician) {
-                    modalSignaturePad.fromDataURL(signatures.technician);
-                } else {
-                    modalSignaturePad.clear();
-                }
-            } catch (e) {
-                console.error('openSignatureModal: Error:', e);
-            }
-        }
-
-        function closeSignatureModal() {
-            try {
-                document.getElementById('signature-modal').style.display = 'none';
-                modalSignaturePad = null;
-            } catch (e) {
-                console.error('closeSignatureModal: Error:', e);
-            }
-        }
-
-        function clearModalSignature() {
-            try {
-                if (modalSignaturePad) {
-                    modalSignaturePad.clear();
-                    console.log('clearModalSignature: Signature cleared');
-                }
-                const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
-                if (currentSignatureType === 'client') {
-                    delete signatures.client;
-                    clientSignaturePad.clear();
-                } else if (currentSignatureType === 'technician') {
-                    delete signatures.technician;
-                    technicianSignaturePad.clear();
-                }
-                localStorage.setItem('signatures', JSON.stringify(signatures));
-            } catch (e) {
-                console.error('clearModalSignature: Error:', e);
-            }
-        }
-
-        function validateModalSignature() {
-            try {
-                if (modalSignaturePad.isEmpty()) {
-                    alert('Veuillez apposer une signature.');
-                    return;
-                }
-                const dataURL = modalSignaturePad.toDataURL('image/png', 0.7);
-                const signatures = JSON.parse(localStorage.getItem('signatures') || '{}');
-                if (currentSignatureType === 'client') {
-                    clientSignaturePad.fromDataURL(dataURL);
-                    signatures.client = dataURL;
-                } else {
-                    technicianSignaturePad.fromDataURL(dataURL);
-                    signatures.technician = dataURL;
-                }
-                localStorage.setItem('signatures', JSON.stringify(signatures));
-                saveDraft();
-                closeSignatureModal();
-                console.log('validateModalSignature: Signature saved for', currentSignatureType);
-            } catch (e) {
-                console.error('validateModalSignature: Error:', e);
-            }
-        }
-
-        const articlesDB = [
-            { name: "Extincteur CO2 5kg", unitPrice: 150.00 },
-            { name: "Maintenance RIA", unitPrice: 80.00 },
-            { name: "BAES Type 1", unitPrice: 120.00 }
-        ];
-
-        function addPrestation() {
-            console.log('addPrestation: Attempting to add new row');
-            try {
-                const tbody = document.getElementById('prestationsBody');
-                if (!tbody) {
-                    console.error('addPrestation: prestationsBody not found');
-                    alert('Erreur : Tableau des prestations non trouvé.');
-                    return;
-                }
-                const index = tbody.children.length;
-                console.log('addPrestation: Adding row with index', index);
-                const row = document.createElement('tr');
-                row.id = `row-${index}`;
-                row.innerHTML = `
-                    <td data-label="Désignation">
-                        <select class="designation" onchange="updateDesignation(${index})">
-                            <option value="">Choisir un article</option>
-                            ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}">${article.name}</option>`).join('')}
-                            <option value="custom">Saisie libre</option>
-                        </select>
-                        <input type="text" class="custom-designation" style="display:none;" placeholder="Désignation manuelle" oninput="updateRow(${index})">
-                        <div class="error-message" id="designation-error-${index}">Veuillez sélectionner ou saisir une désignation</div>
-                    </td>
-                    <td data-label="Qté / PU HT / Total HT">
-                        <div class="numeric-row">
-                            <div class="quantity-cell">
-                                <input type="number" class="quantity" value="1" min="1" required oninput="updateRow(${index})">
-                                <div class="error-message" id="quantity-error-${index}">Quantité doit être > 0</div>
-                            </div>
-                            <div class="unitPrice-cell">
-                                <input type="number" class="unitPrice" placeholder="PU HT" step="0.01" required oninput="updateRow(${index})">
-                                <div class="error-message" id="unitPrice-error-${index}">Prix unitaire doit être > 0</div>
-                            </div>
-                            <div class="total-cell">
-                                <input type="number" class="total" readonly>
-                            </div>
-                        </div>
-                    </td>`;
-                const actionDiv = document.createElement('div');
-                actionDiv.className = 'action-buttons';
-                actionDiv.id = `action-buttons-${index}`;
-                actionDiv.innerHTML = `
-                    <button class="btn-validate validate-btn" id="validate-${index}" onclick="validateRow(${index})" disabled title="Valider"><i class="fas fa-check-circle"></i></button>
-                    <button class="btn-edit edit-btn" id="edit-${index}" onclick="editRow(${index})" disabled title="Modifier"><i class="fas fa-pencil-alt"></i></button>
-                    <button class="btn-delete delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>`;
-                tbody.appendChild(row);
-                tbody.appendChild(actionDiv);
-                try {
-                    const selectElement = row.querySelector('.designation');
-                    if (selectElement && typeof $.fn.select2 === 'function') {
-                        $(selectElement).select2({ width: '100%' });
-                        console.log('addPrestation: Select2 initialized for row', index);
-                    } else {
-                        console.warn('addPrestation: Select2 not initialized, jQuery or Select2 not loaded properly');
-                    }
-                } catch (e) {
-                    console.error('addPrestation: Error initializing Select2:', e);
-                }
-                savePrestations();
-                updateTotals();
-                console.log('addPrestation: Row added successfully');
-            } catch (e) {
-                console.error('addPrestation: Error adding row:', e);
-                alert('Erreur lors de l’ajout de la prestation.');
-            }
-        }
-
-        function updateDesignation(index) {
-            try {
-                const row = document.getElementById(`row-${index}`);
-                if (!row) {
-                    console.error('updateDesignation: Row not found for index', index);
-                    return;
-                }
-                const select = row.querySelector('.designation');
-                const customInput = row.querySelector('.custom-designation');
-                const unitPriceInput = row.querySelector('.unitPrice');
-                const quantityInput = row.querySelector('.quantity');
-                if (select.value === 'custom') {
-                    customInput.style.display = 'block';
-                    unitPriceInput.value = '';
-                } else {
-                    customInput.style.display = 'none';
-                    const selectedOption = select.options[select.selectedIndex];
-                    unitPriceInput.value = selectedOption.dataset.price || '';
-                }
-                quantityInput.value = 1;
-                updateRow(index);
-            } catch (e) {
-                console.error('updateDesignation: Error:', e);
-            }
-        }
-
-        function updateRow(index) {
-            try {
-                const row = document.getElementById(`row-${index}`);
-                if (!row) {
-                    console.error('updateRow: Row not found for index', index);
-                    return;
-                }
-                const select = row.querySelector('.designation');
-                const customDesignation = row.querySelector('.custom-designation');
-                const quantityInput = row.querySelector('.quantity');
-                const unitPriceInput = row.querySelector('.unitPrice');
-                const totalInput = row.querySelector('.total');
-                const designationError = document.getElementById(`designation-error-${index}`);
-                const quantityError = document.getElementById(`quantity-error-${index}`);
-                const unitPriceError = document.getElementById(`unitPrice-error-${index}`);
-                const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value.trim()) : select.value;
-                const quantity = parseFloat(quantityInput.value) || 0;
-                const unitPrice = parseFloat(unitPriceInput.value) || 0;
-
-                let isValid = true;
-
-                if (!designation) {
-                    (select.value === 'custom' ? customDesignation : select).classList.add('error');
-                    designationError.style.display = 'block';
-                    isValid = false;
-                } else {
-                    (select.value === 'custom' ? customDesignation : select).classList.remove('error');
-                    designationError.style.display = 'none';
-                }
-
-                if (quantity <= 0 || isNaN(quantity)) {
-                    quantityInput.classList.add('error');
-                    quantityError.style.display = 'block';
-                    isValid = false;
-                } else {
-                    quantityInput.classList.remove('error');
-                    quantityError.style.display = 'none';
-                }
-
-                if (unitPrice <= 0 || isNaN(unitPrice)) {
-                    unitPriceInput.classList.add('error');
-                    unitPriceError.style.display = 'block';
-                    isValid = false;
-                } else {
-                    unitPriceInput.classList.remove('error');
-                    unitPriceError.style.display = 'none';
-                }
-
-                totalInput.value = (quantity * unitPrice).toFixed(2);
-                const validateBtn = document.getElementById(`validate-${index}`);
-                const editBtn = document.getElementById(`edit-${index}`);
-                if (validateBtn) validateBtn.disabled = !isValid;
-                if (editBtn) editBtn.disabled = !isValid;
-
-                savePrestations();
-                updateTotals();
-            } catch (e) {
-                console.error('updateRow: Error:', e);
-            }
-        }
-
-        function validateRow(index) {
-            try {
-                const row = document.getElementById(`row-${index}`);
-                if (!row) {
-                    console.error('validateRow: Row not found for index', index);
-                    return;
-                }
-                const select = row.querySelector('.designation');
-                const customDesignation = row.querySelector('.custom-designation');
-                const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value.trim()) : select.value;
-                const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
-                const unitPrice = parseFloat(row.querySelector('.unitPrice').value) || 0;
-                if (!designation || quantity <= 0 || unitPrice <= 0) {
-                    alert('Remplir tous les champs correctement.');
-                    return;
-                }
-                row.querySelectorAll('input, select').forEach(input => input.disabled = true);
-                row.classList.add('active');
-                row.onclick = () => editRow(index);
-                savePrestations();
-                updateTotals();
-            } catch (e) {
-                console.error('validateRow: Error:', e);
-            }
-        }
-
-        function editRow(index) {
-            try {
-                const row = document.getElementById(`row-${index}`);
-                if (!row) {
-                    console.error('editRow: Row not found for index', index);
-                    return;
-                }
-                row.querySelectorAll('input, select').forEach(input => input.disabled = false);
-                const actionButtons = document.getElementById(`action-buttons-${index}`);
-                if (actionButtons) actionButtons.style.display = 'flex';
-                row.classList.remove('active');
-                row.onclick = null;
-            } catch (e) {
-                console.error('editRow: Error:', e);
-            }
-        }
-
-        function removeRow(index) {
-            try {
-                const row = document.getElementById(`row-${index}`);
-                const actionButtons = document.getElementById(`action-buttons-${index}`);
-                if (row) row.remove();
-                if (actionButtons) actionButtons.remove();
-                savePrestations();
-                updateTotals();
-            } catch (e) {
-                console.error('removeRow: Error:', e);
-            }
-        }
-
-        function savePrestations() {
-            try {
-                const prestationsData = [];
-                document.querySelectorAll('#prestationsBody tr').forEach(row => {
-                    const select = row.querySelector('.designation');
-                    if (!select) return;
-                    const customDesignation = row.querySelector('.custom-designation');
-                    const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value) : select.value;
-                    const quantity = row.querySelector('.quantity').value;
-                    const unitPrice = row.querySelector('.unitPrice').value;
-                    const total = row.querySelector('.total').value;
-                    if (designation && quantity && unitPrice && total) {
-                        prestationsData.push({ designation, quantity, unitPrice, total });
-                    }
-                });
-                localStorage.setItem('prestationsData', JSON.stringify(prestationsData));
-                console.log('savePrestations: Prestations saved:', prestationsData);
-            } catch (e) {
-                console.error('savePrestations: Error:', e);
-                alert('Stockage plein.');
-            }
-            saveDraft();
-        }
-
-        function loadPrestations() {
-            console.log('loadPrestations: Loading prestations');
-            try {
-                const prestationsData = JSON.parse(localStorage.getItem('prestationsData') || '[]');
-                const tbody = document.getElementById('prestationsBody');
-                if (!tbody) {
-                    console.error('loadPrestations: prestationsBody not found');
-                    return;
-                }
-                tbody.innerHTML = '';
-                prestationsData.forEach((item, index) => {
-                    const isCustom = !articlesDB.some(article => article.name === item.designation);
-                    const row = document.createElement('tr');
-                    row.id = `row-${index}`;
-                    row.innerHTML = `
-                        <td data-label="Désignation">
-                            <select class="designation" onchange="updateDesignation(${index})" disabled>
-                                <option value="">Choisir un article</option>
-                                ${articlesDB.map(article => `<option value="${article.name}" data-price="${article.unitPrice}" ${article.name === item.designation ? 'selected' : ''}>${article.name}</option>`).join('')}
-                                <option value="custom" ${isCustom ? 'selected' : ''}>Saisie libre</option>
-                            </select>
-                            <input type="text" class="custom-designation" value="${isCustom ? item.designation : ''}" style="display:${isCustom ? 'block' : 'none'};" disabled>
-                            <div class="error-message" id="designation-error-${index}">Veuillez sélectionner ou saisir une désignation</div>
-                        </td>
-                        <td data-label="Qté / PU HT / Total HT">
-                            <div class="numeric-row">
-                                <div class="quantity-cell">
-                                    <input type="number" class="quantity" value="${item.quantity || '1'}" min="1" required disabled>
-                                    <div class="error-message" id="quantity-error-${index}">Quantité doit être > 0</div>
-                                </div>
-                                <div class="unitPrice-cell">
-                                    <input type="number" class="unitPrice" value="${item.unitPrice || ''}" step="0.01" required disabled>
-                                    <div class="error-message" id="unitPrice-error-${index}">Prix unitaire doit être > 0</div>
-                                </div>
-                                <div class="total-cell">
-                                    <input type="number" class="total" value="${item.total || ''}" readonly>
-                                </div>
-                            </div>
-                        </td>`;
-                    const actionDiv = document.createElement('div');
-                    actionDiv.className = 'action-buttons';
-                    actionDiv.id = `action-buttons-${index}`;
-                    actionDiv.innerHTML = `
-                        <button class="btn-validate validate-btn" id="validate-${index}" onclick="validateRow(${index})" disabled title="Valider"><i class="fas fa-check-circle"></i></button>
-                        <button class="btn-edit edit-btn" id="edit-${index}" onclick="editRow(${index})" disabled title="Modifier"><i class="fas fa-pencil-alt"></i></button>
-                        <button class="btn-delete delete-btn" onclick="removeRow(${index})" title="Supprimer"><i class="fas fa-trash-alt"></i></button>`;
-                    row.classList.add('active');
-                    row.onclick = () => editRow(index);
-                    tbody.appendChild(row);
-                    tbody.appendChild(actionDiv);
-                    try {
-                        const selectElement = row.querySelector('.designation');
-                        if (selectElement && typeof $.fn.select2 === 'function') {
-                            $(selectElement).select2({ width: '100%' });
-                            console.log('loadPrestations: Select2 initialized for row', index);
-                        }
-                    } catch (e) {
-                        console.error('loadPrestations: Error initializing Select2:', e);
-                    }
-                });
-                updateTotals();
-                if (!prestationsData.length) addPrestation();
-                console.log('loadPrestations: Prestations loaded:', prestationsData);
-            } catch (e) {
-                console.error('loadPrestations: Error:', e);
-            }
-        }
-
-        function updateTotals() {
-            try {
-                let totalHT = 0;
-                document.querySelectorAll('#prestationsBody tr').forEach(row => {
-                    const totalInput = row.querySelector('.total');
-                    if (totalInput) {
-                        const total = parseFloat(totalInput.value) || 0;
-                        totalHT += total;
-                    }
-                });
-                const tva = totalHT * 0.2;
-                const totalTTC = totalHT + tva;
-                document.getElementById('totalHT').textContent = totalHT.toFixed(2) + ' €';
-                document.getElementById('tva').textContent = tva.toFixed(2) + ' €';
-                document.getElementById('totalTTC').textContent = totalTTC.toFixed(2) + ' €';
-                console.log('updateTotals: Totals updated - HT:', totalHT, 'TVA:', tva, 'TTC:', totalTTC);
-            } catch (e) {
-                console.error('updateTotals: Error:', e);
-            }
-        }
-
-        function toggleDelaiInput() {
-            try {
-                const select = document.getElementById('delaiReglement');
-                const customInput = document.getElementById('delaiCustom');
-                if (select && customInput) {
-                    customInput.style.display = select.value === 'custom' ? 'block' : 'none';
-                }
-            } catch (e) {
-                console.error('toggleDelaiInput: Error:', e);
-            }
-        }
-
-        function toggleMoyenInput() {
-            try {
-                const select = document.getElementById('moyenReglement');
-                const customInput = document.getElementById('moyenCustom');
-                if (select && customInput) {
-                    customInput.style.display = select.value === 'custom' ? 'block' : 'none';
-                }
-            } catch (e) {
-                console.error('toggleMoyenInput: Error:', e);
-            }
-        }
-
-        function sanitizeInput(input) {
-            return DOMPurify.sanitize(input);
-        }
-
-        function loadClientInfo() {
-            console.log('loadClientInfo: Loading client info');
-            try {
-                const intervention = JSON.parse(localStorage.getItem('currentIntervention') || '{}');
-                if (!intervention.client) {
-                    console.warn('loadClientInfo: No client selected');
-                    alert('Aucun client sélectionné.');
-                    window.location.href = 'intervention.html';
-                    return;
-                }
-                const clientName = document.getElementById('clientName');
-                const adresse = document.getElementById('adresse');
-                const email = document.getElementById('email');
-                const locationAddress = document.getElementById('locationAddress');
-                if (clientName) clientName.textContent = intervention.client || 'Non sélectionné';
-                if (adresse) adresse.textContent = intervention.adresse || 'Non sélectionnée';
-                if (email) email.textContent = intervention.email || 'Non sélectionné';
-                if (locationAddress) {
-                    locationAddress.textContent = intervention.lieu && intervention.lieu !== intervention.adresse ? intervention.lieu : 'Même adresse';
-                }
-                const clients = JSON.parse(localStorage.getItem('clients') || '[]');
-                const client = clients.find(c => c.name === intervention.client);
-                if (client) {
-                    const moyenReglement = document.getElementById('moyenReglement');
-                    const delaiReglement = document.getElementById('delaiReglement');
-                    if (moyenReglement) moyenReglement.value = client.moyenReglement || 'Chèque';
-                    if (delaiReglement) delaiReglement.value = client.delaiReglement || 'Immédiat à l’intervention';
-                    toggleMoyenInput();
-                    toggleDelaiInput();
-                }
-                console.log('loadClientInfo: Client info loaded:', intervention);
-            } catch (e) {
-                console.error('loadClientInfo: Error:', e);
-            }
-        }
-
-        function loadCrmExtincteurs() {
-            console.log('loadCrmExtincteurs: Starting at', new Date().toISOString());
-            const crmSection = document.getElementById('crmExtincteursSection');
-            const tbody = document.getElementById('crmExtincteursBody');
-            console.log('loadCrmExtincteurs: crmSection found:', !!crmSection, 'tbody found:', !!tbody);
-
-            if (!crmSection || !tbody) {
-                console.error('loadCrmExtincteurs: Missing DOM elements');
-                if (tbody) {
-                    tbody.innerHTML = '<tr><td colspan="4">Erreur de chargement</td></tr>';
-                }
-                return;
-            }
-
-            crmSection.style.display = 'block';
-            crmSection.style.visibility = 'visible';
-            tbody.innerHTML = '';
-
-            let extincteursData = [];
-            try {
-                const interventionRaw = localStorage.getItem('currentIntervention');
-                console.log('loadCrmExtincteurs: Raw currentIntervention:', interventionRaw);
-                if (interventionRaw) {
-                    const intervention = JSON.parse(interventionRaw);
-                    console.log('loadCrmExtincteurs: Parsed currentIntervention:', intervention);
-                    if (intervention.crm_extincteurs && Array.isArray(intervention.crm_extincteurs.extincteurs)) {
-                        extincteursData = intervention.crm_extincteurs.extincteurs;
-                        console.log('loadCrmExtincteurs: Found extincteurs data:', extincteursData);
-                    } else {
-                        console.warn('loadCrmExtincteurs: No extincteurs data in currentIntervention.crm_extincteurs');
-                    }
-                } else {
-                    console.warn('loadCrmExtincteurs: currentIntervention not found in localStorage');
-                }
-            } catch (e) {
-                console.error('loadCrmExtincteurs: Error parsing currentIntervention:', e);
-            }
-
-            console.log('loadCrmExtincteurs: Full localStorage contents:', Object.keys(localStorage).map(key => ({ [key]: localStorage.getItem(key) })));
-
-            if (!Array.isArray(extincteursData) || extincteursData.length === 0) {
-                console.log('loadCrmExtincteurs: No valid data or empty array');
-                tbody.innerHTML = '<tr><td colspan="4">Aucun extincteur</td></tr>';
-                return;
-            }
-
-            console.log('loadCrmExtincteurs: Processing data...');
-            let hasValidData = false;
-            extincteursData.forEach((item, index) => {
-                if (item && typeof item === 'object') {
-                    hasValidData = true;
-                    console.log(`loadCrmExtincteurs: Rendering item ${index}:`, item);
-                    const emplacementAbbr = (item.emplacement || '').substring(0, 4) || 'N/A';
-                    tbody.innerHTML += `
-                        <tr>
-                            <td data-label="Nº">${item.num || item.id || 'N/A'}</td>
-                            <td data-label="Type">${item.type || item.typeExtincteur || 'N/A'}</td>
-                            <td data-label="Sect.">${emplacementAbbr}</td>
-                            <td data-label="Opé.">${item.operations || item.operation || 'N/A'}${item.pp ? ` [${item.pp}]` : ''}</td>
-                        </tr>`;
-                } else {
-                    console.warn(`loadCrmExtincteurs: Invalid item at index ${index}:`, item);
-                }
-            });
-
-            if (!hasValidData) {
-                console.log('loadCrmExtincteurs: No valid entries');
-                tbody.innerHTML = '<tr><td colspan="4">Données CRM mal formées</td></tr>';
-            }
-
-            const computedStyle = window.getComputedStyle(crmSection);
-            console.log('loadCrmExtincteurs: crmSection computed styles - display:', computedStyle.display, 'visibility:', computedStyle.visibility);
-        }
-
-        function saveCrmData(data) {
-            try {
-                console.log('saveCrmData: Saving data to currentIntervention.crm_extincteurs:', data);
-                const intervention = JSON.parse(localStorage.getItem('currentIntervention') || '{}');
-                intervention.crm_extincteurs = { extincteurs: data };
-                localStorage.setItem('currentIntervention', JSON.stringify(intervention));
-                console.log('saveCrmData: Data saved successfully');
-            } catch (e) {
-                console.error('saveCrmData: Error saving data:', e);
-                alert('Erreur lors de la sauvegarde des données CRM.');
-            }
-        }
-
-        function saveDraft() {
-            try {
-                const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
-                drafts['bon_intervention'] = {
-                    client: sanitizeInput(document.getElementById('clientName').textContent),
-                    adresse: sanitizeInput(document.getElementById('adresse').textContent),
-                    locationAddress: sanitizeInput(document.getElementById('locationAddress').textContent),
-                    email: sanitizeInput(document.getElementById('email').textContent),
-                    interventionDate: document.getElementById('interventionDate').value,
-                    technician: sanitizeInput(document.getElementById('technician').value),
-                    duration: document.getElementById('duration').value,
-                    delaiReglement: document.getElementById('delaiReglement').value === 'custom' ? sanitizeInput(document.getElementById('delaiCustom').value) : document.getElementById('delaiReglement').value,
-                    moyenReglement: document.getElementById('moyenReglement').value === 'custom' ? sanitizeInput(document.getElementById('moyenCustom').value) : document.getElementById('moyenReglement').value,
-                    observations: sanitizeInput(document.getElementById('observations').value),
-                    prestations: JSON.parse(localStorage.getItem('prestationsData') || '[]'),
-                    summary: `Bon d'intervention pour ${sanitizeInput(document.getElementById('clientName').textContent)}`,
-                    timestamp: Date.now()
-                };
-                localStorage.setItem('drafts', JSON.stringify(drafts));
-                console.log('saveDraft: Draft saved');
-            } catch (e) {
-                console.error('saveDraft: Error:', e);
-                alert('Stockage plein.');
-            }
-        }
-
-        function loadDraft() {
-            try {
-                const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
-                const draft = drafts['bon_intervention'];
-                if (draft) {
-                    const interventionDate = document.getElementById('interventionDate');
-                    const technician = document.getElementById('technician');
-                    const duration = document.getElementById('duration');
-                    const delaiReglement = document.getElementById('delaiReglement');
-                    const moyenReglement = document.getElementById('moyenReglement');
-                    const delaiCustom = document.getElementById('delaiCustom');
-                    const moyenCustom = document.getElementById('moyenCustom');
-                    const observations = document.getElementById('observations');
-                    if (interventionDate) interventionDate.value = draft.interventionDate || '';
-                    if (technician) technician.value = draft.technician || '';
-                    if (duration) duration.value = draft.duration || '';
-                    if (delaiReglement) delaiReglement.value = draft.delaiReglement === draft.delaiCustom ? 'custom' : draft.delaiReglement || 'Immédiat à l’intervention';
-                    if (moyenReglement) moyenReglement.value = draft.moyenReglement === draft.moyenCustom ? 'custom' : draft.moyenReglement || 'Chèque';
-                    if (delaiCustom) delaiCustom.value = draft.delaiReglement === 'custom' ? draft.delaiCustom : '';
-                    if (moyenCustom) moyenCustom.value = draft.moyenReglement === 'custom' ? draft.moyenCustom : '';
-                    if (observations) observations.value = draft.observations || '';
-                    toggleDelaiInput();
-                    toggleMoyenInput();
-                    console.log('loadDraft: Draft loaded');
-                }
-            } catch (e) {
-                console.error('loadDraft: Error:', e);
-            }
-        }
-
-        function validateBonIntervention() {
-            try {
-                const prestations = JSON.parse(localStorage.getItem('prestationsData') || '[]');
-                if (prestations.length === 0) {
-                    alert('Ajoutez au moins une prestation.');
-                    return;
-                }
-                if (clientSignaturePad.isEmpty() || technicianSignaturePad.isEmpty()) {
-                    alert('Signatures client et technicien requises.');
-                    return;
-                }
-                const interventionDate = document.getElementById('interventionDate');
-                const technician = document.getElementById('technician');
-                if (!interventionDate.value || !technician.value) {
-                    alert('Date et technicien requis.');
-                    return;
-                }
-                const clients = JSON.parse(localStorage.getItem('clients') || '[]');
-                const clientName = document.getElementById('clientName').textContent;
-                const client = clients.find(c => c.name === clientName);
-                if (client) {
-                    client.interventions = client.interventions || [];
-                    client.moyenReglement = document.getElementById('moyenReglement').value === 'custom' ? sanitizeInput(document.getElementById('moyenCustom').value) : document.getElementById('moyenReglement').value;
-                    client.delaiReglement = document.getElementById('delaiReglement').value === 'custom' ? sanitizeInput(document.getElementById('delaiCustom').value) : document.getElementById('delaiReglement').value;
-                    client.interventions.push({
-                        id: `bon_${Date.now()}`,
-                        date: interventionDate.value,
-                        technician: sanitizeInput(technician.value),
-                        duration: document.getElementById('duration').value,
-                        prestations,
-                        totalHT: document.getElementById('totalHT').textContent,
-                        tva: document.getElementById('tva').textContent,
-                        totalTTC: document.getElementById('totalTTC').textContent,
-                        delaiReglement: document.getElementById('delaiReglement').value === 'custom' ? sanitizeInput(document.getElementById('delaiCustom').value) : document.getElementById('delaiReglement').value,
-                        moyenReglement: document.getElementById('moyenReglement').value === 'custom' ? sanitizeInput(document.getElementById('moyenCustom').value) : document.getElementById('moyenReglement').value,
-                        observations: sanitizeInput(document.getElementById('observations').value),
-                        signatures: JSON.parse(localStorage.getItem('signatures') || '{}'),
-                        summary: `Bon d'intervention du ${interventionDate.value}`
-                    });
-                    localStorage.setItem('clients', JSON.stringify(clients));
-                }
-                const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
-                delete drafts['bon_intervention'];
-                localStorage.setItem('drafts', JSON.stringify(drafts));
-                localStorage.removeItem('prestationsData');
-                localStorage.removeItem('signatures');
-                alert('Bon validé !');
-                window.location.href = 'intervention.html';
-            } catch (e) {
-                console.error('validateBonIntervention: Error:', e);
-            }
-        }
-
-        function generatePDF() {
-            try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                doc.addImage('assets/logo.png', 'PNG', 160, 10, 30, 15);
-                doc.setFontSize(20);
-                doc.setFont("helvetica", "bold");
-                doc.text("Bon d'Intervention - MPro Incendie", 20, 20);
-                doc.setLineWidth(0.5);
-                doc.line(20, 25, 190, 25);
-                doc.setFontSize(14);
-                doc.setFont("helvetica", "bold");
-                doc.text("Client", 20, 35);
-                doc.setFontSize(12);
-                doc.setFont("helvetica", "normal");
-                doc.text(`Nom: ${sanitizeInput(document.getElementById('clientName').textContent)}`, 20, 45);
-                doc.text(`Adresse: ${sanitizeInput(document.getElementById('adresse').textContent)}`, 20, 50);
-                doc.text(`Lieu: ${sanitizeInput(document.getElementById('locationAddress').textContent)}`, 20, 55);
-                doc.text(`Email: ${sanitizeInput(document.getElementById('email').textContent)}`, 20, 60);
-                doc.setFontSize(14);
-                doc.setFont("helvetica", "bold");
-                doc.text("Résumé CRM Extincteurs", 20, 75);
-                let extincteursData = [];
-                try {
-                    const intervention = JSON.parse(localStorage.getItem('currentIntervention') || '{}');
-                    if (intervention.crm_extincteurs && Array.isArray(intervention.crm_extincteurs.extincteurs)) {
-                        extincteursData = intervention.crm_extincteurs.extincteurs;
-                    }
-                } catch (e) {
-                    console.error('generatePDF: Error parsing extincteurs data:', e);
-                }
-                let y = 80;
-                if (extincteursData.length > 0) {
-                    doc.autoTable({
-                        startY: y,
-                        head: [['Nº', 'Type', 'Sect.', 'Opé.']],
-                        body: extincteursData.map(item => [
-                            item.num || item.id || 'N/A',
-                            item.type || item.typeExtincteur || 'N/A',
-                            (item.emplacement || '').substring(0, 4) || 'N/A',
-                            (item.operations || item.operation || 'N/A') + (item.pp ? ` [${item.pp}]` : '')
-                        ]),
-                        styles: { fontSize: 10, cellPadding: 2 },
-                        headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0] },
-                        margin: { left: 20, right: 20 }
-                    });
-                    y = doc.lastAutoTable.finalY + 10;
-                } else {
-                    y += 10;
-                }
-                doc.setFontSize(14);
-                doc.setFont("helvetica", "bold");
-                doc.text("Prestations & Matériel", 20, y);
-                const rows = document.querySelectorAll('#prestationsBody tr');
-                if (rows.length > 0) {
-                    doc.autoTable({
-                        startY: y + 5,
-                        head: [['Désignation', 'Qté', 'PU HT (€)', 'Total HT (€)']],
-                        body: Array.from(rows).map(row => {
-                            const select = row.querySelector('.designation');
-                            const customDesignation = row.querySelector('.custom-designation');
-                            const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value) : select.value;
-                            return [
-                                designation || '-',
-                                row.querySelector('.quantity').value || '0',
-                                row.querySelector('.unitPrice').value || '0.00',
-                                row.querySelector('.total').value || '0.00'
-                            ];
-                        }),
-                        styles: { fontSize: 10, cellPadding: 2 },
-                        headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0] },
-                        margin: { left: 20, right: 20 }
-                    });
-                    y = doc.lastAutoTable.finalY + 10;
-                } else {
-                    doc.setFontSize(10);
-                    doc.text("Aucune prestation.", 20, y + 5);
-                    y += 15;
-                }
-                doc.setFontSize(12);
-                doc.setFont("helvetica", "bold");
-                doc.text("Totaux", 20, y);
-                doc.autoTable({
-                    startY: y + 5,
-                    body: [
-                        ['Total HT', document.getElementById('totalHT').textContent],
-                        ['TVA 20%', document.getElementById('tva').textContent],
-                        ['Total TTC', document.getElementById('totalTTC').textContent]
-                    ],
-                    styles: { fontSize: 10, cellPadding: 2 },
-                    columnStyles: { 0: { fontStyle: 'bold' } },
-                    margin: { left: 20, right: 20 }
-                });
-                y = doc.lastAutoTable.finalY + 10;
-                doc.setFontSize(12);
-                doc.setFont("helvetica", "bold");
-                doc.text("Modalités de règlement", 20, y);
-                doc.setFontSize(10);
-                doc.setFont("helvetica", "normal");
-                doc.text(`Délais: ${sanitizeInput(document.getElementById('delaiReglement').value === 'custom' ? document.getElementById('delaiCustom').value : document.getElementById('delaiReglement').value)}`, 20, y + 5);
-                doc.text(`Moyen: ${sanitizeInput(document.getElementById('moyenReglement').value === 'custom' ? document.getElementById('moyenCustom').value : document.getElementById('moyenReglement').value)}`, 20, y + 10);
-                const observations = sanitizeInput(document.getElementById('observations').value);
-                if (observations) {
-                    doc.text("Observations:", 20, y + 15);
-                    doc.text(doc.splitTextToSize(observations, 170), 20, y + 20);
-                    y += 20 + (Math.ceil(observations.length / 85) * 5);
-                } else {
-                    y += 15;
-                }
-                doc.setFontSize(12);
-                doc.setFont("helvetica", "bold");
-                doc.text("Signatures", 20, y);
-                if (!clientSignaturePad.isEmpty()) {
-                    doc.setFontSize(10);
-                    doc.text('Client:', 20, y + 10);
-                    doc.addImage(clientSignaturePad.toDataURL('image/png', 1.0), 'PNG', 20, y + 15, 60, 30);
-                }
-                if (!technicianSignaturePad.isEmpty()) {
-                    doc.setFontSize(10);
-                    doc.text('Technicien:', 110, y + 10);
-                    doc.addImage(technicianSignaturePad.toDataURL('image/png', 1.0), 'PNG', 110, y + 15, 60, 30);
-                }
-                doc.setFontSize(10);
-                doc.text('MPro Incendie - SIRET: 123456789', 20, 280);
-                doc.save(`bon_intervention_${new Date().toISOString().slice(0,10)}.pdf`);
-            } catch (e) {
-                console.error('generatePDF: Error:', e);
-            }
-        }
-
-        function sendEmail() {
-            try {
-                const clientEmail = document.getElementById('email').textContent;
-                const prestations = JSON.parse(localStorage.getItem('prestationsData') || '[]');
-                if (prestations.length === 0) {
-                    alert('Ajoutez au moins une prestation avant envoi.');
-                    return;
-                }
-                emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', {
-                    to_email: clientEmail,
-                    client: sanitizeInput(document.getElementById('clientName').textContent),
-                    date: document.getElementById('interventionDate').value,
-                    prestations: JSON.stringify(prestations),
-                    total: document.getElementById('totalTTC').textContent,
-                    observations: sanitizeInput(document.getElementById('observations').value),
-                    signature_client: clientSignaturePad.toDataURL('image/png', 0.7),
-                    signature_technician: technicianSignaturePad.toDataURL('image/png', 0.7)
-                }).then(() => alert('Email envoyé !'), () => alert('Erreur envoi.'));
-            } catch (e) {
-                console.error('sendEmail: Error:', e);
-            }
-        }
-
-        function toggleShortcutPanel() {
-            try {
-                const panel = document.getElementById('shortcutPanel');
-                if (panel) {
-                    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-                    console.log('toggleShortcutPanel: Panel display:', panel.style.display);
-                }
-            } catch (e) {
-                console.error('toggleShortcutPanel: Error:', e);
-            }
-        }
+        let prestations = JSON.parse(localStorage.getItem('prestations')) || [];
+        let signaturePad, currentSignatureType;
+        const { jsPDF } = window.jspdf;
 
         window.onload = () => {
-            console.log('window.onload: Initializing at', new Date().toISOString());
-            console.log('jQuery loaded:', typeof $ !== 'undefined' ? 'Yes' : 'No');
-            try {
-                localStorage.removeItem('signatures');
-                clientSignaturePad.clear();
-                technicianSignaturePad.clear();
-                loadClientInfo();
-                loadCrmExtincteurs();
-                loadPrestations();
-                loadSignatures();
-                loadDraft();
-                setInterval(saveDraft, 10000);
-            } catch (e) {
-                console.error('window.onload: Error:', e);
-            }
+            loadInterventionData();
+            updatePrestationsTable();
+            loadExtincteurSummary();
+            saveBrouillon();
         };
+
+        function loadInterventionData() {
+            const intervention = JSON.parse(localStorage.getItem('currentIntervention')) || {};
+            document.getElementById('clientName').textContent = intervention.client || 'Non sélectionné';
+            document.getElementById('clientAdresse').textContent = intervention.clientAdresse || 'Non sélectionnée';
+            document.getElementById('lieu').textContent = intervention.lieu || 'Non sélectionné';
+            document.getElementById('clientEmail').textContent = intervention.clientEmail || 'Non sélectionné';
+            document.getElementById('dateIntervention').value = intervention.date || '';
+            document.getElementById('technician').value = intervention.technician || '';
+            document.getElementById('duree').value = intervention.duree || '';
+            document.getElementById('reglementObservations').value = intervention.reglementObservations || '';
+            if (intervention.delaiPaiement) {
+                document.querySelector(`input[name="delaiPaiement"][value="${intervention.delaiPaiement}"]`)?.setAttribute('checked', true);
+                if (intervention.delaiPaiement === 'custom') {
+                    document.getElementById('customDelai').value = intervention.customDelai || '';
+                    document.getElementById('customDelai').style.display = 'block';
+                }
+            }
+            if (intervention.moyenPaiement) {
+                document.querySelector(`input[name="moyenPaiement"][value="${intervention.moyenPaiement}"]`)?.setAttribute('checked', true);
+                if (intervention.moyenPaiement === 'custom') {
+                    document.getElementById('customMoyen').value = intervention.customMoyen || '';
+                    document.getElementById('customMoyen').style.display = 'block';
+                }
+            }
+            if (intervention.clientSignature) {
+                document.getElementById('clientSignature').src = intervention.clientSignature;
+                document.getElementById('clientSignature').style.display = 'block';
+            }
+            if (intervention.technicienSignature) {
+                document.getElementById('technicienSignature').src = intervention.technicienSignature;
+                document.getElementById('technicienSignature').style.display = 'block';
+            }
+        }
+
+        function loadExtincteurSummary() {
+            const intervention = JSON.parse(localStorage.getItem('currentIntervention'));
+            const tableBody = document.getElementById('extincteurSummaryList');
+            tableBody.innerHTML = '';
+            if (intervention && intervention.crm_extincteurs && intervention.crm_extincteurs.extincteurs) {
+                intervention.crm_extincteurs.extincteurs.forEach(ext => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${ext.id}</td>
+                        <td>${ext.type}</td>
+                        <td>${ext.emplacement || 'N/A'}</td>
+                        <td>${ext.operations || ''}${ext.pp ? `[${ext.pp}]` : ''}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        }
+
+        function addPrestation() {
+            prestations.push({ designation: '', quantite: 1, puHT: 0, totalHT: 0 });
+            updatePrestationsTable();
+        }
+
+        function updatePrestationsTable() {
+            const tableBody = document.getElementById('prestationsList');
+            tableBody.innerHTML = '';
+            prestations.forEach((prestation, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="text" value="${prestation.designation}" oninput="updatePrestation(${index}, 'designation', this.value)"></td>
+                    <td><input type="number" value="${prestation.quantite}" min="1" oninput="updatePrestation(${index}, 'quantite', this.value)"></td>
+                    <td><input type="number" value="${prestation.puHT}" min="0" step="0.01" oninput="updatePrestation(${index}, 'puHT', this.value)"></td>
+                    <td>${prestation.totalHT.toFixed(2)} €</td>
+                    <td><a href="#" onclick="removePrestation(${index})">Supprimer</a></td>
+                `;
+                tableBody.appendChild(row);
+            });
+            calculateTotals();
+            saveBrouillon();
+        }
+
+        function updatePrestation(index, field, value) {
+            prestations[index][field] = field === 'designation' ? value : parseFloat(value) || 0;
+            prestations[index].totalHT = prestations[index].quantite * prestations[index].puHT;
+            updatePrestationsTable();
+        }
+
+        function removePrestation(index) {
+            prestations.splice(index, 1);
+            updatePrestationsTable();
+        }
+
+        function calculateTotals() {
+            const totalHT = prestations.reduce((sum, p) => sum + p.totalHT, 0);
+            const tva = totalHT * 0.2;
+            const totalTTC = totalHT + tva;
+            document.getElementById('totalHT').textContent = totalHT.toFixed(2) + ' €';
+            document.getElementById('tva').textContent = tva.toFixed(2) + ' €';
+            document.getElementById('totalTTC').textContent = totalTTC.toFixed(2) + ' €';
+        }
+
+        function toggleCustomDelai() {
+            document.getElementById('customDelai').style.display = 
+                document.querySelector('input[name="delaiPaiement"][value="custom"]').checked ? 'block' : 'none';
+            saveBrouillon();
+        }
+
+        function toggleCustomMoyen() {
+            document.getElementById('customMoyen').style.display = 
+                document.querySelector('input[name="moyenPaiement"][value="custom"]').checked ? 'block' : 'none';
+            saveBrouillon();
+        }
+
+        function openSignatureDialog(type) {
+            currentSignatureType = type;
+            document.getElementById('signatureDialog').style.display = 'block';
+            document.getElementById('signatureOverlay').style.display = 'block';
+            const canvas = document.getElementById('signatureCanvas');
+            signaturePad = new SignaturePad(canvas);
+        }
+
+        function clearSignature() {
+            signaturePad.clear();
+        }
+
+        function cancelSignature() {
+            signaturePad.clear();
+            document.getElementById('signatureDialog').style.display = 'none';
+            document.getElementById('signatureOverlay').style.display = 'none';
+        }
+
+        function validateSignature() {
+            if (!signaturePad.isEmpty()) {
+                const img = document.getElementById(currentSignatureType + 'Signature');
+                img.src = signaturePad.toDataURL();
+                img.style.display = 'block';
+                document.getElementById(currentSignatureType + 'SignatureError').style.display = 'none';
+                saveBrouillon();
+            }
+            cancelSignature();
+        }
+
+        function saveBrouillon() {
+            const interventionData = {
+                client: document.getElementById('clientName').textContent,
+                clientAdresse: document.getElementById('clientAdresse').textContent,
+                lieu: document.getElementById('lieu').textContent,
+                clientEmail: document.getElementById('clientEmail').textContent,
+                date: document.getElementById('dateIntervention').value,
+                technician: document.getElementById('technician').value,
+                duree: document.getElementById('duree').value,
+                prestations: prestations,
+                delaiPaiement: document.querySelector('input[name="delaiPaiement"]:checked')?.value || '',
+                customDelai: document.getElementById('customDelai').value,
+                moyenPaiement: document.querySelector('input[name="moyenPaiement"]:checked')?.value || '',
+                customMoyen: document.getElementById('customMoyen').value,
+                reglementObservations: document.getElementById('reglementObservations').value,
+                clientSignature: document.getElementById('clientSignature').src,
+                technicienSignature: document.getElementById('technicienSignature').src,
+                crm_extincteurs: JSON.parse(localStorage.getItem('currentIntervention'))?.crm_extincteurs || {},
+                timestamp: new Date().toISOString()
+            };
+            let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
+            drafts['bon_intervention'] = interventionData;
+            localStorage.setItem('drafts', JSON.stringify(drafts));
+            localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
+        }
+
+        function validerIntervention() {
+            const client = document.getElementById('clientName').textContent;
+            const date = document.getElementById('dateIntervention').value;
+            const technician = document.getElementById('technician').value;
+            const clientSignature = document.getElementById('clientSignature').src;
+            const technicienSignature = document.getElementById('technicienSignature').src;
+
+            let isValid = true;
+            document.getElementById('dateError').style.display = 'none';
+            document.getElementById('technicienError').style.display = 'none';
+            document.getElementById('clientSignatureError').style.display = 'none';
+            document.getElementById('technicienSignatureError').style.display = 'none';
+
+            if (!client || client === 'Non sélectionné') {
+                alert('Le nom du client est obligatoire.');
+                isValid = false;
+            }
+            if (!date) {
+                document.getElementById('dateError').style.display = 'block';
+                isValid = false;
+            }
+            if (!technician) {
+                document.getElementById('technicienError').style.display = 'block';
+                isValid = false;
+            }
+            if (!clientSignature || clientSignature === '') {
+                document.getElementById('clientSignatureError').style.display = 'block';
+                isValid = false;
+            }
+            if (!technicienSignature || technicienSignature === '') {
+                document.getElementById('technicienSignatureError').style.display = 'block';
+                isValid = false;
+            }
+            if (prestations.length === 0) {
+                alert('Veuillez ajouter au moins une prestation.');
+                isValid = false;
+            }
+
+            if (isValid) {
+                const interventionData = {
+                    client: client,
+                    clientAdresse: document.getElementById('clientAdresse').textContent,
+                    lieu: document.getElementById('lieu').textContent,
+                    clientEmail: document.getElementById('clientEmail').textContent,
+                    date: date,
+                    technician: technician,
+                    duree: document.getElementById('duree').value,
+                    prestations: prestations,
+                    delaiPaiement: document.querySelector('input[name="delaiPaiement"]:checked')?.value || '',
+                    customDelai: document.getElementById('customDelai').value,
+                    moyenPaiement: document.querySelector('input[name="moyenPaiement"]:checked')?.value || '',
+                    customMoyen: document.getElementById('customMoyen').value,
+                    reglementObservations: document.getElementById('reglementObservations').value,
+                    clientSignature: clientSignature,
+                    technicienSignature: technicienSignature,
+                    crm_extincteurs: JSON.parse(localStorage.getItem('currentIntervention'))?.crm_extincteurs || {},
+                    timestamp: new Date().toISOString()
+                };
+
+                // Enregistrement dans l'historique client
+                let clientHistory = JSON.parse(localStorage.getItem('clientHistory')) || {};
+                const clientId = JSON.parse(localStorage.getItem('currentIntervention'))?.clientId || client;
+                if (!clientHistory[clientId]) clientHistory[clientId] = [];
+                clientHistory[clientId].push(interventionData);
+                localStorage.setItem('clientHistory', JSON.stringify(clientHistory));
+
+                // Nettoyage des brouillons
+                let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
+                delete drafts['bon_intervention'];
+                localStorage.setItem('drafts', JSON.stringify(drafts));
+                localStorage.removeItem('currentIntervention');
+                localStorage.removeItem('prestations');
+
+                alert('Bon d’intervention validé avec succès !');
+                window.location.href = 'index.html';
+            }
+        }
+
+        function genererPDF() {
+            const doc = new jsPDF();
+            doc.setFontSize(20);
+            doc.setTextColor('#e63946');
+            doc.text('Bon d’Intervention - MPro Incendie', 20, 20);
+            doc.setFontSize(12);
+            doc.setTextColor(0);
+
+            // Client
+            doc.text(`Client: ${document.getElementById('clientName').textContent}`, 20, 40);
+            doc.text(`Adresse: ${document.getElementById('clientAdresse').textContent}`, 20, 50);
+            doc.text(`Lieu: ${document.getElementById('lieu').textContent}`, 20, 60);
+            doc.text(`Email: ${document.getElementById('clientEmail').textContent}`, 20, 70);
+
+            // Résumé Extincteurs
+            doc.text('Résumé CRM Extincteurs', 20, 90);
+            let y = 100;
+            const intervention = JSON.parse(localStorage.getItem('currentIntervention'));
+            if (intervention && intervention.crm_extincteurs && intervention.crm_extincteurs.extincteurs) {
+                intervention.crm_extincteurs.extincteurs.forEach(ext => {
+                    doc.text(`#${ext.id} - ${ext.type} (${ext.emplacement}) ${ext.operations}${ext.pp ? `[${ext.pp}]` : ''}`, 20, y);
+                    y += 10;
+                });
+            }
+
+            // Détails Intervention
+            doc.text('Détails de l’intervention', 20, y + 10);
+            doc.text(`Date: ${document.getElementById('dateIntervention').value}`, 20, y + 20);
+            doc.text(`Technicien: ${document.getElementById('technician').value}`, 20, y + 30);
+            doc.text(`Durée: ${document.getElementById('duree').value || '0'} heures`, 20, y + 40);
+            y += 50;
+
+            // Prestations
+            doc.text('Prestations & Matériel', 20, y);
+            y += 10;
+            prestations.forEach(p => {
+                doc.text(`${p.designation} - Qté: ${p.quantite} - PU HT: ${p.puHT}€ - Total: ${p.totalHT.toFixed(2)}€`, 20, y);
+                y += 10;
+            });
+
+            // Totaux
+            const totalHT = prestations.reduce((sum, p) => sum + p.totalHT, 0);
+            const tva = totalHT * 0.2;
+            const totalTTC = totalHT + tva;
+            doc.text(`Total HT: ${totalHT.toFixed(2)} €`, 20, y + 10);
+            doc.text(`TVA 20%: ${tva.toFixed(2)} €`, 20, y + 20);
+            doc.text(`Total TTC: ${totalTTC.toFixed(2)} €`, 20, y + 30);
+
+            // Modalités
+            doc.text('Modalités de règlement', 20, y + 50);
+            const delai = document.querySelector('input[name="delaiPaiement"]:checked')?.value === 'custom' ? 
+                document.getElementById('customDelai').value : document.querySelector('input[name="delaiPaiement"]:checked')?.value || '';
+            const moyen = document.querySelector('input[name="moyenPaiement"]:checked')?.value === 'custom' ? 
+                document.getElementById('customMoyen').value : document.querySelector('input[name="moyenPaiement"]:checked')?.value || '';
+            doc.text(`Délai: ${delai}`, 20, y + 60);
+            doc.text(`Moyen: ${moyen}`, 20, y + 70);
+            doc.text(`Observations: ${document.getElementById('reglementObservations').value}`, 20, y + 80);
+            y += 90;
+
+            // Signatures
+            const clientSignature = document.getElementById('clientSignature').src;
+            const technicienSignature = document.getElementById('technicienSignature').src;
+            if (clientSignature) {
+                doc.addImage(clientSignature, 'PNG', 20, y, 80, 40);
+                doc.text('Signature Client', 20, y + 50);
+            }
+            if (technicienSignature) {
+                doc.addImage(technicienSignature, 'PNG', 110, y, 80, 40);
+                doc.text('Signature Technicien', 110, y + 50);
+            }
+
+            doc.save('bon_intervention.pdf');
+        }
+
+        function envoyerEmail() {
+            const clientEmail = document.getElementById('clientEmail').textContent;
+            if (clientEmail === 'Non sélectionné') {
+                alert('Veuillez sélectionner un client avec un email valide.');
+                return;
+            }
+            emailjs.init('VOTRE_USER_ID');
+            const templateParams = {
+                to_email: clientEmail,
+                subject: 'Bon d’Intervention - MPro Incendie',
+                message: `Bonjour,\nVeuillez trouver ci-joint le bon d’intervention.\nTotal TTC: ${document.getElementById('totalTTC').textContent}\nCordialement,\nMPro Incendie`
+            };
+            emailjs.send('VOTRE_SERVICE_ID', 'VOTRE_TEMPLATE_ID', templateParams)
+                .then(() => alert('Email envoyé avec succès !'))
+                .catch(() => alert('Erreur lors de l’envoi de l’email.'));
+        }
     </script>
 </body>
 </html>
