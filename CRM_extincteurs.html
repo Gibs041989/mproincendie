@@ -2,653 +2,280 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Compte-rendu Extincteurs - MPro Incendie</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bon d'Intervention - MPro Incendie</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <style>
-        .extincteur { 
-            border: 1px solid #ddd; 
-            padding: 15px; 
-            margin: 15px 0; 
-            border-radius: 8px; 
-            background-color: #f9f9f9; 
-        }
-        .extincteur h3 { 
-            margin-top: 0; 
-            color: #c62828; 
-        }
-        .summary { 
-            margin-top: 10px; 
-            padding: 10px; 
-            background-color: #e0f7fa; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            transition: background-color 0.3s ease; 
-        }
-        .summary:hover { 
-            background-color: #b3e5fc; 
-        }
-        .summary-content { 
-            display: flex; 
-            align-items: center; 
-            gap: 5px; 
-        }
-        .summary-content::before { 
-            content: "🧯"; 
-        }
-        .footer-nav { 
-            position: fixed; 
-            bottom: 0; 
-            left: 0; 
-            right: 0; 
-            background-color: #f5f5f5; 
-            padding: 10px 0; 
-            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); 
-            z-index: 1000; 
-        }
-        .footer-nav .navigation { 
-            margin: 0; 
-            display: flex; 
-            flex-direction: row; 
-            flex-wrap: nowrap; 
-            justify-content: space-around; 
-            align-items: center; 
-            gap: 20px; 
-        }
-        .footer-nav a { 
-            flex: 1; 
-            text-align: center; 
-            padding: 10px; 
-            font-size: 22px; 
-            background-color: transparent; 
-            border-radius: 8px; 
-            transition: background-color 0.3s ease; 
-        }
-        .footer-nav a:hover { 
-            background-color: #ffebee; 
-        }
-        .checkbox-container { 
-            display: flex; 
-            align-items: center; 
-            padding: 8px; 
-            margin: 5px 0; 
-            border: 1px solid #ddd; 
-            border-radius: 4px; 
-            background-color: #fff; 
-            cursor: pointer; 
-            transition: background-color 0.3s ease; 
-        }
-        .checkbox-container:hover { 
-            background-color: #f0f0f0; 
-        }
-        .checkbox-container.checked { 
-            background-color: #e0f7fa; 
-        }
-        .checkbox-container label { 
-            margin: 0; 
-            font-weight: normal; 
-            white-space: nowrap; 
-        }
-        .checkbox-container input { 
-            margin-left: auto; 
-            width: 20px; 
-            height: 20px; 
-        }
-        .custom-input { 
-            display: none; 
-            margin-top: 5px; 
-        }
-        .extincteur-counter { 
-            font-style: italic; 
-            color: #666; 
-            margin-top: 5px; 
-        }
-        .error-message { 
-            color: #d32f2f; 
-            font-size: 0.9em; 
-            margin-top: 5px; 
-            display: none; 
-        }
-        .extincteur .form-content { 
-            display: block; 
-        }
-        .extincteur .form-content.hidden { 
-            display: none; 
-        }
-        .extincteur .form-content.read-only input,
-        .extincteur .form-content.read-only select,
-        .extincteur .form-content.read-only textarea,
-        .extincteur .form-content.read-only .checkbox-container input {
-            background-color: #e0e0e0;
-            pointer-events: none;
-        }
-        .extincteur .form-content.read-only button { 
-            display: none; 
-        }
-        .action-dialog {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #fff;
-            border: 1px solid #ddd;
-            padding: 20px;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            border-radius: 8px;
-            min-width: 300px;
-        }
-        .action-dialog p {
-            margin-bottom: 15px;
-            font-size: 16px;
-        }
-        .action-dialog button {
-            margin: 0 10px;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            display: inline-block;
-        }
-        .action-dialog button:first-child {
-            background-color: #10b981;
-            color: #fff;
-        }
-        .action-dialog button:first-child:hover {
-            background-color: #059669;
-        }
-        .action-dialog button:nth-child(2) {
-            background-color: #e63946;
-            color: #fff;
-        }
-        .action-dialog button:nth-child(2):hover {
-            background-color: #d00000;
-        }
-        .action-dialog button:last-child {
-            background-color: #f1f1f1;
-            color: #555;
-        }
-        .action-dialog button:last-child:hover {
-            background-color: #e0e0e0;
-        }
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-        .section {
-            margin-bottom: 40px;
-        }
-        .nav-buttons {
-            margin-top: 40px;
-            padding-bottom: 60px;
-        }
-        @media (max-width: 600px) {
-            .nav-buttons a, .nav-buttons button { 
-                flex: 1 1 100%; 
-                padding: 12px; 
-                font-size: 20px; 
-            }
-            .extincteur { 
-                padding: 12px; 
-            }
-            .footer-nav a { 
-                font-size: 24px; 
-                padding: 10px; 
-            }
-            .checkbox-container { 
-                padding: 8px; 
-            }
-            .checkbox-container label { 
-                font-size: 18px; 
-            }
-            .checkbox-container input { 
-                width: 28px; 
-                height: 28px; 
-            }
-            .summary { 
-                padding: 10px; 
-                font-size: 18px; 
-            }
-            .action-dialog {
-                width: 90%;
-                min-width: 280px;
-            }
-            .action-dialog button {
-                margin: 5px;
-                padding: 6px 12px;
-                font-size: 12px;
-            }
-        }
-    </style>
+    <link rel="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <section class="section">
+        <h1>🔥 Bon d'Intervention</h1>
+        
+        <section class="client">
             <h2>🧾 Client</h2>
-            <p><strong>Client:</strong> <span id="clientName">Non sélectionné</span></p>
-            <p><strong>Lieu d’intervention:</strong> <span id="lieu">Non sélectionné</span></p>
+            <p>Client : <span id="clientName">Non sélectionné</span></p>
+            <p>Adresse : <span id="clientAdresse">Non sélectionnée</span></p>
+            <p>Lieu d’intervention : <span id="lieu">Non sélectionné</span></p>
+            <p>Email : <span id="clientEmail">Non sélectionné</span></p>
         </section>
-
+        
+        <section class="section">
+            <h2>📋 Résumé CRM Extincteurs</h2>
+            <div class="table-container">
+                <table id="extincteurSummaryTable">
+                    <thead>
+                        <tr>
+                            <th>Nº</th>
+                            <th>Type</th>
+                            <th>Sect.</th>
+                            <th>Opé.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="extincteurSummaryList"></tbody>
+                </table>
+            </div>
+        </section>
+        
         <section class="section">
             <h2>📅 Détails de l’intervention</h2>
-            <label>Date d’intervention: <input type="date" id="interventionDate" required></label>
+            <label>Date d’intervention : <input type="date" id="dateIntervention"></label>
             <span class="error-message" id="dateError">Veuillez indiquer une date</span>
-            <label>Technicien intervenant: <input type="text" id="technician" placeholder="Nom du technicien"></label>
+            <label>Technicien : <input type="text" id="technician"></label>
+            <span class="error-message" id="technicienError"></span>
+            <label>Durée (heures) : <input type="number" id="duree" min="0" step="0.5"></label>
         </section>
-
+        
         <section class="section">
-            <h2>🧯 Extincteurs</h2>
-            <div id="extincteursList"></div>
-            <p class="extincteur-counter" id="extincteurCounter">Extincteurs validés : 0</p>
-            <button class="action" onclick="addExtincteur()">➕ Ajouter un extincteur</button>
-            <p id="extincteurError" class="error-message">Veuillez ajouter au moins un extincteur.</p>
+            <h2>📋 Prestations & Matériel</h2>
+            <div class="table-container">
+                <table id="prestationsTable">
+                    <thead>
+                        <tr>
+                            <th>Désignation</th>
+                            <th>Qté</th>
+                            <th>PU HT</th>
+                            <th>Prix Total HT</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prestationsList"></tbody>
+                </table>
+            </div>
+            <table id="totalsTable">
+                <tr><th>Total HT :</th><td id="totalHT">0.00 €</td></tr>
+                <tr><th>TVA 20% :</th><td id="tva">0.00 €</td></tr>
+                <tr><th>Total TTC :</th><td id="totalTTC">0.00 €</td></tr>
+            </table>
         </section>
-
+        
         <section class="section">
-            <h2>✅ Devoir de conseil</h2>
-            <div class="checkbox-container">
-                <label for="registre">Registre présent et à jour</label>
-                <input type="checkbox" id="registre" onchange="updateCheckboxStyle(this)">
-            </div>
-            <div class="checkbox-container">
-                <label for="signaletique">Signalétique à jour</label>
-                <input type="checkbox" id="signaletique" onchange="updateCheckboxStyle(this)">
-            </div>
-            <div class="checkbox-container">
-                <label for="baes">BAES présents</label>
-                <input type="checkbox" id="baes" onchange="updateCheckboxStyle(this)">
-            </div>
-            <div class="checkbox-container">
-                <label for="plans">Plans de sécurité présents et à jour</label>
-                <input type="checkbox" id="plans" onchange="updateCheckboxStyle(this)">
-            </div>
+            <h2>💳 Modalités de règlement</h2>
+            <label>Délais de règlement :
+                <id="delaiPaiement">
+                    <option>Immédiat à l’intervention</option>
+                    <option>À réception de facture</option>
+                    <option>Sous 30 jours à réception de facture</option>
+                    <option value="custom">Saisie libre</option>
+                </select>
+                <input type="text" id="customDelai" style="display: none;" placeholder="Délai personnalisé">
+            </label>
+            <label>Moyen de règlement :
+                <select id="moyenPaiement">
+                    <option value="Chèque">Chèque</option>
+                    <option value="Virement">Virement</option>
+                    <option value="Espèces">Espèces</option>
+                    <option value="custom">Saisie libre</option>
+                </select>
+                <input type="text" id="customMoyen" style="display: none;" placeholder="Moyen personnalisé">
+            </label>
+            <label>Observations :
+                <textarea id="reglementObservations"></textarea>
+            </label>
         </section>
-
+        
         <section class="section">
-            <h2>📝 Observations générales</h2>
-            <textarea id="observations" rows="4" placeholder="Notes sur l'intervention..."></textarea>
+            <h2>✍️ Signatures</h2>
+            <div class="signature-container">
+                <h3>Client</h3>
+                <canvas id="clientSignature" width="300" height="150"></canvas>
+                <button class="secondary" onclick="clearSignature('clientSignature')">Effacer</button>
+                <span class="error-message" id="clientSignatureError">Veuillez signer</span>
+            </div>
+            <div class="signature-container">
+                <h3>Technicien</h3>
+                <canvas id="technicienSignature" width="300" height="150"></canvas>
+                <button class="secondary" onclick="clearSignature('technicienSignature')">Effacer</button>
+                <span class="error-message" id="technicienSignatureError">Veuillez signer</span>
+            </div>
         </section>
-
-        <section class="section nav-buttons">
-            <button class="primary" onclick="validateCRM()">✅ Valider le compte rendu</button>
-            <a href="bon_intervention.html"><button class="action">➡️ Passer au bon d’intervention</button></a>
-        </section>
-    </div>
-
-    <div class="footer-nav">
-        <div class="navigation nav-buttons">
-            <a href="index.html">🏠</a>
-            <a href="crm_extincteurs.html">🧯</a>
-            <a href="crm_ria.html">🚿</a>
-            <a href="crm_baes.html">💡</a>
-            <a href="crm_desenfumage.html">💨</a>
+        
+        <div class="nav-buttons">
+            <button class="primary" onclick="validerIntervention()">✅ Valider</button>
+            <button class="secondary" onclick="saveBrouillon()">💾 Brouillon</button>
+            <button class="secondary" onclick="genererPDF()">📄 PDF</button>
+            <button class="secondary" onclick="envoyerEmail()">📧 Email</button>
+            <a class="neutral" href="index.html">⬅️ Retour</a>
         </div>
     </div>
+    
+    <a class="floating-btn" onclick="addPrestation()">➕</a>
+    
+    <div id="signatureDialog" style="display: none;">
+        <canvas id="signatureCanvas"></canvas>
+        <button class="secondary" onclick="clearSignature('signatureCanvas')">Effacer</button>
+        <button class="secondary" onclick="cancelSignature()">Annuler</button>
+        <button class="primary" onclick="validateSignature()">Valider</button>
+    </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
     <script>
-        let extincteurCount = 0;
-        let extincteursValides = JSON.parse(localStorage.getItem('extincteursValides')) || {};
+        let prestations = [];
+        let clientSignaturePad, technicienSignaturePad;
+        const { jsPDF } = window.jspdf;
 
         window.onload = () => {
-            const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
-            if (!interventionData || !interventionData.client) {
-                alert('Aucun client sélectionné. Veuillez choisir un client depuis la page Interventions.');
-                window.location.href = 'intervention.html';
-                return;
-            }
-            document.getElementById('clientName').textContent = interventionData.client || 'Non sélectionné';
-            document.getElementById('lieu').textContent = interventionData.lieu || 'Non sélectionné';
-            document.getElementById('interventionDate').value = interventionData.date || '';
-            document.getElementById('technician').value = interventionData.technician || '';
-            document.getElementById('observations').value = interventionData.observations || '';
-            if (interventionData.devoirConseil) {
-                document.getElementById('registre').checked = interventionData.devoirConseil.registre;
-                document.getElementById('signaletique').checked = interventionData.devoirConseil.signaletique;
-                document.getElementById('baes').checked = interventionData.devoirConseil.baes;
-                document.getElementById('plans').checked = interventionData.devoirConseil.plans;
-                document.querySelectorAll('.checkbox-container input').forEach(cb => updateCheckboxStyle(cb));
-            }
-            loadExtincteurs();
-            saveDraft(); // Sauvegarde initiale
+            clientSignaturePad = new SignaturePad(document.getElementById('clientSignature'));
+            technicienSignaturePad = new SignaturePad(document.getElementById('technicienSignature'));
+            loadInterventionData();
+            loadPrestations();
+            saveBrouillon();
         };
 
-        function addExtincteur() {
-            extincteurCount++;
-            const div = document.createElement('div');
-            div.className = 'extincteur';
-            div.id = `extincteur-${extincteurCount}`;
-            div.innerHTML = `
-                <div class="form-content">
-                    <h3>🧯 Nouvel extincteur #${extincteurCount}</h3>
-                    <label>N° extincteur: <input type="text" class="num" value="EXT-${extincteurCount}"></label>
-                    <label>Type d'extincteur: 
-                        <select class="type" onchange="toggleCustomInput(this, 'customType-${extincteurCount}')">
-                            <option value="">-- Sélectionner --</option>
-                            <option value="Eau 6L">Eau 6L</option>
-                            <option value="CO2 2kg">CO2 2kg</option>
-                            <option value="Poudre 5kg">Poudre 5kg</option>
-                            <option value="Autre">Autre</option>
-                        </select>
-                        <input type="text" class="custom-input customType-${extincteurCount}" placeholder="Type personnalisé">
-                    </label>
-                    <label>Ext. PP ? <input type="checkbox" id="pp-${extincteurCount}" class="pp" onchange="updateCheckboxStyle(this)"></label>
-                    <label>Fabricant: 
-                        <select class="fabricant" onchange="toggleCustomInput(this, 'customFabricant-${extincteurCount}')">
-                            <option value="">-- Sélectionner --</option>
-                            <option value="Desautel">Desautel</option>
-                            <option value="Kidde">Kidde</option>
-                            <option value="Sicli">Sicli</option>
-                            <option value="Autre">Autre</option>
-                        </select>
-                        <input type="text" class="custom-input customFabricant-${extincteurCount}" placeholder="Fabricant personnalisé">
-                    </label>
-                    <label>Millésime: 
-                        <select class="millesime" onchange="toggleCustomInput(this, 'customMillesime-${extincteurCount}')">
-                            <option value="">-- Sélectionner --</option>
-                            ${Array.from({length: 11}, (_, i) => 2015 + i).map(year => `<option value="${year}">${year}</option>`).join('')}
-                            <option value="Autre">Autre</option>
-                        </select>
-                        <input type="text" class="custom-input customMillesime-${extincteurCount}" placeholder="Année personnalisée">
-                    </label>
-                    <label>Étage: <input type="text" class="etage" placeholder="Ex. Rez-de-chaussée, 1er étage"></label>
-                    <label>Emplacement: <input type="text" class="emplacement" placeholder="Ex. Hall principal"></label>
-                    <h4 class="operations-title">Opérations effectuées</h4>
-                    <div class="checkbox-container">
-                        <label for="op-verif-${extincteurCount}">Vérification OK</label>
-                        <input type="checkbox" id="op-verif-${extincteurCount}" class="op-verif" onchange="updateCheckboxStyle(this)">
-                    </div>
-                    <div class="checkbox-container">
-                        <label for="op-quinquennale-${extincteurCount}">Révision quinquennale</label>
-                        <input type="checkbox" id="op-quinquennale-${extincteurCount}" class="op-quinquennale" onchange="updateCheckboxStyle(this)">
-                    </div>
-                    <div class="checkbox-container">
-                        <label for="op-recharge-${extincteurCount}">Rechargé</label>
-                        <input type="checkbox" id="op-recharge-${extincteurCount}" class="op-recharge" onchange="updateCheckboxStyle(this)">
-                    </div>
-                    <div class="checkbox-container">
-                        <label for="op-mise-service-${extincteurCount}">Mise en service</label>
-                        <input type="checkbox" id="op-mise-service-${extincteurCount}" class="op-mise-service" onchange="updateCheckboxStyle(this)">
-                    </div>
-                    <div class="checkbox-container">
-                        <label for="op-echange-${extincteurCount}">Échange standard</label>
-                        <input type="checkbox" id="op-echange-${extincteurCount}" class="op-echange" onchange="updateCheckboxStyle(this)">
-                    </div>
-                    <label>Observation: <textarea class="observation" rows="2"></textarea></label>
-                    <button class="action" onclick="validateExtincteur(${extincteurCount})">✅ Valider extincteur</button>
-                    <button class="secondary" onclick="removeExtincteur(${extincteurCount})">🗑️ Supprimer</button>
-                    <p class="error-message" id="error-${extincteurCount}"></p>
-                </div>
-                <div class="summary hidden" id="summary-${extincteurCount}" onclick="showActionDialog(${extincteurCount})">
-                    <div class="summary-content"></div>
-                </div>
-            `;
-            document.getElementById('extincteursList').appendChild(div);
-            div.querySelectorAll('.checkbox-container').forEach(container => {
-                container.addEventListener('click', (e) => {
-                    const checkbox = container.querySelector('input[type="checkbox"]');
-                    if (e.target !== checkbox && !container.closest('.form-content').classList.contains('read-only')) {
-                        checkbox.click();
-                    }
+        function loadInterventionData() {
+            const intervention = JSON.parse(localStorage.getItem('currentIntervention')) || {};
+            document.getElementById('clientName').textContent = intervention.client || 'Non sélectionné';
+            document.getElementById('clientAdresse').textContent = intervention.clientAdresse || 'Non sélectionnée';
+            document.getElementById('lieu').textContent = intervention.lieu || 'Non sélectionné';
+            document.getElementById('clientEmail').textContent = intervention.clientEmail || 'Non sélectionné';
+            document.getElementById('dateIntervention').value = intervention.date || '';
+            document.getElementById('technician').value = intervention.technician || '';
+            document.getElementById('duree').value = intervention.duree || '';
+            document.getElementById('reglementObservations').value = intervention.reglementObservations || '';
+            if (intervention.delaiPaiement) {
+                document.getElementById('delaiPaiement').value = intervention.delaiPaiement;
+                if (intervention.delaiPaiement === 'custom') {
+                    document.getElementById('customDelai').value = intervention.customDelai || '';
+                    document.getElementById('customDelai').style.display = 'block';
+                }
+            }
+            if (intervention.moyenPaiement) {
+                document.getElementById('moyenPaiement').value = intervention.moyenPaiement;
+                if (intervention.moyenPaiement === 'custom') {
+                    document.getElementById('customMoyen').value = intervention.customMoyen || '';
+                    document.getElementById('customMoyen').style.display = 'block';
+                }
+            }
+            loadExtincteurSummary();
+        }
+
+        function loadExtincteurSummary() {
+            const intervention = JSON.parse(localStorage.getItem('currentIntervention'));
+            const tableBody = document.getElementById('extincteurSummaryList');
+            tableBody.innerHTML = '';
+            if (intervention && intervention.crm_extincteurs && intervention.crm_extincteurs.extincteurs) {
+                intervention.crm_extincteurs.extincteurs.forEach(ext => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${ext.id}</td>
+                        <td>${ext.type}</td>
+                        <td>${ext.emplacement || 'N/A'}</td>
+                        <td>${ext.operations || ''}${ext.pp ? `[${ext.pp}]` : ''}</td>
+                    `;
+                    tableBody.appendChild(row);
                 });
+            }
+        }
+
+        function addPrestation() {
+            prestations.push({ designation: '', quantite: 1, puHT: 0, totalHT: 0 });
+            updatePrestationsTable();
+        }
+
+        function updatePrestationsTable() {
+            const tableBody = document.getElementById('prestationsList');
+            tableBody.innerHTML = '';
+            prestations.forEach((prestation, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td data-label="Désignation"><input type="text" value="${prestation.designation}" oninput="updatePrestation(${index}, 'designation', this.value)"></td>
+                    <td data-label="Qté"><input type="number" value="${prestation.quantite}" min="1" oninput="updatePrestation(${index}, 'quantite', this.value)"></td>
+                    <td data-label="PU HT (€)"><input type="number" value="${prestation.puHT}" min="0" step="0.01" oninput="updatePrestation(${index}, 'puHT', this.value)"></td>
+                    <td data-label="Total HT (€)">${prestation.totalHT.toFixed(2)} €</td>
+                    <td><button class="secondary" onclick="removePrestation(${index})">Supprimer</button></td>
+                `;
+                tableBody.appendChild(row);
             });
-            saveDraft();
+            calculateTotals();
+            saveBrouillon();
         }
 
-        function toggleCustomInput(select, inputId) {
-            const input = document.querySelector(`.${inputId}`);
-            if (select.value === 'Autre') {
-                input.style.display = 'block';
-                input.classList.add('visible');
-            } else {
-                input.style.display = 'none';
-                input.classList.remove('visible');
-                input.value = '';
-            }
-            saveDraft();
+        function updatePrestation(index, field, value) {
+            prestations[index][field] = field === 'designation' ? value : parseFloat(value) || 0;
+            prestations[index].totalHT = prestations[index].quantite * prestations[index].puHT;
+            updatePrestationsTable();
         }
 
-        function updateCheckboxStyle(checkbox) {
-            const container = checkbox.closest('.checkbox-container');
-            if (checkbox.checked) {
-                container.classList.add('checked');
-            } else {
-                container.classList.remove('checked');
-            }
-            saveDraft();
+        function removePrestation(index) {
+            prestations.splice(index, 1);
+            updatePrestationsTable();
         }
 
-        function showActionDialog(id) {
-            const overlay = document.createElement('div');
-            overlay.className = 'overlay';
-            document.body.appendChild(overlay);
-
-            const dialog = document.createElement('div');
-            dialog.className = 'action-dialog';
-            dialog.innerHTML = `
-                <p>Que voulez-vous faire ?</p>
-                <button onclick="openExtincteurForm(${id})">✏️ Modifier</button>
-                <button onclick="removeExtincteurWithDialog(${id})">🗑️ Supprimer</button>
-                <button onclick="closeDialog(this.parentElement)">Annuler</button>
-            `;
-            document.body.appendChild(dialog);
+        function calculateTotals() {
+            const totalHT = prestations.reduce((sum, p) => sum + p.totalHT, 0);
+            const tva = totalHT * 0.2;
+            const totalTTC = totalHT + tva;
+            document.getElementById('totalHT').textContent = totalHT.toFixed(2) + ' €';
+            document.getElementById('tva').textContent = tva.toFixed(2) + ' €';
+            document.getElementById('totalTTC').textContent = totalTTC.toFixed(2) + ' €';
         }
 
-        function openExtincteurForm(id) {
-            closeDialog(document.querySelector('.action-dialog'));
-            const extincteur = document.getElementById(`extincteur-${id}`);
-            const formContent = extincteur.querySelector('.form-content');
-            formContent.classList.remove('hidden', 'read-only');
-            extincteur.querySelectorAll('input, select, textarea').forEach(elem => {
-                elem.removeAttribute('readonly');
-                elem.removeAttribute('disabled');
-                elem.style.pointerEvents = 'auto';
-            });
-            extincteur.querySelectorAll('.checkbox-container input').forEach(cb => {
-                cb.removeAttribute('disabled');
-                cb.style.pointerEvents = 'auto';
-                updateCheckboxStyle(cb);
-            });
-            const validateButton = extincteur.querySelector('button[onclick^="validateExtincteur"], button[onclick^="updateExtincteur"]');
-            if (validateButton) {
-                validateButton.textContent = '✅ Valider modification';
-                validateButton.setAttribute('onclick', `updateExtincteur(${id})`);
-                validateButton.style.display = 'inline';
-            }
-            extincteur.querySelector('button[onclick^="removeExtincteur"]').style.display = 'inline';
+        function clearSignature(type) {
+            const signaturePad = type === 'clientSignature' ? clientSignaturePad : technicienSignaturePad;
+            signaturePad.clear();
+            document.getElementById(type + 'Error').style.display = 'none';
+            saveBrouillon();
         }
 
-        function validateExtincteur(id) {
-            const extincteur = document.getElementById(`extincteur-${id}`);
-            const formContent = extincteur.querySelector('.form-content');
-            const summaryDiv = document.getElementById(`summary-${id}`);
-            const errorDiv = document.getElementById(`error-${id}`);
-            errorDiv.style.display = 'none';
-            errorDiv.textContent = '';
-
-            const num = extincteur.querySelector('.num').value;
-            const typeSelect = extincteur.querySelector('.type');
-            const type = typeSelect.value === 'Autre' ? extincteur.querySelector(`.customType-${id}`).value : typeSelect.value;
-            const fabricantSelect = extincteur.querySelector('.fabricant');
-            const fabricant = fabricantSelect.value === 'Autre' ? extincteur.querySelector(`.customFabricant-${id}`).value : fabricantSelect.value;
-            const millesimeSelect = extincteur.querySelector('.millesime');
-            const millesime = millesimeSelect.value === 'Autre' ? extincteur.querySelector(`.customMillesime-${id}`).value : millesimeSelect.value;
-            const etage = extincteur.querySelector('.etage').value;
-            const emplacement = extincteur.querySelector('.emplacement').value;
-            const observation = extincteur.querySelector('.observation').value.trim();
-
-            if (!num || !type || !millesime || !etage || !emplacement) {
-                errorDiv.textContent = 'Veuillez remplir tous les champs obligatoires : N° Extincteur, Type, Millésime, Étage, Emplacement.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-
-            const operations = Array.from(extincteur.querySelectorAll('input[type="checkbox"]'))
-                .filter(cb => cb.checked && cb.className !== 'pp');
-            if (operations.length === 0 && observation === '') {
-                errorDiv.textContent = 'Veuillez cocher au moins une opération ou ajouter une observation.';
-                errorDiv.style.display = 'block';
-                return;
-            }
-
-            const pp = extincteur.querySelector('.pp').checked ? 'PP' : '';
-            const ops = operations.map(cb => {
-                if (cb.className.includes('verif')) return '[VF]';
-                if (cb.className.includes('recharge')) return '[RE]';
-                if (cb.className.includes('quinquennale')) return '[RQ]';
-                if (cb.className.includes('echange')) return '[ES]';
-                if (cb.className.includes('mise-service')) return '[MES]';
-                return '';
-            }).join('');
-
-            const summary = `${num} - ${type} (${emplacement}) ${ops}${pp ? `[${pp}]` : ''}`;
-            summaryDiv.querySelector('.summary-content').textContent = summary;
-            summaryDiv.classList.remove('hidden');
-            formContent.classList.add('hidden');
-
-            extincteursValides[id] = {
-                id: num,
-                type: type,
-                pp: pp,
-                fabricant: fabricant,
-                millesime: millesime,
-                etage: etage,
-                emplacement: emplacement,
-                operations: ops,
-                observation: observation
-            };
-
-            updateExtincteurCounter();
-            localStorage.setItem('extincteursValides', JSON.stringify(extincteursValides));
-            saveDraft();
-        }
-
-        function updateExtincteur(id) {
-            validateExtincteur(id); // Réutilise la logique de validation
-        }
-
-        function removeExtincteurWithDialog(id) {
-            const extincteur = document.getElementById(`extincteur-${id}`);
-            if (extincteur) {
-                extincteur.remove();
-                delete extincteursValides[id];
-                updateExtincteurCounter();
-                localStorage.setItem('extincteursValides', JSON.stringify(extincteursValides));
-                saveDraft();
-            }
-            closeDialog(document.querySelector('.action-dialog'));
-        }
-
-        function removeExtincteur(id) {
-            const extincteur = document.getElementById(`extincteur-${id}`);
-            if (extincteur) {
-                extincteur.remove();
-                delete extincteursValides[id];
-                updateExtincteurCounter();
-                localStorage.setItem('extincteursValides', JSON.stringify(extincteursValides));
-                saveDraft();
-            }
-        }
-
-        function closeDialog(dialog) {
-            if (dialog) {
-                const overlay = dialog.previousElementSibling;
-                if (overlay && overlay.className === 'overlay') {
-                    overlay.remove();
-                }
-                dialog.remove();
-            }
-        }
-
-        function updateExtincteurCounter() {
-            const count = Object.keys(extincteursValides).length;
-            document.getElementById('extincteurCounter').textContent = `Extincteurs validés : ${count}`;
-        }
-
-        function loadExtincteurs() {
-            Object.entries(extincteursValides).forEach(([id, ext]) => {
-                extincteurCount = Math.max(extincteurCount, parseInt(id));
-                addExtincteur();
-                const extincteur = document.getElementById(`extincteur-${id}`);
-                extincteur.querySelector('.num').value = ext.num;
-                const typeSelect = extincteur.querySelector('.type');
-                if (['Eau 6L', 'CO2 2kg', 'Poudre 5kg'].includes(ext.type)) {
-                    typeSelect.value = ext.type;
-                } else {
-                    typeSelect.value = 'Autre';
-                    extincteur.querySelector(`.customType-${id}`).value = ext.type;
-                    extincteur.querySelector(`.customType-${id}`).style.display = 'block';
-                }
-                extincteur.querySelector(`#pp-${id}`).checked = ext.pp === 'PP';
-                const fabricantSelect = extincteur.querySelector('.fabricant');
-                if (['Desautel', 'Kidde', 'Sicli'].includes(ext.fabricant)) {
-                    fabricantSelect.value = ext.fabricant;
-                } else {
-                    fabricantSelect.value = 'Autre';
-                    extincteur.querySelector(`.customFabricant-${id}`).value = ext.fabricant;
-                    extincteur.querySelector(`.customFabricant-${id}`).style.display = 'block';
-                }
-                const millesimeSelect = extincteur.querySelector('.millesime');
-                if (ext.millesime >= 2015 && ext.millesime <= 2025) {
-                    millesimeSelect.value = ext.millesime;
-                } else {
-                    millesimeSelect.value = 'Autre';
-                    extincteur.querySelector(`.customMillesime-${id}`).value = ext.millesime;
-                    extincteur.querySelector(`.customMillesime-${id}`).style.display = 'block';
-                }
-                extincteur.querySelector('.etage').value = ext.etage;
-                extincteur.querySelector('.emplacement').value = ext.emplacement;
-                extincteur.querySelector('.observation').value = ext.observation;
-                if (ext.operations.includes('[VF]')) extincteur.querySelector(`#op-verif-${id}`).checked = true;
-                if (ext.operations.includes('[RQ]')) extincteur.querySelector(`#op-quinquennale-${id}`).checked = true;
-                if (ext.operations.includes('[RE]')) extincteur.querySelector(`#op-recharge-${id}`).checked = true;
-                if (ext.operations.includes('[MES]')) extincteur.querySelector(`#op-mise-service-${id}`).checked = true;
-                if (ext.operations.includes('[ES]')) extincteur.querySelector(`#op-echange-${id}`).checked = true;
-                extincteur.querySelectorAll('.checkbox-container input').forEach(cb => updateCheckboxStyle(cb));
-                validateExtincteur(id);
-            });
-        }
-
-        function saveDraft() {
-            const crmData = {
+        function saveBrouillon() {
+            const interventionData = {
                 client: document.getElementById('clientName').textContent,
+                clientAdresse: document.getElementById('clientAdresse').textContent,
                 lieu: document.getElementById('lieu').textContent,
-                date: document.getElementById('interventionDate').value,
+                clientEmail: document.getElementById('clientEmail').textContent,
+                date: document.getElementById('dateIntervention').value,
                 technician: document.getElementById('technician').value,
-                extincteurs: Object.values(extincteursValides),
-                observations: document.getElementById('observations').value,
-                devoirConseil: {
-                    registre: document.getElementById('registre').checked,
-                    signaletique: document.getElementById('signaletique').checked,
-                    baes: document.getElementById('baes').checked,
-                    plans: document.getElementById('plans').checked
-                },
+                duree: document.getElementById('duree').value,
+                prestations: prestations,
+                delaiPaiement: document.getElementById('delaiPaiement').value,
+                customDelai: document.getElementById('customDelai').value,
+                moyenPaiement: document.getElementById('moyenPaiement').value,
+                customMoyen: document.getElementById('customMoyen').value,
+                reglementObservations: document.getElementById('reglementObservations').value,
+                clientSignature: clientSignaturePad.toDataURL(),
+                technicienSignature: technicienSignaturePad.toDataURL(),
+                crm_extincteurs: JSON.parse(localStorage.getItem('currentIntervention'))?.crm_extincteurs || {},
                 timestamp: new Date().toISOString()
             };
             let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
-            drafts['crm_extincteurs'] = crmData;
+            drafts['bon_intervention'] = interventionData;
             localStorage.setItem('drafts', JSON.stringify(drafts));
-            let interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
-            interventionData.crm_extincteurs = crmData;
             localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
         }
 
-        function validateCRM() {
+        function validerIntervention() {
             const client = document.getElementById('clientName').textContent;
-            const date = document.getElementById('interventionDate').value;
-            const extincteurs = Object.values(extincteursValides);
+            const date = document.getElementById('dateIntervention').value;
+            const technician = document.getElementById('technician').value;
 
             let isValid = true;
             document.getElementById('dateError').style.display = 'none';
-            document.getElementById('extincteurError').style.display = 'none';
-            document.getElementById('interventionDate').classList.remove('error');
+            document.getElementById('technicienError').style.display = 'none';
+            document.getElementById('clientSignatureError').style.display = 'none';
+            document.getElementById('technicienSignatureError').style.display = 'none';
+            document.getElementById('dateIntervention').classList.remove('error');
+            document.getElementById('technician').classList.remove('error');
 
             if (!client || client === 'Non sélectionné') {
                 alert('Le nom du client est obligatoire.');
@@ -656,28 +283,45 @@
             }
             if (!date) {
                 document.getElementById('dateError').style.display = 'block';
-                document.getElementById('interventionDate').classList.add('error');
+                document.getElementById('dateIntervention').classList.add('error');
                 isValid = false;
             }
-            if (extincteurs.length === 0) {
-                document.getElementById('extincteurError').style.display = 'block';
+            if (!technician) {
+                document.getElementById('technicienError').style.display = 'block';
+                document.getElementById('technician').classList.add('error');
+                isValid = false;
+            }
+            if (clientSignaturePad.isEmpty()) {
+                document.getElementById('clientSignatureError').style.display = 'block';
+                isValid = false;
+            }
+            if (technicienSignaturePad.isEmpty()) {
+                document.getElementById('technicienSignatureError').style.display = 'block';
+                isValid = false;
+            }
+            if (prestations.length === 0) {
+                alert('Veuillez ajouter au moins une prestation.');
                 isValid = false;
             }
 
             if (isValid) {
-                const crmData = {
+                const interventionData = {
                     client: client,
+                    clientAdresse: document.getElementById('clientAdresse').textContent,
                     lieu: document.getElementById('lieu').textContent,
+                    clientEmail: document.getElementById('clientEmail').textContent,
                     date: date,
-                    technician: document.getElementById('technician').value,
-                    extincteurs: extincteurs,
-                    observations: document.getElementById('observations').value,
-                    devoirConseil: {
-                        registre: document.getElementById('registre').checked,
-                        signaletique: document.getElementById('signaletique').checked,
-                        baes: document.getElementById('baes').checked,
-                        plans: document.getElementById('plans').checked
-                    },
+                    technician: technician,
+                    duree: document.getElementById('duree').value,
+                    prestations: prestations,
+                    delaiPaiement: document.getElementById('delaiPaiement').value,
+                    customDelai: document.getElementById('customDelai').value,
+                    moyenPaiement: document.getElementById('moyenPaiement').value,
+                    customMoyen: document.getElementById('customMoyen').value,
+                    reglementObservations: document.getElementById('reglementObservations').value,
+                    clientSignature: clientSignaturePad.toDataURL(),
+                    technicienSignature: technicienSignaturePad.toDataURL(),
+                    crm_extincteurs: JSON.parse(localStorage.getItem('currentIntervention'))?.crm_extincteurs || {},
                     timestamp: new Date().toISOString()
                 };
 
@@ -685,32 +329,109 @@
                 let clientHistory = JSON.parse(localStorage.getItem('clientHistory')) || {};
                 const clientId = JSON.parse(localStorage.getItem('currentIntervention'))?.clientId || client;
                 if (!clientHistory[clientId]) clientHistory[clientId] = [];
-                clientHistory[clientId].push(crmData);
+                clientHistory[clientId].push(interventionData);
                 localStorage.setItem('clientHistory', JSON.stringify(clientHistory));
-
-                // Mise à jour de currentIntervention
-                let interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
-                interventionData.crm_extincteurs = crmData;
-                localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
 
                 // Nettoyage des brouillons
                 let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
-                delete drafts['crm_extincteurs'];
+                delete drafts['bon_intervention'];
                 localStorage.setItem('drafts', JSON.stringify(drafts));
-                localStorage.removeItem('extincteursValides');
+                localStorage.removeItem('currentIntervention');
 
-                alert('Compte-rendu validé avec succès !');
-                window.location.href = 'bon_intervention.html';
+                alert('Bon d’intervention validé avec succès !');
+                window.location.href = 'index.html';
             }
         }
 
-        document.querySelectorAll('.checkbox-container').forEach(container => {
-            container.addEventListener('click', (e) => {
-                const checkbox = container.querySelector('input[type="checkbox"]');
-                if (e.target !== checkbox && !container.closest('.form-content').classList.contains('read-only')) {
-                    checkbox.click();
-                }
+        function genererPDF() {
+            const doc = new jsPDF();
+            doc.setFontSize(20);
+            doc.setTextColor('#e63946');
+            doc.text('Bon d’Intervention - MPro Incendie', 20, 20);
+            doc.setFontSize(12);
+            doc.setTextColor(0);
+
+            // Client
+            doc.text(`Client: ${document.getElementById('clientName').textContent}`, 20, 40);
+            doc.text(`Adresse: ${document.getElementById('clientAdresse').textContent}`, 20, 50);
+            doc.text(`Lieu: ${document.getElementById('lieu').textContent}`, 20, 60);
+            doc.text(`Email: ${document.getElementById('clientEmail').textContent}`, 20, 70);
+
+            // Résumé Extincteurs
+            doc.text('Résumé CRM Extincteurs', 20, 90);
+            let y = 100;
+            const intervention = JSON.parse(localStorage.getItem('currentIntervention'));
+            if (intervention && intervention.crm_extincteurs && intervention.crm_extincteurs.extincteurs) {
+                intervention.crm_extincteurs.extincteurs.forEach(ext => {
+                    doc.text(`#${ext.id} - ${ext.type} (${ext.emplacement}) ${ext.operations}${ext.pp ? `[${ext.pp}]` : ''}`, 20, y);
+                    y += 10;
+                });
+            }
+
+            // Prestations
+            doc.text('Prestations & Matériel', 20, y + 10);
+            y += 20;
+            prestations.forEach(p => {
+                doc.text(`${p.designation} - Qté: ${p.quantite} - PU HT: ${p.puHT}€ - Total: ${p.totalHT.toFixed(2)}€`, 20, y);
+                y += 10;
             });
+
+            // Totaux
+            const totalHT = prestations.reduce((sum, p) => sum + p.totalHT, 0);
+            const tva = totalHT * 0.2;
+            const totalTTC = totalHT + tva;
+            doc.text(`Total HT: ${totalHT.toFixed(2)} €`, 20, y + 10);
+            doc.text(`TVA 20%: ${tva.toFixed(2)} €`, 20, y + 20);
+            doc.text(`Total TTC: ${totalTTC.toFixed(2)} €`, 20, y + 30);
+
+            // Modalités
+            doc.text('Modalités de règlement', 20, y + 50);
+            const delai = document.getElementById('delaiPaiement').value === 'custom' ? 
+                document.getElementById('customDelai').value : document.getElementById('delaiPaiement').value;
+            const moyen = document.getElementById('moyenPaiement').value === 'custom' ? 
+                document.getElementById('customMoyen').value : document.getElementById('moyenPaiement').value;
+            doc.text(`Délai: ${delai}`, 20, y + 60);
+            doc.text(`Moyen: ${moyen}`, 20, y + 70);
+            doc.text(`Observations: ${document.getElementById('reglementObservations').value}`, 20, y + 80);
+
+            // Signatures
+            if (!clientSignaturePad.isEmpty()) {
+                doc.addImage(clientSignaturePad.toDataURL(), 'PNG', 20, y + 90, 80, 40);
+                doc.text('Signature Client', 20, y + 140);
+            }
+            if (!technicienSignaturePad.isEmpty()) {
+                doc.addImage(technicienSignaturePad.toDataURL(), 'PNG', 110, y + 90, 80, 40);
+                doc.text('Signature Technicien', 110, y + 140);
+            }
+
+            doc.save('bon_intervention.pdf');
+        }
+
+        function envoyerEmail() {
+            const clientEmail = document.getElementById('clientEmail').textContent;
+            if (clientEmail === 'Non sélectionné') {
+                alert('Veuillez sélectionner un client avec un email valide.');
+                return;
+            }
+            emailjs.init('VOTRE_USER_ID');
+            const templateParams = {
+                to_email: clientEmail,
+                subject: 'Bon d’Intervention - MPro Incendie',
+                message: `Bonjour,\nVeuillez trouver ci-joint le bon d’intervention.\nTotal TTC: ${document.getElementById('totalTTC').textContent}\nCordialement,\nMPro Incendie`
+            };
+            emailjs.send('VOTRE_SERVICE_ID', 'VOTRE_TEMPLATE_ID', templateParams)
+                .then(() => alert('Email envoyé avec succès !'))
+                .catch(() => alert('Erreur lors de l’envoi de l’email.'));
+        }
+
+        document.getElementById('delaiPaiement').addEventListener('change', function() {
+            document.getElementById('customDelai').style.display = this.value === 'custom' ? 'block' : 'none';
+            saveBrouillon();
+        });
+
+        document.getElementById('moyenPaiement').addEventListener('change', function() {
+            document.getElementById('customMoyen').style.display = this.value === 'custom' ? 'block' : 'none';
+            saveBrouillon();
         });
     </script>
 </body>
