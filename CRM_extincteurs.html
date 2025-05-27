@@ -126,7 +126,6 @@
         .extincteur .form-content.read-only button { 
             display: none; 
         }
-        /* Styles pour le dialogue d'action */
         .action-dialog {
             position: fixed;
             top: 50%;
@@ -139,7 +138,7 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
             border-radius: 8px;
-            min-width: 300px; /* Assure une largeur minimale pour mobile */
+            min-width: 300px;
         }
         .action-dialog p {
             margin-bottom: 15px;
@@ -152,23 +151,23 @@
             font-size: 14px;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            display: inline-block; /* Assure que les boutons sont visibles */
+            display: inline-block;
         }
-        .action-dialog button:first-child { /* Modifier */
-            background-color: #10b981; /* Vert */
+        .action-dialog button:first-child {
+            background-color: #10b981;
             color: #fff;
         }
         .action-dialog button:first-child:hover {
             background-color: #059669;
         }
-        .action-dialog button:nth-child(2) { /* Supprimer */
-            background-color: #e63946; /* Rouge */
+        .action-dialog button:nth-child(2) {
+            background-color: #e63946;
             color: #fff;
         }
         .action-dialog button:nth-child(2):hover {
             background-color: #d00000;
         }
-        .action-dialog button:last-child { /* Annuler */
+        .action-dialog button:last-child {
             background-color: #f1f1f1;
             color: #555;
         }
@@ -185,11 +184,11 @@
             z-index: 999;
         }
         .section {
-            margin-bottom: 40px; /* Plus d'espace entre les sections */
+            margin-bottom: 40px;
         }
         .nav-buttons {
-            margin-top: 40px; /* Plus d'espace au-dessus des boutons */
-            padding-bottom: 60px; /* Espace pour éviter chevauchement avec footer-nav */
+            margin-top: 40px;
+            padding-bottom: 60px;
         }
         @media (max-width: 600px) {
             .nav-buttons a, .nav-buttons button { 
@@ -240,7 +239,8 @@
 
         <section class="section">
             <h2>📅 Détails de l’intervention</h2>
-            <label>Date d’intervention: <input type="date" id="interventionDate" value="2025-05-16" required></label>
+            <label>Date d’intervention: <input type="date" id="interventionDate" required></label>
+            <span class="error-message" id="dateError">Veuillez indiquer une date</span>
             <label>Technicien intervenant: <input type="text" id="technician" placeholder="Nom du technicien"></label>
         </section>
 
@@ -249,7 +249,7 @@
             <div id="extincteursList"></div>
             <p class="extincteur-counter" id="extincteurCounter">Extincteurs validés : 0</p>
             <button class="action" onclick="addExtincteur()">➕ Ajouter un extincteur</button>
-            <p id="extincteurError" class="error-message" style="display: none;">Veuillez ajouter au moins un extincteur.</p>
+            <p id="extincteurError" class="error-message">Veuillez ajouter au moins un extincteur.</p>
         </section>
 
         <section class="section">
@@ -295,7 +295,7 @@
 
     <script>
         let extincteurCount = 0;
-        let extincteursValides = [];
+        let extincteursValides = JSON.parse(localStorage.getItem('extincteursValides')) || {};
 
         window.onload = () => {
             const interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
@@ -306,11 +306,21 @@
             }
             document.getElementById('clientName').textContent = interventionData.client || 'Non sélectionné';
             document.getElementById('lieu').textContent = interventionData.lieu || 'Non sélectionné';
-            loadDraft();
+            document.getElementById('interventionDate').value = interventionData.date || '';
+            document.getElementById('technician').value = interventionData.technician || '';
+            document.getElementById('observations').value = interventionData.observations || '';
+            if (interventionData.devoirConseil) {
+                document.getElementById('registre').checked = interventionData.devoirConseil.registre;
+                document.getElementById('signaletique').checked = interventionData.devoirConseil.signaletique;
+                document.getElementById('baes').checked = interventionData.devoirConseil.baes;
+                document.getElementById('plans').checked = interventionData.devoirConseil.plans;
+                document.querySelectorAll('.checkbox-container input').forEach(cb => updateCheckboxStyle(cb));
+            }
+            loadExtincteurs();
+            saveDraft(); // Sauvegarde initiale
         };
 
         function addExtincteur() {
-            console.log("Ajout d'un nouvel extincteur...");
             extincteurCount++;
             const div = document.createElement('div');
             div.className = 'extincteur';
@@ -376,12 +386,11 @@
                     <button class="secondary" onclick="removeExtincteur(${extincteurCount})">🗑️ Supprimer</button>
                     <p class="error-message" id="error-${extincteurCount}"></p>
                 </div>
-                <div class="summary" id="summary-${extincteurCount}" onclick="showActionDialog(${extincteurCount})">
+                <div class="summary hidden" id="summary-${extincteurCount}" onclick="showActionDialog(${extincteurCount})">
                     <div class="summary-content"></div>
                 </div>
             `;
-            const extincteursList = document.getElementById('extincteursList');
-            extincteursList.appendChild(div);
+            document.getElementById('extincteursList').appendChild(div);
             div.querySelectorAll('.checkbox-container').forEach(container => {
                 container.addEventListener('click', (e) => {
                     const checkbox = container.querySelector('input[type="checkbox"]');
@@ -390,16 +399,11 @@
                     }
                 });
             });
-            console.log(`Extincteur ${extincteurCount} ajouté avec succès.`);
+            saveDraft();
         }
 
         function toggleCustomInput(select, inputId) {
-            console.log(`toggleCustomInput appelé pour ${inputId}, valeur sélectionnée : ${select.value}`);
             const input = document.querySelector(`.${inputId}`);
-            if (!input) {
-                console.error(`Champ personnalisé ${inputId} non trouvé.`);
-                return;
-            }
             if (select.value === 'Autre') {
                 input.style.display = 'block';
                 input.classList.add('visible');
@@ -408,20 +412,20 @@
                 input.classList.remove('visible');
                 input.value = '';
             }
+            saveDraft();
         }
 
         function updateCheckboxStyle(checkbox) {
-            console.log(`updateCheckboxStyle appelé pour checkbox ${checkbox.id}, état : ${checkbox.checked}`);
             const container = checkbox.closest('.checkbox-container');
             if (checkbox.checked) {
                 container.classList.add('checked');
             } else {
                 container.classList.remove('checked');
             }
+            saveDraft();
         }
 
         function showActionDialog(id) {
-            console.log(`Affichage du dialogue pour l'extincteur ${id}`);
             const overlay = document.createElement('div');
             overlay.className = 'overlay';
             document.body.appendChild(overlay);
@@ -438,261 +442,128 @@
         }
 
         function openExtincteurForm(id) {
-            console.log(`Ouverture du formulaire pour l'extincteur ${id}`);
-            const dialog = document.querySelector('.action-dialog');
-            if (dialog) {
-                closeDialog(dialog);
-            } else {
-                console.warn('Dialogue non trouvé pour la fermeture.');
-            }
-
+            closeDialog(document.querySelector('.action-dialog'));
             const extincteur = document.getElementById(`extincteur-${id}`);
-            if (!extincteur) {
-                console.error(`Extincteur ${id} non trouvé.`);
-                return;
-            }
             const formContent = extincteur.querySelector('.form-content');
-            if (!formContent) {
-                console.error(`Formulaire pour l'extincteur ${id} non trouvé.`);
-                return;
-            }
-            formContent.classList.remove('hidden');
-            formContent.classList.remove('read-only');
-            const inputs = extincteur.querySelectorAll('input');
-            const selects = extincteur.querySelectorAll('select');
-            const textareas = extincteur.querySelectorAll('textarea');
-            inputs.forEach(elem => {
+            formContent.classList.remove('hidden', 'read-only');
+            extincteur.querySelectorAll('input, select, textarea').forEach(elem => {
                 elem.removeAttribute('readonly');
-                elem.style.pointerEvents = 'auto';
-            });
-            selects.forEach(elem => {
                 elem.removeAttribute('disabled');
                 elem.style.pointerEvents = 'auto';
             });
-            textareas.forEach(elem => {
-                elem.removeAttribute('readonly');
-                elem.style.pointerEvents = 'auto';
-            });
-            extincteur.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            extincteur.querySelectorAll('.checkbox-container input').forEach(cb => {
                 cb.removeAttribute('disabled');
                 cb.style.pointerEvents = 'auto';
                 updateCheckboxStyle(cb);
             });
-            const validateButtonForm = extincteur.querySelector('button[onclick^="validateExtincteur"]') || extincteur.querySelector('button[onclick^="updateExtincteur"]');
-            const removeButton = extincteur.querySelector('button[onclick^="removeExtincteur"]');
-            if (validateButtonForm) {
-                validateButtonForm.textContent = '✅ Valider modification';
-                validateButtonForm.setAttribute('onclick', `updateExtincteur(${id})`);
-                validateButtonForm.style.display = 'inline';
+            const validateButton = extincteur.querySelector('button[onclick^="validateExtincteur"], button[onclick^="updateExtincteur"]');
+            if (validateButton) {
+                validateButton.textContent = '✅ Valider modification';
+                validateButton.setAttribute('onclick', `updateExtincteur(${id})`);
+                validateButton.style.display = 'inline';
             }
-            if (removeButton) {
-                removeButton.style.display = 'inline';
-            }
+            extincteur.querySelector('button[onclick^="removeExtincteur"]').style.display = 'inline';
         }
 
         function validateExtincteur(id) {
-            console.log(`Validation de l'extincteur ${id}`);
             const extincteur = document.getElementById(`extincteur-${id}`);
-            if (!extincteur) {
-                console.error(`Extincteur ${id} non trouvé.`);
-                return;
-            }
             const formContent = extincteur.querySelector('.form-content');
             const summaryDiv = document.getElementById(`summary-${id}`);
             const errorDiv = document.getElementById(`error-${id}`);
-            if (!formContent || !summaryDiv || !errorDiv) {
-                console.error(`Éléments manquants pour l'extincteur ${id}.`);
-                return;
-            }
             errorDiv.style.display = 'none';
             errorDiv.textContent = '';
 
-            try {
-                const num = extincteur.querySelector('.num').value;
-                const typeSelect = extincteur.querySelector('.type');
-                const type = typeSelect.value === 'Autre' ? (extincteur.querySelector(`.customType-${id}`).value || '') : typeSelect.value;
-                const fabricantSelect = extincteur.querySelector('.fabricant');
-                const fabricant = fabricantSelect.value === 'Autre' ? (extincteur.querySelector(`.customFabricant-${id}`).value || '') : fabricantSelect.value;
-                const millesimeSelect = extincteur.querySelector('.millesime');
-                const millesime = millesimeSelect.value === 'Autre' ? (extincteur.querySelector(`.customMillesime-${id}`).value || '') : millesimeSelect.value;
-                const etage = extincteur.querySelector('.etage').value;
-                const emplacement = extincteur.querySelector('.emplacement').value;
-                const observation = extincteur.querySelector('.observation').value.trim();
+            const num = extincteur.querySelector('.num').value;
+            const typeSelect = extincteur.querySelector('.type');
+            const type = typeSelect.value === 'Autre' ? extincteur.querySelector(`.customType-${id}`).value : typeSelect.value;
+            const fabricantSelect = extincteur.querySelector('.fabricant');
+            const fabricant = fabricantSelect.value === 'Autre' ? extincteur.querySelector(`.customFabricant-${id}`).value : fabricantSelect.value;
+            const millesimeSelect = extincteur.querySelector('.millesime');
+            const millesime = millesimeSelect.value === 'Autre' ? extincteur.querySelector(`.customMillesime-${id}`).value : millesimeSelect.value;
+            const etage = extincteur.querySelector('.etage').value;
+            const emplacement = extincteur.querySelector('.emplacement').value;
+            const observation = extincteur.querySelector('.observation').value.trim();
 
-                console.log(`Validation des champs : num=${num}, type=${type}, fabricant=${fabricant}, millesime=${millesime}, etage=${etage}, emplacement=${emplacement}`);
-
-                if (!num || !type || !millesime || !etage || !emplacement) {
-                    errorDiv.textContent = 'Veuillez remplir tous les champs obligatoires : N° Extincteur, Type, Millésime, Étage, Emplacement.';
-                    errorDiv.style.display = 'block';
-                    console.log('Erreur de validation : champs obligatoires manquants');
-                    return;
-                }
-
-                const operations = Array.from(extincteur.querySelectorAll('input[type="checkbox"]'))
-                    .filter(cb => cb.checked && cb.className !== 'pp');
-                if (operations.length === 0 && observation === '') {
-                    errorDiv.textContent = 'Veuillez cocher au moins une opération ou ajouter une observation.';
-                    errorDiv.style.display = 'block';
-                    console.log('Erreur de validation : opération ou observation requise');
-                    return;
-                }
-
-                const pp = extincteur.querySelector('.pp').checked ? 'PP' : '';
-                const ops = operations.map(cb => {
-                    if (cb.className.includes('verif')) return '[VF]';
-                    if (cb.className.includes('recharge')) return '[RE]';
-                    if (cb.className.includes('quinquennale')) return '[RQ]';
-                    if (cb.className.includes('echange')) return '[ES]';
-                    if (cb.className.includes('mise-service')) return '[MES]';
-                    return '';
-                }).join('');
-
-                const summary = `${num} - ${type} (${emplacement}) ${ops}${pp ? `[${pp}]` : ''}`;
-                const summaryContent = summaryDiv.querySelector('.summary-content');
-                summaryContent.textContent = summary;
-                summaryDiv.style.display = 'block';
-
-                extincteursValides[id] = {
-                    num: num,
-                    type: type,
-                    pp: pp,
-                    fabricant: fabricant,
-                    millesime: millesime,
-                    etage: etage,
-                    emplacement: emplacement,
-                    operations: ops,
-                    observation: observation
-                };
-
-                formContent.classList.add('hidden');
-                updateExtincteurCounter();
-                console.log(`Extincteur ${id} validé avec succès.`);
-            } catch (error) {
-                console.error(`Erreur lors de la validation de l'extincteur ${id} :`, error);
-                errorDiv.textContent = 'Une erreur est survenue lors de la validation. Veuillez réessayer.';
+            if (!num || !type || !millesime || !etage || !emplacement) {
+                errorDiv.textContent = 'Veuillez remplir tous les champs obligatoires : N° Extincteur, Type, Millésime, Étage, Emplacement.';
                 errorDiv.style.display = 'block';
+                return;
             }
+
+            const operations = Array.from(extincteur.querySelectorAll('input[type="checkbox"]'))
+                .filter(cb => cb.checked && cb.className !== 'pp');
+            if (operations.length === 0 && observation === '') {
+                errorDiv.textContent = 'Veuillez cocher au moins une opération ou ajouter une observation.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            const pp = extincteur.querySelector('.pp').checked ? 'PP' : '';
+            const ops = operations.map(cb => {
+                if (cb.className.includes('verif')) return '[VF]';
+                if (cb.className.includes('recharge')) return '[RE]';
+                if (cb.className.includes('quinquennale')) return '[RQ]';
+                if (cb.className.includes('echange')) return '[ES]';
+                if (cb.className.includes('mise-service')) return '[MES]';
+                return '';
+            }).join('');
+
+            const summary = `${num} - ${type} (${emplacement}) ${ops}${pp ? `[${pp}]` : ''}`;
+            summaryDiv.querySelector('.summary-content').textContent = summary;
+            summaryDiv.classList.remove('hidden');
+            formContent.classList.add('hidden');
+
+            extincteursValides[id] = {
+                id: num,
+                type: type,
+                pp: pp,
+                fabricant: fabricant,
+                millesime: millesime,
+                etage: etage,
+                emplacement: emplacement,
+                operations: ops,
+                observation: observation
+            };
+
+            updateExtincteurCounter();
+            localStorage.setItem('extincteursValides', JSON.stringify(extincteursValides));
+            saveDraft();
         }
 
         function updateExtincteur(id) {
-            console.log(`Mise à jour de l'extincteur ${id}`);
-            const extincteur = document.getElementById(`extincteur-${id}`);
-            if (!extincteur) {
-                console.error(`Extincteur ${id} non trouvé.`);
-                return;
-            }
-            const formContent = extincteur.querySelector('.form-content');
-            const summaryDiv = document.getElementById(`summary-${id}`);
-            const errorDiv = document.getElementById(`error-${id}`);
-            if (!formContent || !summaryDiv || !errorDiv) {
-                console.error(`Éléments manquants pour l'extincteur ${id}.`);
-                return;
-            }
-            errorDiv.style.display = 'none';
-            errorDiv.textContent = '';
-
-            try {
-                const num = extincteur.querySelector('.num').value;
-                const typeSelect = extincteur.querySelector('.type');
-                const type = typeSelect.value === 'Autre' ? (extincteur.querySelector(`.customType-${id}`).value || '') : typeSelect.value;
-                const fabricantSelect = extincteur.querySelector('.fabricant');
-                const fabricant = fabricantSelect.value === 'Autre' ? (extincteur.querySelector(`.customFabricant-${id}`).value || '') : fabricantSelect.value;
-                const millesimeSelect = extincteur.querySelector('.millesime');
-                const millesime = millesimeSelect.value === 'Autre' ? (extincteur.querySelector(`.customMillesime-${id}`).value || '') : millesimeSelect.value;
-                const etage = extincteur.querySelector('.etage').value;
-                const emplacement = extincteur.querySelector('.emplacement').value;
-                const observation = extincteur.querySelector('.observation').value.trim();
-
-                console.log(`Mise à jour des champs : num=${num}, type=${type}, fabricant=${fabricant}, millesime=${millesime}, etage=${etage}, emplacement=${emplacement}`);
-
-                if (!num || !type || !millesime || !etage || !emplacement) {
-                    errorDiv.textContent = 'Veuillez remplir tous les champs obligatoires : N° Extincteur, Type, Millésime, Étage, Emplacement.';
-                    errorDiv.style.display = 'block';
-                    console.log('Erreur de validation : champs obligatoires manquants');
-                    return;
-                }
-
-                const operations = Array.from(extincteur.querySelectorAll('input[type="checkbox"]'))
-                    .filter(cb => cb.checked && cb.className !== 'pp');
-                if (operations.length === 0 && observation === '') {
-                    errorDiv.textContent = 'Veuillez cocher au moins une opération ou ajouter une observation.';
-                    errorDiv.style.display = 'block';
-                    console.log('Erreur de validation : opération ou observation requise');
-                    return;
-                }
-
-                const pp = extincteur.querySelector('.pp').checked ? 'PP' : '';
-                const ops = operations.map(cb => {
-                    if (cb.className.includes('verif')) return '[VF]';
-                    if (cb.className.includes('recharge')) return '[RE]';
-                    if (cb.className.includes('quinquennale')) return '[RQ]';
-                    if (cb.className.includes('echange')) return '[ES]';
-                    if (cb.className.includes('mise-service')) return '[MES]';
-                    return '';
-                }).join('');
-
-                const summary = `${num} - ${type} (${emplacement}) ${ops}${pp ? `[${pp}]` : ''}`;
-                const summaryContent = summaryDiv.querySelector('.summary-content');
-                summaryContent.textContent = summary;
-                summaryDiv.style.display = 'block';
-
-                extincteursValides[id] = {
-                    num: num,
-                    type: type,
-                    pp: pp,
-                    fabricant: fabricant,
-                    millesime: millesime,
-                    etage: etage,
-                    emplacement: emplacement,
-                    operations: ops,
-                    observation: observation
-                };
-
-                formContent.classList.add('hidden');
-                updateExtincteurCounter();
-                console.log(`Extincteur ${id} mis à jour avec succès.`);
-            } catch (error) {
-                console.error(`Erreur lors de la mise à jour de l'extincteur ${id} :`, error);
-                errorDiv.textContent = 'Une erreur est survenue lors de la mise à jour. Veuillez réessayer.';
-                errorDiv.style.display = 'block';
-            }
+            validateExtincteur(id); // Réutilise la logique de validation
         }
 
         function removeExtincteurWithDialog(id) {
-            console.log(`Suppression de l'extincteur ${id} via dialogue`);
             const extincteur = document.getElementById(`extincteur-${id}`);
             if (extincteur) {
                 extincteur.remove();
                 delete extincteursValides[id];
                 updateExtincteurCounter();
+                localStorage.setItem('extincteursValides', JSON.stringify(extincteursValides));
+                saveDraft();
             }
             closeDialog(document.querySelector('.action-dialog'));
         }
 
         function removeExtincteur(id) {
-            console.log(`Suppression de l'extincteur ${id}`);
             const extincteur = document.getElementById(`extincteur-${id}`);
             if (extincteur) {
                 extincteur.remove();
                 delete extincteursValides[id];
                 updateExtincteurCounter();
+                localStorage.setItem('extincteursValides', JSON.stringify(extincteursValides));
+                saveDraft();
             }
         }
 
         function closeDialog(dialog) {
-            console.log("Fermeture du dialogue");
-            if (dialog && dialog.parentElement) {
+            if (dialog) {
                 const overlay = dialog.previousElementSibling;
                 if (overlay && overlay.className === 'overlay') {
                     overlay.remove();
                 }
                 dialog.remove();
-            } else {
-                console.warn("Dialogue ou overlay non trouvé pour la fermeture.");
-                const overlay = document.querySelector('.overlay');
-                const dialogToRemove = document.querySelector('.action-dialog');
-                if (overlay) overlay.remove();
-                if (dialogToRemove) dialogToRemove.remove();
             }
         }
 
@@ -701,77 +572,136 @@
             document.getElementById('extincteurCounter').textContent = `Extincteurs validés : ${count}`;
         }
 
-        function loadDraft() {
-            const drafts = JSON.parse(localStorage.getItem('drafts')) || {};
-            const draft = drafts['crm_extincteurs'];
-            if (draft) {
-                document.getElementById('clientName').textContent = draft.client || 'Non sélectionné';
-                document.getElementById('lieu').textContent = draft.lieu || 'Non sélectionné';
-                document.getElementById('interventionDate').value = draft.date;
-                document.getElementById('technician').value = draft.technician;
-                document.getElementById('observations').value = draft.observations;
-                if (draft.devoirConseil) {
-                    document.getElementById('registre').checked = draft.devoirConseil.registre;
-                    document.getElementById('signaletique').checked = draft.devoirConseil.signaletique;
-                    document.getElementById('baes').checked = draft.devoirConseil.baes;
-                    document.getElementById('plans').checked = draft.devoirConseil.plans;
+        function loadExtincteurs() {
+            Object.entries(extincteursValides).forEach(([id, ext]) => {
+                extincteurCount = Math.max(extincteurCount, parseInt(id));
+                addExtincteur();
+                const extincteur = document.getElementById(`extincteur-${id}`);
+                extincteur.querySelector('.num').value = ext.num;
+                const typeSelect = extincteur.querySelector('.type');
+                if (['Eau 6L', 'CO2 2kg', 'Poudre 5kg'].includes(ext.type)) {
+                    typeSelect.value = ext.type;
+                } else {
+                    typeSelect.value = 'Autre';
+                    extincteur.querySelector(`.customType-${id}`).value = ext.type;
+                    extincteur.querySelector(`.customType-${id}`).style.display = 'block';
                 }
-            }
+                extincteur.querySelector(`#pp-${id}`).checked = ext.pp === 'PP';
+                const fabricantSelect = extincteur.querySelector('.fabricant');
+                if (['Desautel', 'Kidde', 'Sicli'].includes(ext.fabricant)) {
+                    fabricantSelect.value = ext.fabricant;
+                } else {
+                    fabricantSelect.value = 'Autre';
+                    extincteur.querySelector(`.customFabricant-${id}`).value = ext.fabricant;
+                    extincteur.querySelector(`.customFabricant-${id}`).style.display = 'block';
+                }
+                const millesimeSelect = extincteur.querySelector('.millesime');
+                if (ext.millesime >= 2015 && ext.millesime <= 2025) {
+                    millesimeSelect.value = ext.millesime;
+                } else {
+                    millesimeSelect.value = 'Autre';
+                    extincteur.querySelector(`.customMillesime-${id}`).value = ext.millesime;
+                    extincteur.querySelector(`.customMillesime-${id}`).style.display = 'block';
+                }
+                extincteur.querySelector('.etage').value = ext.etage;
+                extincteur.querySelector('.emplacement').value = ext.emplacement;
+                extincteur.querySelector('.observation').value = ext.observation;
+                if (ext.operations.includes('[VF]')) extincteur.querySelector(`#op-verif-${id}`).checked = true;
+                if (ext.operations.includes('[RQ]')) extincteur.querySelector(`#op-quinquennale-${id}`).checked = true;
+                if (ext.operations.includes('[RE]')) extincteur.querySelector(`#op-recharge-${id}`).checked = true;
+                if (ext.operations.includes('[MES]')) extincteur.querySelector(`#op-mise-service-${id}`).checked = true;
+                if (ext.operations.includes('[ES]')) extincteur.querySelector(`#op-echange-${id}`).checked = true;
+                extincteur.querySelectorAll('.checkbox-container input').forEach(cb => updateCheckboxStyle(cb));
+                validateExtincteur(id);
+            });
+        }
+
+        function saveDraft() {
+            const crmData = {
+                client: document.getElementById('clientName').textContent,
+                lieu: document.getElementById('lieu').textContent,
+                date: document.getElementById('interventionDate').value,
+                technician: document.getElementById('technician').value,
+                extincteurs: Object.values(extincteursValides),
+                observations: document.getElementById('observations').value,
+                devoirConseil: {
+                    registre: document.getElementById('registre').checked,
+                    signaletique: document.getElementById('signaletique').checked,
+                    baes: document.getElementById('baes').checked,
+                    plans: document.getElementById('plans').checked
+                },
+                timestamp: new Date().toISOString()
+            };
+            let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
+            drafts['crm_extincteurs'] = crmData;
+            localStorage.setItem('drafts', JSON.stringify(drafts));
+            let interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
+            interventionData.crm_extincteurs = crmData;
+            localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
         }
 
         function validateCRM() {
             const client = document.getElementById('clientName').textContent;
-            const lieu = document.getElementById('lieu').textContent;
             const date = document.getElementById('interventionDate').value;
             const extincteurs = Object.values(extincteursValides);
 
+            let isValid = true;
+            document.getElementById('dateError').style.display = 'none';
+            document.getElementById('extincteurError').style.display = 'none';
+            document.getElementById('interventionDate').classList.remove('error');
+
             if (!client || client === 'Non sélectionné') {
                 alert('Le nom du client est obligatoire.');
-                return;
+                isValid = false;
             }
             if (!date) {
-                alert('La date d’intervention est obligatoire.');
-                return;
+                document.getElementById('dateError').style.display = 'block';
+                document.getElementById('interventionDate').classList.add('error');
+                isValid = false;
             }
             if (extincteurs.length === 0) {
-                document.getElementById('extincteurError').textContent = 'Vous devez valider au moins un extincteur pour soumettre le compte-rendu.';
                 document.getElementById('extincteurError').style.display = 'block';
-                return;
+                isValid = false;
             }
 
-            const summary = Object.values(extincteursValides).map(ext => {
-                const ops = ext.operations || '';
-                return `${ext.num} - ${ext.type} (${ext.emplacement}) ${ops}${ext.pp ? `[${ext.pp}]` : ''}`;
-            }).join('\n');
+            if (isValid) {
+                const crmData = {
+                    client: client,
+                    lieu: document.getElementById('lieu').textContent,
+                    date: date,
+                    technician: document.getElementById('technician').value,
+                    extincteurs: extincteurs,
+                    observations: document.getElementById('observations').value,
+                    devoirConseil: {
+                        registre: document.getElementById('registre').checked,
+                        signaletique: document.getElementById('signaletique').checked,
+                        baes: document.getElementById('baes').checked,
+                        plans: document.getElementById('plans').checked
+                    },
+                    timestamp: new Date().toISOString()
+                };
 
-            const observations = document.getElementById('observations').value;
-            const devoirConseil = {
-                registre: document.getElementById('registre').checked,
-                signaletique: document.getElementById('signaletique').checked,
-                baes: document.getElementById('baes').checked,
-                plans: document.getElementById('plans').checked
-            };
+                // Enregistrement dans l'historique client
+                let clientHistory = JSON.parse(localStorage.getItem('clientHistory')) || {};
+                const clientId = JSON.parse(localStorage.getItem('currentIntervention'))?.clientId || client;
+                if (!clientHistory[clientId]) clientHistory[clientId] = [];
+                clientHistory[clientId].push(crmData);
+                localStorage.setItem('clientHistory', JSON.stringify(clientHistory));
 
-            const crmData = {
-                client: client,
-                lieu: lieu,
-                date: date,
-                technician: document.getElementById('technician').value,
-                extincteurs: extincteurs,
-                summary: summary,
-                observations: observations,
-                devoirConseil: devoirConseil
-            };
+                // Mise à jour de currentIntervention
+                let interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
+                interventionData.crm_extincteurs = crmData;
+                localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
 
-            let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
-            drafts['crm_extincteurs'] = crmData;
-            localStorage.setItem('drafts', JSON.stringify(drafts));
+                // Nettoyage des brouillons
+                let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
+                delete drafts['crm_extincteurs'];
+                localStorage.setItem('drafts', JSON.stringify(drafts));
+                localStorage.removeItem('extincteursValides');
 
-            let interventionData = JSON.parse(localStorage.getItem('currentIntervention')) || {};
-            interventionData.crm_extincteurs = crmData;
-            localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
-
-            alert(`Compte-rendu validé avec succès !\nClient: ${client}\nLieu: ${lieu}\nDate: ${date}\nNombre d’extincteurs: ${extincteurs.length}`);
+                alert('Compte-rendu validé avec succès !');
+                window.location.href = 'bon_intervention.html';
+            }
         }
 
         document.querySelectorAll('.checkbox-container').forEach(container => {
