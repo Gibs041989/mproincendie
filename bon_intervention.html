@@ -119,7 +119,7 @@
             .action-buttons .validate-btn { font-size: 18px; }
             .select2-container { width: 100% !important; }
             .select2-selection { height: 40px !important; font-size: 14px !important; padding: 6px !important; border: 1px solid #ddd !important; border-radius: 4px !important; }
-            #crmExtincteursTable { overflow-x: auto; }
+            #crmExtincteursTable { overflow-x: auto; display: block !important; }
             #crmExtincteursTable th { display: none; }
             #crmExtincteursTable tr { display: block; margin-bottom: 8px; padding: 4px; border-radius: 5px; background: #fff; width: 100%; box-sizing: border-box; }
             #crmExtincteursTable td { display: block; width: 100% !important; padding: 4px; font-size: 12px; box-sizing: border-box; border: none; }
@@ -382,9 +382,11 @@
                 const tbody = document.getElementById('prestationsBody');
                 if (!tbody) {
                     console.error('addPrestation: prestationsBody not found');
+                    alert('Erreur : Tableau des prestations non trouvé.');
                     return;
                 }
                 const index = tbody.children.length;
+                console.log('addPrestation: Adding row with index', index);
                 const row = document.createElement('tr');
                 row.id = `row-${index}`;
                 row.innerHTML = `
@@ -422,8 +424,13 @@
                 tbody.appendChild(row);
                 tbody.appendChild(actionDiv);
                 try {
-                    $(row.querySelector('.designation')).select2({ width: '100%' });
-                    console.log('addPrestation: Select2 initialized for row', index);
+                    const selectElement = row.querySelector('.designation');
+                    if (selectElement && typeof $.fn.select2 === 'function') {
+                        $(selectElement).select2({ width: '100%' });
+                        console.log('addPrestation: Select2 initialized for row', index);
+                    } else {
+                        console.warn('addPrestation: Select2 not initialized, jQuery or Select2 not loaded properly');
+                    }
                 } catch (e) {
                     console.error('addPrestation: Error initializing Select2:', e);
                 }
@@ -432,12 +439,17 @@
                 console.log('addPrestation: Row added successfully');
             } catch (e) {
                 console.error('addPrestation: Error adding row:', e);
+                alert('Erreur lors de l’ajout de la prestation.');
             }
         }
 
         function updateDesignation(index) {
             try {
                 const row = document.getElementById(`row-${index}`);
+                if (!row) {
+                    console.error('updateDesignation: Row not found for index', index);
+                    return;
+                }
                 const select = row.querySelector('.designation');
                 const customInput = row.querySelector('.custom-designation');
                 const unitPriceInput = row.querySelector('.unitPrice');
@@ -460,6 +472,10 @@
         function updateRow(index) {
             try {
                 const row = document.getElementById(`row-${index}`);
+                if (!row) {
+                    console.error('updateRow: Row not found for index', index);
+                    return;
+                }
                 const select = row.querySelector('.designation');
                 const customDesignation = row.querySelector('.custom-designation');
                 const quantityInput = row.querySelector('.quantity');
@@ -480,7 +496,7 @@
                     isValid = false;
                 } else {
                     (select.value === 'custom' ? customDesignation : select).classList.remove('error');
-                    designationError.style.display = 'none;
+                    designationError.style.display = 'none';
                 }
 
                 if (quantity <= 0 || isNaN(quantity)) {
@@ -502,8 +518,10 @@
                 }
 
                 totalInput.value = (quantity * unitPrice).toFixed(2);
-                document.getElementById(`validate-${index}`).disabled = !isValid;
-                document.getElementById(`edit-${index}`).disabled = !isValid;
+                const validateBtn = document.getElementById(`validate-${index}`);
+                const editBtn = document.getElementById(`edit-${index}`);
+                if (validateBtn) validateBtn.disabled = !isValid;
+                if (editBtn) editBtn.disabled = !isValid;
 
                 savePrestations();
                 updateTotals();
@@ -515,6 +533,10 @@
         function validateRow(index) {
             try {
                 const row = document.getElementById(`row-${index}`);
+                if (!row) {
+                    console.error('validateRow: Row not found for index', index);
+                    return;
+                }
                 const select = row.querySelector('.designation');
                 const customDesignation = row.querySelector('.custom-designation');
                 const designation = select.value === 'custom' ? sanitizeInput(customDesignation.value.trim()) : select.value;
@@ -537,8 +559,13 @@
         function editRow(index) {
             try {
                 const row = document.getElementById(`row-${index}`);
+                if (!row) {
+                    console.error('editRow: Row not found for index', index);
+                    return;
+                }
                 row.querySelectorAll('input, select').forEach(input => input.disabled = false);
-                document.getElementById(`action-buttons-${index}`).style.display = 'flex';
+                const actionButtons = document.getElementById(`action-buttons-${index}`);
+                if (actionButtons) actionButtons.style.display = 'flex';
                 row.classList.remove('active');
                 row.onclick = null;
             } catch (e) {
@@ -548,8 +575,10 @@
 
         function removeRow(index) {
             try {
-                document.getElementById(`row-${index}`).remove();
-                document.getElementById(`action-buttons-${index}`).remove();
+                const row = document.getElementById(`row-${index}`);
+                const actionButtons = document.getElementById(`action-buttons-${index}`);
+                if (row) row.remove();
+                if (actionButtons) actionButtons.remove();
                 savePrestations();
                 updateTotals();
             } catch (e) {
@@ -573,6 +602,7 @@
                     }
                 });
                 localStorage.setItem('prestationsData', JSON.stringify(prestationsData));
+                console.log('savePrestations: Prestations saved:', prestationsData);
             } catch (e) {
                 console.error('savePrestations: Error:', e);
                 alert('Stockage plein.');
@@ -631,14 +661,18 @@
                     tbody.appendChild(row);
                     tbody.appendChild(actionDiv);
                     try {
-                        $(row.querySelector('.designation')).select2({ width: '100%' });
-                        console.log('loadPrestations: Select2 initialized for row', index);
+                        const selectElement = row.querySelector('.designation');
+                        if (selectElement && typeof $.fn.select2 === 'function') {
+                            $(selectElement).select2({ width: '100%' });
+                            console.log('loadPrestations: Select2 initialized for row', index);
+                        }
                     } catch (e) {
                         console.error('loadPrestations: Error initializing Select2:', e);
                     }
                 });
                 updateTotals();
                 if (!prestationsData.length) addPrestation();
+                console.log('loadPrestations: Prestations loaded:', prestationsData);
             } catch (e) {
                 console.error('loadPrestations: Error:', e);
             }
@@ -659,6 +693,7 @@
                 document.getElementById('totalHT').textContent = totalHT.toFixed(2) + ' €';
                 document.getElementById('tva').textContent = tva.toFixed(2) + ' €';
                 document.getElementById('totalTTC').textContent = totalTTC.toFixed(2) + ' €';
+                console.log('updateTotals: Totals updated - HT:', totalHT, 'TVA:', tva, 'TTC:', totalTTC);
             } catch (e) {
                 console.error('updateTotals: Error:', e);
             }
@@ -667,7 +702,10 @@
         function toggleDelaiInput() {
             try {
                 const select = document.getElementById('delaiReglement');
-                document.getElementById('delaiCustom').style.display = select.value === 'custom' ? 'block' : 'none';
+                const customInput = document.getElementById('delaiCustom');
+                if (select && customInput) {
+                    customInput.style.display = select.value === 'custom' ? 'block' : 'none';
+                }
             } catch (e) {
                 console.error('toggleDelaiInput: Error:', e);
             }
@@ -676,7 +714,10 @@
         function toggleMoyenInput() {
             try {
                 const select = document.getElementById('moyenReglement');
-                document.getElementById('moyenCustom').style.display = select.value === 'custom' ? 'block' : 'none';
+                const customInput = document.getElementById('moyenCustom');
+                if (select && customInput) {
+                    customInput.style.display = select.value === 'custom' ? 'block' : 'none';
+                }
             } catch (e) {
                 console.error('toggleMoyenInput: Error:', e);
             }
@@ -691,22 +732,32 @@
             try {
                 const intervention = JSON.parse(localStorage.getItem('currentIntervention') || '{}');
                 if (!intervention.client) {
+                    console.warn('loadClientInfo: No client selected');
                     alert('Aucun client sélectionné.');
                     window.location.href = 'intervention.html';
                     return;
                 }
-                document.getElementById('clientName').textContent = intervention.client || 'Non sélectionné';
-                document.getElementById('adresse').textContent = intervention.adresse || 'Non sélectionnée';
-                document.getElementById('email').textContent = intervention.email || 'Non sélectionné';
-                document.getElementById('locationAddress').textContent = intervention.lieu && intervention.lieu !== intervention.adresse ? intervention.lieu : 'Même adresse';
+                const clientName = document.getElementById('clientName');
+                const adresse = document.getElementById('adresse');
+                const email = document.getElementById('email');
+                const locationAddress = document.getElementById('locationAddress');
+                if (clientName) clientName.textContent = intervention.client || 'Non sélectionné';
+                if (adresse) adresse.textContent = intervention.adresse || 'Non sélectionnée';
+                if (email) email.textContent = intervention.email || 'Non sélectionné';
+                if (locationAddress) {
+                    locationAddress.textContent = intervention.lieu && intervention.lieu !== intervention.adresse ? intervention.lieu : 'Même adresse';
+                }
                 const clients = JSON.parse(localStorage.getItem('clients') || '[]');
                 const client = clients.find(c => c.name === intervention.client);
                 if (client) {
-                    document.getElementById('moyenReglement').value = client.moyenReglement || 'Chèque';
-                    document.getElementById('delaiReglement').value = client.delaiReglement || 'Immédiat à l’intervention';
+                    const moyenReglement = document.getElementById('moyenReglement');
+                    const delaiReglement = document.getElementById('delaiReglement');
+                    if (moyenReglement) moyenReglement.value = client.moyenReglement || 'Chèque';
+                    if (delaiReglement) delaiReglement.value = client.delaiReglement || 'Immédiat à l’intervention';
                     toggleMoyenInput();
                     toggleDelaiInput();
                 }
+                console.log('loadClientInfo: Client info loaded:', intervention);
             } catch (e) {
                 console.error('loadClientInfo: Error:', e);
             }
@@ -718,27 +769,39 @@
             const tbody = document.getElementById('crmExtincteursBody');
             console.log('loadCrmExtincteurs: crmSection found:', !!crmSection, 'tbody found:', !!tbody);
 
-            if (crmSection) {
-                crmSection.style.display = 'block';
-                crmSection.style.visibility = 'visible';
+            if (!crmSection || !tbody) {
+                console.error('loadCrmExtincteurs: Missing DOM elements');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="4">Erreur de chargement</td></tr>';
+                }
+                return;
             }
-            if (tbody) tbody.innerHTML = '';
+
+            crmSection.style.display = 'block';
+            crmSection.style.visibility = 'visible';
+            tbody.innerHTML = '';
 
             let extincteursData = [];
             try {
-                const intervention = JSON.parse(localStorage.getItem('currentIntervention') || '{}');
-                console.log('loadCrmExtincteurs: currentIntervention:', intervention);
-                if (intervention.crm_extincteurs && Array.isArray(intervention.crm_extincteurs.extincteurs)) {
-                    extincteursData = intervention.crm_extincteurs.extincteurs;
-                    console.log('loadCrmExtincteurs: Found extincteurs data:', extincteursData);
+                const interventionRaw = localStorage.getItem('currentIntervention');
+                console.log('loadCrmExtincteurs: Raw currentIntervention:', interventionRaw);
+                if (interventionRaw) {
+                    const intervention = JSON.parse(interventionRaw);
+                    console.log('loadCrmExtincteurs: Parsed currentIntervention:', intervention);
+                    if (intervention.crm_extincteurs && Array.isArray(intervention.crm_extincteurs.extincteurs)) {
+                        extincteursData = intervention.crm_extincteurs.extincteurs;
+                        console.log('loadCrmExtincteurs: Found extincteurs data:', extincteursData);
+                    } else {
+                        console.warn('loadCrmExtincteurs: No extincteurs data in currentIntervention.crm_extincteurs');
+                    }
                 } else {
-                    console.log('loadCrmExtincteurs: No extincteurs data in currentIntervention.crm_extincteurs');
+                    console.warn('loadCrmExtincteurs: currentIntervention not found in localStorage');
                 }
             } catch (e) {
                 console.error('loadCrmExtincteurs: Error parsing currentIntervention:', e);
             }
 
-            console.log('loadCrmExtincteurs: Full localStorage contents:', Object.fromEntries(Object.entries(localStorage)));
+            console.log('loadCrmExtincteurs: Full localStorage contents:', Object.keys(localStorage).map(key => ({ [key]: localStorage.getItem(key) })));
 
             if (!Array.isArray(extincteursData) || extincteursData.length === 0) {
                 console.log('loadCrmExtincteurs: No valid data or empty array');
@@ -780,6 +843,7 @@
                 const intervention = JSON.parse(localStorage.getItem('currentIntervention') || '{}');
                 intervention.crm_extincteurs = { extincteurs: data };
                 localStorage.setItem('currentIntervention', JSON.stringify(intervention));
+                console.log('saveCrmData: Data saved successfully');
             } catch (e) {
                 console.error('saveCrmData: Error saving data:', e);
                 alert('Erreur lors de la sauvegarde des données CRM.');
@@ -805,6 +869,7 @@
                     timestamp: Date.now()
                 };
                 localStorage.setItem('drafts', JSON.stringify(drafts));
+                console.log('saveDraft: Draft saved');
             } catch (e) {
                 console.error('saveDraft: Error:', e);
                 alert('Stockage plein.');
@@ -816,16 +881,25 @@
                 const drafts = JSON.parse(localStorage.getItem('drafts') || '{}');
                 const draft = drafts['bon_intervention'];
                 if (draft) {
-                    document.getElementById('interventionDate').value = draft.interventionDate || '';
-                    document.getElementById('technician').value = draft.technician || '';
-                    document.getElementById('duration').value = draft.duration || '';
-                    document.getElementById('delaiReglement').value = draft.delaiReglement === draft.delaiCustom ? 'custom' : draft.delaiReglement || 'Immédiat à l’intervention';
-                    document.getElementById('moyenReglement').value = draft.moyenReglement === draft.moyenCustom ? 'custom' : draft.moyenReglement || 'Chèque';
-                    document.getElementById('delaiCustom').value = draft.delaiReglement === 'custom' ? draft.delaiCustom : '';
-                    document.getElementById('moyenCustom').value = draft.moyenReglement === 'custom' ? draft.moyenCustom : '';
-                    document.getElementById('observations').value = draft.observations || '';
+                    const interventionDate = document.getElementById('interventionDate');
+                    const technician = document.getElementById('technician');
+                    const duration = document.getElementById('duration');
+                    const delaiReglement = document.getElementById('delaiReglement');
+                    const moyenReglement = document.getElementById('moyenReglement');
+                    const delaiCustom = document.getElementById('delaiCustom');
+                    const moyenCustom = document.getElementById('moyenCustom');
+                    const observations = document.getElementById('observations');
+                    if (interventionDate) interventionDate.value = draft.interventionDate || '';
+                    if (technician) technician.value = draft.technician || '';
+                    if (duration) duration.value = draft.duration || '';
+                    if (delaiReglement) delaiReglement.value = draft.delaiReglement === draft.delaiCustom ? 'custom' : draft.delaiReglement || 'Immédiat à l’intervention';
+                    if (moyenReglement) moyenReglement.value = draft.moyenReglement === draft.moyenCustom ? 'custom' : draft.moyenReglement || 'Chèque';
+                    if (delaiCustom) delaiCustom.value = draft.delaiReglement === 'custom' ? draft.delaiCustom : '';
+                    if (moyenCustom) moyenCustom.value = draft.moyenReglement === 'custom' ? draft.moyenCustom : '';
+                    if (observations) observations.value = draft.observations || '';
                     toggleDelaiInput();
                     toggleMoyenInput();
+                    console.log('loadDraft: Draft loaded');
                 }
             } catch (e) {
                 console.error('loadDraft: Error:', e);
@@ -843,7 +917,9 @@
                     alert('Signatures client et technicien requises.');
                     return;
                 }
-                if (!document.getElementById('interventionDate').value || !document.getElementById('technician').value) {
+                const interventionDate = document.getElementById('interventionDate');
+                const technician = document.getElementById('technician');
+                if (!interventionDate.value || !technician.value) {
                     alert('Date et technicien requis.');
                     return;
                 }
@@ -856,8 +932,8 @@
                     client.delaiReglement = document.getElementById('delaiReglement').value === 'custom' ? sanitizeInput(document.getElementById('delaiCustom').value) : document.getElementById('delaiReglement').value;
                     client.interventions.push({
                         id: `bon_${Date.now()}`,
-                        date: document.getElementById('interventionDate').value,
-                        technician: sanitizeInput(document.getElementById('technician').value),
+                        date: interventionDate.value,
+                        technician: sanitizeInput(technician.value),
                         duration: document.getElementById('duration').value,
                         prestations,
                         totalHT: document.getElementById('totalHT').textContent,
@@ -867,7 +943,7 @@
                         moyenReglement: document.getElementById('moyenReglement').value === 'custom' ? sanitizeInput(document.getElementById('moyenCustom').value) : document.getElementById('moyenReglement').value,
                         observations: sanitizeInput(document.getElementById('observations').value),
                         signatures: JSON.parse(localStorage.getItem('signatures') || '{}'),
-                        summary: `Bon d'intervention du ${document.getElementById('interventionDate').value}`
+                        summary: `Bon d'intervention du ${interventionDate.value}`
                     });
                     localStorage.setItem('clients', JSON.stringify(clients));
                 }
@@ -1037,23 +1113,33 @@
         }
 
         function toggleShortcutPanel() {
-            const panel = document.getElementById('shortcutPanel');
-            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-            console.log('toggleShortcutPanel: Panel display:', panel.style.display);
+            try {
+                const panel = document.getElementById('shortcutPanel');
+                if (panel) {
+                    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+                    console.log('toggleShortcutPanel: Panel display:', panel.style.display);
+                }
+            } catch (e) {
+                console.error('toggleShortcutPanel: Error:', e);
+            }
         }
 
         window.onload = () => {
             console.log('window.onload: Initializing at', new Date().toISOString());
             console.log('jQuery loaded:', typeof $ !== 'undefined' ? 'Yes' : 'No');
-            localStorage.removeItem('signatures');
-            clientSignaturePad.clear();
-            technicianSignaturePad.clear();
-            loadClientInfo();
-            loadCrmExtincteurs();
-            loadPrestations();
-            loadSignatures();
-            loadDraft();
-            setInterval(saveDraft, 10000);
+            try {
+                localStorage.removeItem('signatures');
+                clientSignaturePad.clear();
+                technicianSignaturePad.clear();
+                loadClientInfo();
+                loadCrmExtincteurs();
+                loadPrestations();
+                loadSignatures();
+                loadDraft();
+                setInterval(saveDraft, 10000);
+            } catch (e) {
+                console.error('window.onload: Error:', e);
+            }
         };
     </script>
 </body>
