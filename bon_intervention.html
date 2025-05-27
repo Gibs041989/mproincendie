@@ -34,11 +34,9 @@
         
         <div>
             <h2>📅 Détails de l’intervention</h2>
-            <p>Date d’intervention : <input type="date" id="dateIntervention"></p>
-            <p class="error-message" id="dateError">Veuillez indiquer une date</p>
-            <p>Technicien : <input type="text" id="technician" placeholder="Nom du technicien"></p>
-            <p class="error-message" id="technicienError">Veuillez indiquer un technicien</p>
-            <p>Durée (heures) : <input type="number" id="duree" min="0" step="0.5"></p>
+            <p>Date d’intervention : <span id="dateIntervention">Non spécifiée</span></p>
+            <p>Technicien : <span id="technician">Non spécifié</span></p>
+            <p>Durée (heures) : <span id="duree">0</span></p>
         </div>
         
         <div>
@@ -48,7 +46,7 @@
                     <th>Désignation</th>
                     <th>Qté</th>
                     <th>PU HT</th>
-                    <th>Prix Total HT</th>
+                    <th>Total HT</th>
                 </tr>
                 <tbody id="prestationsList"></tbody>
             </table>
@@ -63,21 +61,21 @@
         <div>
             <h2>💳 Modalités de règlement</h2>
             <p>Délais de règlement :</p>
-            <ul>
-                <li><label><input type="radio" name="delaiPaiement" value="Immédiat à l’intervention" onchange="saveBrouillon()"> Immédiat à l’intervention</label></li>
-                <li><label><input type="radio" name="delaiPaiement" value="À réception de facture" onchange="saveBrouillon()"> À réception de facture</label></li>
-                <li><label><input type="radio" name="delaiPaiement" value="Sous 30 jours à réception de facture" onchange="saveBrouillon()"> Sous 30 jours à réception de facture</label></li>
-                <li><label><input type="radio" name="delaiPaiement" value="custom" onchange="toggleCustomDelai()"> Saisie libre</label>
-                    <input type="text" id="customDelai" style="display: none;" placeholder="Délai personnalisé" oninput="saveBrouillon()"></li>
-            </ul>
+            <select id="delaiPaiement" onchange="toggleCustomDelai(); saveBrouillon()">
+                <option value="Immédiat à l’intervention">Immédiat à l’intervention</option>
+                <option value="À réception de facture">À réception de facture</option>
+                <option value="Sous 30 jours à réception de facture">Sous 30 jours à réception de facture</option>
+                <option value="custom">Saisie libre</option>
+            </select>
+            <p><input type="text" id="customDelai" style="display: none;" placeholder="Délai personnalisé" oninput="saveBrouillon()"></p>
             <p>Moyen de règlement :</p>
-            <ul>
-                <li><label><input type="radio" name="moyenPaiement" value="Chèque" onchange="saveBrouillon()"> Chèque</label></li>
-                <li><label><input type="radio" name="moyenPaiement" value="Virement" onchange="saveBrouillon()"> Virement</label></li>
-                <li><label><input type="radio" name="moyenPaiement" value="Espèces" onchange="saveBrouillon()"> Espèces</label></li>
-                <li><label><input type="radio" name="moyenPaiement" value="custom" onchange="toggleCustomMoyen()"> Saisie libre</label>
-                    <input type="text" id="customMoyen" style="display: none;" placeholder="Moyen personnalisé" oninput="saveBrouillon()"></li>
-            </ul>
+            <select id="moyenPaiement" onchange="toggleCustomMoyen(); saveBrouillon()">
+                <option value="Chèque">Chèque</option>
+                <option value="Virement">Virement</option>
+                <option value="Espèces">Espèces</option>
+                <option value="custom">Saisie libre</option>
+            </select>
+            <p><input type="text" id="customMoyen" style="display: none;" placeholder="Moyen personnalisé" oninput="saveBrouillon()"></p>
             <p>Observations :</p>
             <textarea id="reglementObservations" oninput="saveBrouillon()"></textarea>
         </div>
@@ -88,13 +86,11 @@
                 <p>Client</p>
                 <p><a href="#" onclick="openSignatureDialog('client')">Signer</a></p>
                 <img id="clientSignature" style="display: none; width: 300px; height: 150px;">
-                <p class="error-message" id="clientSignatureError">Veuillez signer</p>
             </div>
             <div>
                 <p>Technicien</p>
                 <p><a href="#" onclick="openSignatureDialog('technicien')">Signer</a></p>
                 <img id="technicienSignature" style="display: none; width: 300px; height: 150px;">
-                <p class="error-message" id="technicienSignatureError">Veuillez signer</p>
             </div>
         </div>
         
@@ -123,7 +119,7 @@
         </div>
         <div id="signatureOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999;"></div>
         
-        <p><a class="floating-btn" href="#" onclick="addPrestation()">➕</a></p>
+        <p><a href="#" onclick="addPrestation()">➕</a></p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
@@ -134,7 +130,7 @@
         let signaturePad, currentSignatureType;
         const { jsPDF } = window.jspdf;
 
-        // Initialisation
+        // Quand la page charge
         window.onload = () => {
             loadInterventionData();
             updatePrestationsTable();
@@ -142,28 +138,26 @@
             saveBrouillon();
         };
 
-        // Charger les données de l'intervention depuis localStorage
+        // Charger les informations sauvegardées
         function loadInterventionData() {
             const intervention = JSON.parse(localStorage.getItem('currentIntervention')) || {};
             document.getElementById('clientName').textContent = intervention.client || 'Non sélectionné';
             document.getElementById('clientAdresse').textContent = intervention.clientAdresse || 'Non sélectionnée';
             document.getElementById('lieu').textContent = intervention.lieu || 'Non sélectionné';
             document.getElementById('clientEmail').textContent = intervention.clientEmail || 'Non sélectionné';
-            document.getElementById('dateIntervention').value = intervention.date || '';
-            document.getElementById('technician').value = intervention.technician || '';
-            document.getElementById('duree').value = intervention.duree || '';
+            document.getElementById('dateIntervention').textContent = intervention.date || 'Non spécifiée';
+            document.getElementById('technician').textContent = intervention.technician || 'Non spécifié';
+            document.getElementById('duree').textContent = intervention.duree || '0';
             document.getElementById('reglementObservations').value = intervention.reglementObservations || '';
             if (intervention.delaiPaiement) {
-                const radio = document.querySelector(`input[name="delaiPaiement"][value="${intervention.delaiPaiement}"]`);
-                if (radio) radio.checked = true;
+                document.getElementById('delaiPaiement').value = intervention.delaiPaiement;
                 if (intervention.delaiPaiement === 'custom') {
                     document.getElementById('customDelai').value = intervention.customDelai || '';
                     document.getElementById('customDelai').style.display = 'block';
                 }
             }
             if (intervention.moyenPaiement) {
-                const radio = document.querySelector(`input[name="moyenPaiement"][value="${intervention.moyenPaiement}"]`);
-                if (radio) radio.checked = true;
+                document.getElementById('moyenPaiement').value = intervention.moyenPaiement;
                 if (intervention.moyenPaiement === 'custom') {
                     document.getElementById('customMoyen').value = intervention.customMoyen || '';
                     document.getElementById('customMoyen').style.display = 'block';
@@ -179,18 +173,20 @@
             }
         }
 
-        // Charger le résumé des extincteurs depuis CRM_extincteurs
+        // Charger les extincteurs depuis CRM_extincteurs
         function loadExtincteurSummary() {
             const intervention = JSON.parse(localStorage.getItem('currentIntervention'));
             const tableBody = document.getElementById('extincteurSummaryList');
             tableBody.innerHTML = '';
             if (intervention && intervention.crm_extincteurs && intervention.crm_extincteurs.extincteurs) {
                 intervention.crm_extincteurs.extincteurs.forEach(ext => {
+                    const numero = ext.id ? ext.id.replace('EXT-', '') : 'N/A'; // Prend juste le chiffre
+                    const emplacement = ext.emplacement ? ext.emplacement.substring(0, 10) + (ext.emplacement.length > 10 ? '...' : '') : 'N/A'; // Abréviation
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${ext.id}</td>
-                        <td>${ext.type}</td>
-                        <td>${ext.emplacement || 'N/A'}</td>
+                        <td>${numero}</td>
+                        <td>${ext.type || 'N/A'}</td>
+                        <td>${emplacement}</td>
                         <td>${ext.operations || ''}${ext.pp ? `[${ext.pp}]` : ''}</td>
                     `;
                     tableBody.appendChild(row);
@@ -198,7 +194,7 @@
             }
         }
 
-        // Ajouter une prestation
+        // Ajouter une ligne de prestation
         function addPrestation() {
             prestations.push({ designation: '', quantite: 1, puHT: 0, totalHT: 0 });
             updatePrestationsTable();
@@ -249,18 +245,18 @@
         // Afficher/masquer le champ personnalisé pour délai
         function toggleCustomDelai() {
             document.getElementById('customDelai').style.display = 
-                document.querySelector('input[name="delaiPaiement"][value="custom"]').checked ? 'block' : 'none';
+                document.getElementById('delaiPaiement').value === 'custom' ? 'block' : 'none';
             saveBrouillon();
         }
 
         // Afficher/masquer le champ personnalisé pour moyen
         function toggleCustomMoyen() {
             document.getElementById('customMoyen').style.display = 
-                document.querySelector('input[name="moyenPaiement"][value="custom"]').checked ? 'block' : 'none';
+                document.getElementById('moyenPaiement').value === 'custom' ? 'block' : 'none';
             saveBrouillon();
         }
 
-        // Ouvrir le dialogue de signature
+        // Ouvrir le panneau de signature
         function openSignatureDialog(type) {
             currentSignatureType = type;
             document.getElementById('signatureDialog').style.display = 'block';
@@ -274,7 +270,7 @@
             signaturePad.clear();
         }
 
-        // Fermer le dialogue de signature
+        // Fermer le panneau de signature
         function closeSignatureDialog() {
             signaturePad.clear();
             document.getElementById('signatureDialog').style.display = 'none';
@@ -287,7 +283,6 @@
                 const img = document.getElementById(currentSignatureType + 'Signature');
                 img.src = signaturePad.toDataURL();
                 img.style.display = 'block';
-                document.getElementById(currentSignatureType + 'SignatureError').style.display = 'none';
                 saveBrouillon();
             }
             closeSignatureDialog();
@@ -300,13 +295,13 @@
                 clientAdresse: document.getElementById('clientAdresse').textContent,
                 lieu: document.getElementById('lieu').textContent,
                 clientEmail: document.getElementById('clientEmail').textContent,
-                date: document.getElementById('dateIntervention').value,
-                technician: document.getElementById('technician').value,
-                duree: document.getElementById('duree').value,
+                date: document.getElementById('dateIntervention').textContent,
+                technician: document.getElementById('technician').textContent,
+                duree: document.getElementById('duree').textContent,
                 prestations: prestations,
-                delaiPaiement: document.querySelector('input[name="delaiPaiement"]:checked')?.value || '',
+                delaiPaiement: document.getElementById('delaiPaiement').value,
                 customDelai: document.getElementById('customDelai').value,
-                moyenPaiement: document.querySelector('input[name="moyenPaiement"]:checked')?.value || '',
+                moyenPaiement: document.getElementById('moyenPaiement').value,
                 customMoyen: document.getElementById('customMoyen').value,
                 reglementObservations: document.getElementById('reglementObservations').value,
                 clientSignature: document.getElementById('clientSignature').src,
@@ -320,42 +315,38 @@
             localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
         }
 
-        // Valider l'intervention
+        // Valider l’intervention
         function validerIntervention() {
             const client = document.getElementById('clientName').textContent;
-            const date = document.getElementById('dateIntervention').value;
-            const technician = document.getElementById('technician').value;
+            const date = document.getElementById('dateIntervention').textContent;
+            const technician = document.getElementById('technician').textContent;
             const clientSignature = document.getElementById('clientSignature').src;
             const technicienSignature = document.getElementById('technicienSignature').src;
 
             let isValid = true;
-            document.getElementById('dateError').style.display = 'none';
-            document.getElementById('technicienError').style.display = 'none';
-            document.getElementById('clientSignatureError').style.display = 'none';
-            document.getElementById('technicienSignatureError').style.display = 'none';
 
             if (!client || client === 'Non sélectionné') {
-                alert('Le nom du client est obligatoire.');
+                alert('Il faut choisir un client.');
                 isValid = false;
             }
-            if (!date) {
-                document.getElementById('dateError').style.display = 'block';
+            if (!date || date === 'Non spécifiée') {
+                alert('Il faut indiquer une date.');
                 isValid = false;
             }
-            if (!technician) {
-                document.getElementById('technicienError').style.display = 'block';
+            if (!technician || technician === 'Non spécifié') {
+                alert('Il faut indiquer un technicien.');
                 isValid = false;
             }
             if (!clientSignature || clientSignature === '') {
-                document.getElementById('clientSignatureError').style.display = 'block';
+                alert('Il faut une signature pour le client.');
                 isValid = false;
             }
             if (!technicienSignature || technicienSignature === '') {
-                document.getElementById('technicienSignatureError').style.display = 'block';
+                alert('Il faut une signature pour le technicien.');
                 isValid = false;
             }
             if (prestations.length === 0) {
-                alert('Veuillez ajouter au moins une prestation.');
+                alert('Il faut ajouter au moins une prestation.');
                 isValid = false;
             }
 
@@ -367,11 +358,11 @@
                     clientEmail: document.getElementById('clientEmail').textContent,
                     date: date,
                     technician: technician,
-                    duree: document.getElementById('duree').value,
+                    duree: document.getElementById('duree').textContent,
                     prestations: prestations,
-                    delaiPaiement: document.querySelector('input[name="delaiPaiement"]:checked')?.value || '',
+                    delaiPaiement: document.getElementById('delaiPaiement').value,
                     customDelai: document.getElementById('customDelai').value,
-                    moyenPaiement: document.querySelector('input[name="moyenPaiement"]:checked')?.value || '',
+                    moyenPaiement: document.getElementById('moyenPaiement').value,
                     customMoyen: document.getElementById('customMoyen').value,
                     reglementObservations: document.getElementById('reglementObservations').value,
                     clientSignature: clientSignature,
@@ -380,14 +371,14 @@
                     timestamp: new Date().toISOString()
                 };
 
-                // Enregistrement dans l'historique client
+                // Sauvegarder dans l’historique client
                 let clientHistory = JSON.parse(localStorage.getItem('clientHistory')) || {};
                 const clientId = JSON.parse(localStorage.getItem('currentIntervention'))?.clientId || client;
                 if (!clientHistory[clientId]) clientHistory[clientId] = [];
                 clientHistory[clientId].push(interventionData);
                 localStorage.setItem('clientHistory', JSON.stringify(clientHistory));
 
-                // Nettoyage des brouillons
+                // Nettoyer les brouillons
                 let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
                 delete drafts['bon_intervention'];
                 localStorage.setItem('drafts', JSON.stringify(drafts));
@@ -399,7 +390,7 @@
             }
         }
 
-        // Générer le PDF
+        // Créer le PDF
         function genererPDF() {
             const doc = new jsPDF();
             doc.setFontSize(20);
@@ -420,16 +411,18 @@
             const intervention = JSON.parse(localStorage.getItem('currentIntervention'));
             if (intervention && intervention.crm_extincteurs && intervention.crm_extincteurs.extincteurs) {
                 intervention.crm_extincteurs.extincteurs.forEach(ext => {
-                    doc.text(`#${ext.id} - ${ext.type} (${ext.emplacement}) ${ext.operations}${ext.pp ? `[${ext.pp}]` : ''}`, 20, y);
+                    const numero = ext.id ? ext.id.replace('EXT-', '') : 'N/A';
+                    const emplacement = ext.emplacement ? ext.emplacement.substring(0, 10) + (ext.emplacement.length > 10 ? '...' : '') : 'N/A';
+                    doc.text(`#${numero} - ${ext.type} (${emplacement}) ${ext.operations}${ext.pp ? `[${ext.pp}]` : ''}`, 20, y);
                     y += 10;
                 });
             }
 
             // Détails Intervention
             doc.text('Détails de l’intervention', 20, y + 10);
-            doc.text(`Date: ${document.getElementById('dateIntervention').value || 'Non spécifiée'}`, 20, y + 20);
-            doc.text(`Technicien: ${document.getElementById('technician').value || 'Non spécifié'}`, 20, y + 30);
-            doc.text(`Durée: ${document.getElementById('duree').value || '0'} heures`, 20, y + 40);
+            doc.text(`Date: ${document.getElementById('dateIntervention').textContent}`, 20, y + 20);
+            doc.text(`Technicien: ${document.getElementById('technician').textContent}`, 20, y + 30);
+            doc.text(`Durée: ${document.getElementById('duree').textContent} heures`, 20, y + 40);
             y += 50;
 
             // Prestations
@@ -450,12 +443,12 @@
 
             // Modalités
             doc.text('Modalités de règlement', 20, y + 50);
-            const delai = document.querySelector('input[name="delaiPaiement"]:checked')?.value === 'custom' ? 
-                document.getElementById('customDelai').value : document.querySelector('input[name="delaiPaiement"]:checked')?.value || 'Non spécifié';
-            const moyen = document.querySelector('input[name="moyenPaiement"]:checked')?.value === 'custom' ? 
-                document.getElementById('customMoyen').value : document.querySelector('input[name="moyenPaiement"]:checked')?.value || 'Non spécifié';
-            doc.text(`Délai: ${delai}`, 20, y + 60);
-            doc.text(`Moyen: ${moyen}`, 20, y + 70);
+            const delai = document.getElementById('delaiPaiement').value === 'custom' ? 
+                document.getElementById('customDelai').value : document.getElementById('delaiPaiement').value;
+            const moyen = document.getElementById('moyenPaiement').value === 'custom' ? 
+                document.getElementById('customMoyen').value : document.getElementById('moyenPaiement').value;
+            doc.text(`Délai: ${delai || 'Non spécifié'}`, 20, y + 60);
+            doc.text(`Moyen: ${moyen || 'Non spécifié'}`, 20, y + 70);
             doc.text(`Observations: ${document.getElementById('reglementObservations').value || 'Aucune'}`, 20, y + 80);
             y += 90;
 
@@ -474,20 +467,20 @@
             doc.save('bon_intervention.pdf');
         }
 
-        // Envoyer l'email
+        // Envoyer l’email
         function envoyerEmail() {
             const clientEmail = document.getElementById('clientEmail').textContent;
             if (clientEmail === 'Non sélectionné' || !clientEmail.includes('@')) {
-                alert('Veuillez sélectionner un client avec un email valide.');
+                alert('Il faut un email valide pour le client.');
                 return;
             }
-            emailjs.init('VOTRE_USER_ID'); // Remplacer par votre user_id EmailJS
+            emailjs.init('VOTRE_USER_ID'); // Remplacer par ton code EmailJS
             const templateParams = {
                 to_email: clientEmail,
                 subject: 'Bon d’Intervention - MPro Incendie',
                 message: `Bonjour,\nVeuillez trouver ci-joint le bon d’intervention.\nTotal TTC: ${document.getElementById('totalTTC').textContent}\nCordialement,\nMPro Incendie`
             };
-            emailjs.send('VOTRE_SERVICE_ID', 'VOTRE_TEMPLATE_ID', templateParams) // Remplacer par service_id et template_id
+            emailjs.send('VOTRE_SERVICE_ID', 'VOTRE_TEMPLATE_ID', templateParams) // Remplacer par tes codes EmailJS
                 .then(() => alert('Email envoyé avec succès !'))
                 .catch(() => alert('Erreur lors de l’envoi de l’email.'));
         }
