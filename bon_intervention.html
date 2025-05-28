@@ -22,14 +22,27 @@
             #prestationsTable tbody tr td:nth-child(1) { /* Désignation */
                 width: 100%;
             }
-            #prestationsTable tbody tr td:nth-child(2), /* Qté */
-            #prestationsTable tbody tr td:nth-child(3), /* PU HT */
+            #prestationsTable tbody tr td:nth-child(2) { /* Qté */
+                display: inline-block;
+                width: 20%;
+            }
+            #prestationsTable tbody tr td:nth-child(3) { /* PU HT */
+                display: inline-block;
+                width: 30%;
+            }
             #prestationsTable tbody tr td:nth-child(4) { /* Total HT */
                 display: inline-block;
-                width: 33%;
+                width: 30%;
             }
-            #prestationsTable tbody tr td:nth-child(5) { /* Supprimer */
-                text-align: center;
+            #prestationsTable tbody tr td:nth-child(5) { /* Actions */
+                display: block;
+                width: 100%;
+                text-align: right;
+            }
+            #prestationsTable tbody tr td:nth-child(5) a {
+                margin-left: 10px;
+                font-size: 18px;
+                color: #e63946;
             }
         }
         /* Styles pour les boutons en pied de page */
@@ -209,20 +222,20 @@
             <div>
                 <p>Client</p>
                 <p><a href="#" onclick="openSignatureDialog('client')">Signer</a></p>
-                <img id="clientSignature" style="display: none; width: 300px; height: 150px;">
+                <img id="clientSignature" style="display: none; width: 200px; height: 100px;">
             </div>
             <div>
                 <p>Technicien</p>
                 <p><a href="#" onclick="openSignatureDialog('technicien')">Signer</a></p>
-                <img id="technicienSignature" style="display: none; width: 300px; height: 150px;">
+                <img id="technicienSignature" style="display: none; width: 200px; height: 100px;">
             </div>
         </div>
         
         <div class="action-buttons">
             <a href="#" onclick="validerIntervention()">✅ Valider</a>
             <a href="#" onclick="saveDraft()">💾 Brouillon</a>
-            <a href="#" onclick="genererPDF()">📄 PDF</a>
-            <a href="#" onclick="envoyerEmail()">📧 Email</a>
+            <a href="#" onclick="generatePDF()">📄 PDF</a>
+            <a href="#" onclick="sendEmail()">📩 Email</a>
             <a href="index.html">⬅️ Retour</a>
         </div>
         
@@ -303,8 +316,8 @@
             tableBody.innerHTML = '';
             if (intervention && intervention.crm_extincteurs && intervention.crm_extincteurs.extincteurs) {
                 intervention.crm_extincteurs.extincteurs.forEach(ext => {
-                    const numero = ext.id ? ext.id.replace('EXT-', '') : 'N/A'; // Juste le chiffre
-                    const emplacement = ext.emplacement ? ext.emplacement.substring(0, 10) + (ext.emplacement.length > 10 ? '...' : '') : 'N/A'; // Abréviation
+                    const numero = ext.id ? ext.id.replace('EXT-', '') : 'N/A';
+                    const emplacement = ext.emplacement ? ext.emplacement.substring(0, 10) + (ext.emplacement.length > 10 ? '...' : '') : 'N/A';
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${numero}</td>
@@ -319,7 +332,7 @@
 
         // Ajouter une ligne de prestation
         function addPrestation() {
-            prestations.push({ designation: '', quantite: 1, puHT: 0, totalHT: 0 });
+            prestations.push({ designation: '', quantite: 1, puHT: 0, totalHT: 0, isLocked: false });
             updatePrestationsTable();
         }
 
@@ -330,11 +343,15 @@
             prestations.forEach((prestation, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td><input type="text" value="${prestation.designation}" oninput="updatePrestation(${index}, 'designation', this.value)"></td>
-                    <td><input type="number" value="${prestation.quantite}" min="1" oninput="updatePrestation(${index}, 'quantite', this.value)"></td>
-                    <td><input type="number" value="${prestation.puHT}" min="0" step="0.01" oninput="updatePrestation(${index}, 'puHT', this.value)"></td>
+                    <td><input type="text" value="${prestation.designation}" oninput="updatePrestation(${index}, 'designation', this.value)" ${prestation.isLocked ? 'readonly' : ''}></td>
+                    <td><input type="number" value="${prestation.quantite}" min="1" oninput="updatePrestation(${index}, 'quantite', this.value)" ${prestation.isLocked ? 'readonly' : ''}></td>
+                    <td><input type="number" value="${prestation.puHT}" min="0" step="0.01" oninput="updatePrestation(${index}, 'puHT', this.value)" ${prestation.isLocked ? 'readonly' : ''}></td>
                     <td>${prestation.totalHT.toFixed(2)} €</td>
-                    <td><a href="#" onclick="removePrestation(${index})">Supprimer</a></td>
+                    <td>
+                        <a href="#" onclick="toggleEdit(${index})" title="Modifier">✏️</a>
+                        <a href="#" onclick="validatePrestation(${index})" title="Valider">✅</a>
+                        <a href="#" onclick="removePrestation(${index})" title="Supprimer">🗑️</a>
+                    </td>
                 `;
                 tableBody.appendChild(row);
             });
@@ -346,6 +363,18 @@
         function updatePrestation(index, field, value) {
             prestations[index][field] = field === 'designation' ? value : parseFloat(value) || 0;
             prestations[index].totalHT = prestations[index].quantite * prestations[index].puHT;
+            updatePrestationsTable();
+        }
+
+        // Valider une prestation (verrouiller)
+        function validatePrestation(index) {
+            prestations[index].isLocked = true;
+            updatePrestationsTable();
+        }
+
+        // Activer/désactiver l’édition (déverrouiller)
+        function toggleEdit(index) {
+            prestations[index].isLocked = !prestations[index].isLocked;
             updatePrestationsTable();
         }
 
@@ -525,7 +554,7 @@
         }
 
         // Créer le PDF
-        function genererPDF() {
+        function generatePDF() {
             const doc = new jsPDF();
             doc.addImage('assets/logo.png', 'PNG', 20, 10, 50, 20); // Logo MPro Incendie
             doc.setFontSize(20);
@@ -603,7 +632,7 @@
         }
 
         // Envoyer l’email
-        function envoyerEmail() {
+        function sendEmail() {
             const clientEmail = document.getElementById('clientEmail').textContent;
             if (clientEmail === 'Non sélectionné' || !clientEmail.includes('@')) {
                 alert('Il faut un email valide pour le client.');
