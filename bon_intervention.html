@@ -6,6 +6,122 @@
     <title>Bon d'Intervention - MPro Incendie</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* Styles pour le tableau sur mobile */
+        @media (max-width: 600px) {
+            #prestationsTable tbody tr {
+                display: block;
+                margin-bottom: 10px;
+                border-bottom: 1px solid #ddd;
+            }
+            #prestationsTable tbody tr td {
+                display: block;
+                text-align: left;
+                padding: 5px;
+            }
+            #prestationsTable tbody tr td:nth-child(1) { /* Désignation */
+                width: 100%;
+            }
+            #prestationsTable tbody tr td:nth-child(2), /* Qté */
+            #prestationsTable tbody tr td:nth-child(3), /* PU HT */
+            #prestationsTable tbody tr td:nth-child(4) { /* Total HT */
+                display: inline-block;
+                width: 33%;
+            }
+            #prestationsTable tbody tr td:nth-child(5) { /* Supprimer */
+                text-align: center;
+            }
+        }
+        /* Styles pour les boutons en pied de page */
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .action-buttons a {
+            padding: 10px 20px;
+            background-color: #e63946;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+        @media (max-width: 600px) {
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .action-buttons a {
+                width: 80%;
+                text-align: center;
+            }
+        }
+        /* Styles pour le bouton flottant et la fenêtre de navigation */
+        .floating-nav-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #e63946;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .nav-window {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+        .nav-window a {
+            display: block;
+            padding: 8px;
+            color: #e63946;
+            text-decoration: none;
+            text-align: center;
+        }
+        .nav-window a:hover {
+            background-color: #f0f0f0;
+        }
+        /* Styles pour les boutons CRM */
+        .crm-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .crm-buttons a {
+            padding: 10px 20px;
+            background-color: #10b981;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+        @media (max-width: 600px) {
+            .crm-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .crm-buttons a {
+                width: 80%;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -17,6 +133,13 @@
             <p>Adresse : <span id="clientAdresse">Non sélectionnée</span></p>
             <p>Lieu d’intervention : <span id="lieu">Non sélectionné</span></p>
             <p>Email : <span id="clientEmail">Non sélectionné</span></p>
+        </div>
+
+        <div class="crm-buttons">
+            <a href="crm_extincteurs.html">Vérifier extincteurs</a>
+            <a href="crm_baes.html">Vérifier BAES</a>
+            <a href="crm_ria.html">Vérifier RIA</a>
+            <a href="crm_desenfumage.html">Vérifier désenfumage</a>
         </div>
         
         <div>
@@ -47,6 +170,7 @@
                     <th>Qté</th>
                     <th>PU HT</th>
                     <th>Total HT</th>
+                    <th></th>
                 </tr>
                 <tbody id="prestationsList"></tbody>
             </table>
@@ -61,23 +185,23 @@
         <div>
             <h2>💳 Modalités de règlement</h2>
             <p>Délais de règlement :</p>
-            <select id="delaiPaiement" onchange="toggleCustomDelai(); saveBrouillon()">
+            <select id="delaiPaiement" onchange="toggleCustomDelai(); saveDraft()">
                 <option value="Immédiat à l’intervention">Immédiat à l’intervention</option>
                 <option value="À réception de facture">À réception de facture</option>
                 <option value="Sous 30 jours à réception de facture">Sous 30 jours à réception de facture</option>
                 <option value="custom">Saisie libre</option>
             </select>
-            <p><input type="text" id="customDelai" style="display: none;" placeholder="Délai personnalisé" oninput="saveBrouillon()"></p>
+            <p><input type="text" id="customDelai" style="display: none;" placeholder="Délai personnalisé" oninput="saveDraft()"></p>
             <p>Moyen de règlement :</p>
-            <select id="moyenPaiement" onchange="toggleCustomMoyen(); saveBrouillon()">
+            <select id="moyenPaiement" onchange="toggleCustomMoyen(); saveDraft()">
                 <option value="Chèque">Chèque</option>
                 <option value="Virement">Virement</option>
                 <option value="Espèces">Espèces</option>
                 <option value="custom">Saisie libre</option>
             </select>
-            <p><input type="text" id="customMoyen" style="display: none;" placeholder="Moyen personnalisé" oninput="saveBrouillon()"></p>
+            <p><input type="text" id="customMoyen" style="display: none;" placeholder="Moyen personnalisé" oninput="saveDraft()"></p>
             <p>Observations :</p>
-            <textarea id="reglementObservations" oninput="saveBrouillon()"></textarea>
+            <textarea id="reglementObservations" oninput="saveDraft()"></textarea>
         </div>
         
         <div>
@@ -94,20 +218,12 @@
             </div>
         </div>
         
-        <div>
-            <p><a href="#" onclick="validerIntervention()">✅ Valider</a></p>
-            <p><a href="#" onclick="saveBrouillon()">💾 Brouillon</a></p>
-            <p><a href="#" onclick="genererPDF()">📄 PDF</a></p>
-            <p><a href="#" onclick="envoyerEmail()">📧 Email</a></p>
-            <p><a href="index.html">⬅️ Retour</a></p>
-        </div>
-        
-        <div>
-            <p><a href="#">✖</a></p>
-            <p><a href="index.html">Accueil</a></p>
-            <p><a href="client.html">Clients</a></p>
-            <p><a href="bon_intervention.html">Interventions</a></p>
-            <p><a href="#">Paramètres</a></p>
+        <div class="action-buttons">
+            <a href="#" onclick="validerIntervention()">✅ Valider</a>
+            <a href="#" onclick="saveDraft()">💾 Brouillon</a>
+            <a href="#" onclick="genererPDF()">📄 PDF</a>
+            <a href="#" onclick="envoyerEmail()">📧 Email</a>
+            <a href="index.html">⬅️ Retour</a>
         </div>
         
         <div id="signatureDialog" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000;">
@@ -119,7 +235,14 @@
         </div>
         <div id="signatureOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999;"></div>
         
-        <p><a href="#" onclick="addPrestation()">➕</a></p>
+        <a href="#" class="floating-nav-btn" onclick="toggleNavWindow()">☰</a>
+        <div id="navWindow" class="nav-window">
+            <a href="#" onclick="closePage()">✖ Fermer</a>
+            <a href="index.html">Accueil</a>
+            <a href="client.html">Clients</a>
+            <a href="bon_intervention.html">Interventions</a>
+            <a href="parametres.html">Paramètres</a>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
@@ -135,7 +258,7 @@
             loadInterventionData();
             updatePrestationsTable();
             loadExtincteurSummary();
-            saveBrouillon();
+            saveDraft();
         };
 
         // Charger les informations sauvegardées
@@ -180,7 +303,7 @@
             tableBody.innerHTML = '';
             if (intervention && intervention.crm_extincteurs && intervention.crm_extincteurs.extincteurs) {
                 intervention.crm_extincteurs.extincteurs.forEach(ext => {
-                    const numero = ext.id ? ext.id.replace('EXT-', '') : 'N/A'; // Prend juste le chiffre
+                    const numero = ext.id ? ext.id.replace('EXT-', '') : 'N/A'; // Juste le chiffre
                     const emplacement = ext.emplacement ? ext.emplacement.substring(0, 10) + (ext.emplacement.length > 10 ? '...' : '') : 'N/A'; // Abréviation
                     const row = document.createElement('tr');
                     row.innerHTML = `
@@ -216,7 +339,7 @@
                 tableBody.appendChild(row);
             });
             calculateTotals();
-            saveBrouillon();
+            saveDraft();
         }
 
         // Mettre à jour une prestation
@@ -246,14 +369,14 @@
         function toggleCustomDelai() {
             document.getElementById('customDelai').style.display = 
                 document.getElementById('delaiPaiement').value === 'custom' ? 'block' : 'none';
-            saveBrouillon();
+            saveDraft();
         }
 
         // Afficher/masquer le champ personnalisé pour moyen
         function toggleCustomMoyen() {
             document.getElementById('customMoyen').style.display = 
                 document.getElementById('moyenPaiement').value === 'custom' ? 'block' : 'none';
-            saveBrouillon();
+            saveDraft();
         }
 
         // Ouvrir le panneau de signature
@@ -283,13 +406,24 @@
                 const img = document.getElementById(currentSignatureType + 'Signature');
                 img.src = signaturePad.toDataURL();
                 img.style.display = 'block';
-                saveBrouillon();
+                saveDraft();
             }
             closeSignatureDialog();
         }
 
+        // Afficher/masquer la fenêtre de navigation
+        function toggleNavWindow() {
+            const navWindow = document.getElementById('navWindow');
+            navWindow.style.display = navWindow.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Fermer la page
+        function closePage() {
+            window.location.href = 'index.html';
+        }
+
         // Sauvegarder le brouillon
-        function saveBrouillon() {
+        function saveDraft() {
             const interventionData = {
                 client: document.getElementById('clientName').textContent,
                 clientAdresse: document.getElementById('clientAdresse').textContent,
@@ -393,21 +527,22 @@
         // Créer le PDF
         function genererPDF() {
             const doc = new jsPDF();
+            doc.addImage('assets/logo.png', 'PNG', 20, 10, 50, 20); // Logo MPro Incendie
             doc.setFontSize(20);
             doc.setTextColor('#e63946');
-            doc.text('Bon d’Intervention - MPro Incendie', 20, 20);
+            doc.text('Bon d’Intervention - MPro Incendie', 20, 40);
             doc.setFontSize(12);
             doc.setTextColor(0);
 
             // Client
-            doc.text(`Client: ${document.getElementById('clientName').textContent}`, 20, 40);
-            doc.text(`Adresse: ${document.getElementById('clientAdresse').textContent}`, 20, 50);
-            doc.text(`Lieu: ${document.getElementById('lieu').textContent}`, 20, 60);
-            doc.text(`Email: ${document.getElementById('clientEmail').textContent}`, 20, 70);
+            doc.text(`Client: ${document.getElementById('clientName').textContent}`, 20, 60);
+            doc.text(`Adresse: ${document.getElementById('clientAdresse').textContent}`, 20, 70);
+            doc.text(`Lieu: ${document.getElementById('lieu').textContent}`, 20, 80);
+            doc.text(`Email: ${document.getElementById('clientEmail').textContent}`, 20, 90);
 
             // Résumé Extincteurs
-            doc.text('Résumé CRM Extincteurs', 20, 90);
-            let y = 100;
+            doc.text('Résumé CRM Extincteurs', 20, 110);
+            let y = 120;
             const intervention = JSON.parse(localStorage.getItem('currentIntervention'));
             if (intervention && intervention.crm_extincteurs && intervention.crm_extincteurs.extincteurs) {
                 intervention.crm_extincteurs.extincteurs.forEach(ext => {
