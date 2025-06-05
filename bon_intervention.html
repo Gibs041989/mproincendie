@@ -103,13 +103,13 @@
                 <h3>Client</h3>
                 <a href="#" onclick="openSignatureDialog('client')">Signer</a>
                 <img id="clientSignature" style="display: none; width: 200px; height: 100px;">
-                <a href="#" id="clearClientSignature" style="display: none;" onclick="clearSignature('client')">Corriger</a>
+                <a href="#" id="clearClientSignature" style="display: none; margin-left: 10px; color: #e63946;" onclick="clearSignature('client')">Corriger</a>
             </div>
             <div>
                 <h3>Technicien</h3>
                 <a href="#" onclick="openSignatureDialog('technicien')">Signer</a>
                 <img id="technicienSignature" style="display: none; width: 200px; height: 100px;">
-                <a href="#" id="clearTechnicienSignature" style="display: none;" onclick="clearSignature('technicien')">Corriger</a>
+                <a href="#" id="clearTechnicienSignature" style="display: none; margin-left: 10px; color: #e63946;" onclick="clearSignature('technicien')">Corriger</a>
             </div>
         </div>
         
@@ -178,7 +178,7 @@
             updatePrestationsTable();
             loadExtincteurSummary();
             saveDraft();
-            // Enregistrement automatique des brouillons toutes les 5 secondes
+            // Enregistrement automatique toutes les 5 secondes
             setInterval(saveDraft, 5000);
         };
 
@@ -258,26 +258,19 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td data-label="Désignation">
-                        <input type="text" id="designation-${index}" value="${prestation.designation}" list="articles" ${prestation.isLocked ? 'readonly' : ''}>
+                        <input type="text" id="designation-${index}" value="${prestation.designation}" list="articles" style="width: 100%;" ${prestation.isLocked ? 'readonly' : ''}>
                         <datalist id="articles">
                             ${articles.map(article => `<option value="${article}">`).join('')}
                         </datalist>
                     </td>
-                    <td data-label="Quantité/Prix/Total" class="prestation-row">
-                        <div class="prestation-fields">
-                            <div class="field">
-                                <span class="mobile-label">Qté</span>
-                                <input type="number" id="quantite-${index}" value="${prestation.quantite}" min="1" ${prestation.isLocked ? 'readonly' : ''}>
-                            </div>
-                            <div class="field">
-                                <span class="mobile-label">PU HT (€)</span>
-                                <input type="number" id="puHT-${index}" value="${prestation.puHT}" min="0" step="0.01" ${prestation.isLocked ? 'readonly' : ''}>
-                            </div>
-                            <div class="field">
-                                <span class="mobile-label">Total HT (€)</span>
-                                <span>${prestation.totalHT.toFixed(2)} €</span>
-                            </div>
-                        </div>
+                    <td data-label="Qté">
+                        <input type="number" id="quantite-${index}" value="${prestation.quantite}" min="1" style="width: 100%;" ${prestation.isLocked ? 'readonly' : ''}>
+                    </td>
+                    <td data-label="PU HT (€)">
+                        <input type="number" id="puHT-${index}" value="${prestation.puHT}" min="0" step="0.01" style="width: 100%;" ${prestation.isLocked ? 'readonly' : ''}>
+                    </td>
+                    <td data-label="Total HT (€)">
+                        ${prestation.totalHT.toFixed(2)} €
                     </td>
                     <td data-label="Actions" class="prestation-actions">
                         <button onclick="toggleEdit(${index})" title="Modifier">✏️</button>
@@ -300,7 +293,7 @@
             prestations[index].totalHT = prestations[index].quantite * prestations[index].puHT;
             const row = document.querySelectorAll('#prestationsList tr')[index];
             if (row) {
-                row.querySelector('.prestation-fields .field:last-child span').textContent = prestations[index].totalHT.toFixed(2) + ' €';
+                row.querySelector('td:nth-child(4)').textContent = prestations[index].totalHT.toFixed(2) + ' €';
             }
             calculateTotals();
             saveDraft();
@@ -359,7 +352,7 @@
             });
         }
 
-        // Effacer la signature
+        // Effacer la signature (Bug 3)
         function clearSignature(type) {
             if (type) {
                 const img = document.getElementById(type + 'Signature');
@@ -410,7 +403,7 @@
             window.location.href = 'index.html';
         }
 
-        // Sauvegarder le brouillon (Brouillons)
+        // Sauvegarder le brouillon
         function saveDraft() {
             const intervention = {
                 id: interventionId,
@@ -468,3 +461,4 @@
     </script>
 </body>
 </html>
+```
