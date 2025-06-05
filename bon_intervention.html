@@ -24,25 +24,42 @@
             }
             #prestationsTable tbody tr td:nth-child(2) { /* Qté */
                 display: inline-block;
-                width: 20%;
+                width: 25%;
             }
             #prestationsTable tbody tr td:nth-child(3) { /* PU HT */
                 display: inline-block;
-                width: 30%;
+                width: 35%;
             }
             #prestationsTable tbody tr td:nth-child(4) { /* Total HT */
                 display: inline-block;
-                width: 30%;
+                width: 40%;
             }
-            #prestationsTable tbody tr td:nth-child(5) { /* Actions */
-                display: block;
-                width: 100%;
+            .prestation-actions {
                 text-align: right;
+                margin-top: 5px;
             }
-            #prestationsTable tbody tr td:nth-child(5) a {
+            .prestation-actions button {
                 margin-left: 10px;
                 font-size: 18px;
                 color: #e63946;
+                background: none;
+                border: none;
+                cursor: pointer;
+            }
+        }
+        /* Styles pour le tableau sur ordinateur */
+        @media (min-width: 601px) {
+            .prestation-actions {
+                text-align: right;
+                margin-top: 5px;
+            }
+            .prestation-actions button {
+                margin-left: 10px;
+                font-size: 18px;
+                color: #e63946;
+                background: none;
+                border: none;
+                cursor: pointer;
             }
         }
         /* Styles pour les boutons en pied de page */
@@ -134,6 +151,11 @@
                 text-align: center;
             }
         }
+        /* Style pour la liste déroulante */
+        input[list="articles"] {
+            width: 100%;
+            padding: 5px;
+        }
     </style>
 </head>
 <body>
@@ -183,11 +205,10 @@
                     <th>Qté</th>
                     <th>PU HT</th>
                     <th>Total HT</th>
-                    <th></th>
                 </tr>
                 <tbody id="prestationsList"></tbody>
             </table>
-            <p><a href="#" onclick="addPrestation()">➕ Ajouter une ligne</a></p>
+            <p><button onclick="addPrestation()">➕ Ajouter une ligne</button></p>
             <table id="totalsTable">
                 <tr><th>Total HT</th><td id="totalHT">0.00 €</td></tr>
                 <tr><th>TVA 20%</th><td id="tva">0.00 €</td></tr>
@@ -266,6 +287,17 @@
         let signaturePad, currentSignatureType;
         const { jsPDF } = window.jspdf;
 
+        // Liste statique des articles (à remplacer par base de données)
+        const articles = [
+            "Extincteur Eau 6L",
+            "Extincteur CO2 2kg",
+            "Recharge Eau 6L",
+            "Recharge CO2",
+            "Vérification BAES",
+            "Maintenance RIA",
+            "Contrôle désenfumage"
+        ];
+
         // Quand la page charge
         window.onload = () => {
             loadInterventionData();
@@ -343,17 +375,25 @@
             prestations.forEach((prestation, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td><input type="text" value="${prestation.designation}" oninput="updatePrestation(${index}, 'designation', this.value)" ${prestation.isLocked ? 'readonly' : ''}></td>
+                    <td>
+                        <input type="text" value="${prestation.designation}" list="articles" oninput="updatePrestation(${index}, 'designation', this.value)" ${prestation.isLocked ? 'readonly' : ''}>
+                        <datalist id="articles">
+                            ${articles.map(article => `<option value="${article}">`).join('')}
+                        </datalist>
+                    </td>
                     <td><input type="number" value="${prestation.quantite}" min="1" oninput="updatePrestation(${index}, 'quantite', this.value)" ${prestation.isLocked ? 'readonly' : ''}></td>
                     <td><input type="number" value="${prestation.puHT}" min="0" step="0.01" oninput="updatePrestation(${index}, 'puHT', this.value)" ${prestation.isLocked ? 'readonly' : ''}></td>
                     <td>${prestation.totalHT.toFixed(2)} €</td>
-                    <td>
-                        <a href="#" onclick="toggleEdit(${index})" title="Modifier">✏️</a>
-                        <a href="#" onclick="validatePrestation(${index})" title="Valider">✅</a>
-                        <a href="#" onclick="removePrestation(${index})" title="Supprimer">🗑️</a>
-                    </td>
                 `;
                 tableBody.appendChild(row);
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'prestation-actions';
+                actionsDiv.innerHTML = `
+                    <button onclick="toggleEdit(${index})" title="Modifier">✏️</button>
+                    <button onclick="validatePrestation(${index})" title="Valider">✅</button>
+                    <button onclick="removePrestation(${index})" title="Supprimer">🗑️</button>
+                `;
+                tableBody.appendChild(actionsDiv);
             });
             calculateTotals();
             saveDraft();
@@ -449,204 +489,6 @@
         // Fermer la page
         function closePage() {
             window.location.href = 'index.html';
-        }
-
-        // Sauvegarder le brouillon
-        function saveDraft() {
-            const interventionData = {
-                client: document.getElementById('clientName').textContent,
-                clientAdresse: document.getElementById('clientAdresse').textContent,
-                lieu: document.getElementById('lieu').textContent,
-                clientEmail: document.getElementById('clientEmail').textContent,
-                date: document.getElementById('dateIntervention').textContent,
-                technician: document.getElementById('technician').textContent,
-                duree: document.getElementById('duree').textContent,
-                prestations: prestations,
-                delaiPaiement: document.getElementById('delaiPaiement').value,
-                customDelai: document.getElementById('customDelai').value,
-                moyenPaiement: document.getElementById('moyenPaiement').value,
-                customMoyen: document.getElementById('customMoyen').value,
-                reglementObservations: document.getElementById('reglementObservations').value,
-                clientSignature: document.getElementById('clientSignature').src,
-                technicienSignature: document.getElementById('technicienSignature').src,
-                crm_extincteurs: JSON.parse(localStorage.getItem('currentIntervention'))?.crm_extincteurs || {},
-                timestamp: new Date().toISOString()
-            };
-            let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
-            drafts['bon_intervention'] = interventionData;
-            localStorage.setItem('drafts', JSON.stringify(drafts));
-            localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
-        }
-
-        // Valider l’intervention
-        function validerIntervention() {
-            const client = document.getElementById('clientName').textContent;
-            const date = document.getElementById('dateIntervention').textContent;
-            const technician = document.getElementById('technician').textContent;
-            const clientSignature = document.getElementById('clientSignature').src;
-            const technicienSignature = document.getElementById('technicienSignature').src;
-
-            let isValid = true;
-
-            if (!client || client === 'Non sélectionné') {
-                alert('Il faut choisir un client.');
-                isValid = false;
-            }
-            if (!date || date === 'Non spécifiée') {
-                alert('Il faut indiquer une date.');
-                isValid = false;
-            }
-            if (!technician || technician === 'Non spécifié') {
-                alert('Il faut indiquer un technicien.');
-                isValid = false;
-            }
-            if (!clientSignature || clientSignature === '') {
-                alert('Il faut une signature pour le client.');
-                isValid = false;
-            }
-            if (!technicienSignature || technicienSignature === '') {
-                alert('Il faut une signature pour le technicien.');
-                isValid = false;
-            }
-            if (prestations.length === 0) {
-                alert('Il faut ajouter au moins une prestation.');
-                isValid = false;
-            }
-
-            if (isValid) {
-                const interventionData = {
-                    client: client,
-                    clientAdresse: document.getElementById('clientAdresse').textContent,
-                    lieu: document.getElementById('lieu').textContent,
-                    clientEmail: document.getElementById('clientEmail').textContent,
-                    date: date,
-                    technician: technician,
-                    duree: document.getElementById('duree').textContent,
-                    prestations: prestations,
-                    delaiPaiement: document.getElementById('delaiPaiement').value,
-                    customDelai: document.getElementById('customDelai').value,
-                    moyenPaiement: document.getElementById('moyenPaiement').value,
-                    customMoyen: document.getElementById('customMoyen').value,
-                    reglementObservations: document.getElementById('reglementObservations').value,
-                    clientSignature: clientSignature,
-                    technicienSignature: technicienSignature,
-                    crm_extincteurs: JSON.parse(localStorage.getItem('currentIntervention'))?.crm_extincteurs || {},
-                    timestamp: new Date().toISOString()
-                };
-
-                // Sauvegarder dans l’historique client
-                let clientHistory = JSON.parse(localStorage.getItem('clientHistory')) || {};
-                const clientId = JSON.parse(localStorage.getItem('currentIntervention'))?.clientId || client;
-                if (!clientHistory[clientId]) clientHistory[clientId] = [];
-                clientHistory[clientId].push(interventionData);
-                localStorage.setItem('clientHistory', JSON.stringify(clientHistory));
-
-                // Nettoyer les brouillons
-                let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
-                delete drafts['bon_intervention'];
-                localStorage.setItem('drafts', JSON.stringify(drafts));
-                localStorage.removeItem('currentIntervention');
-                localStorage.removeItem('prestations');
-
-                alert('Bon d’intervention validé avec succès !');
-                window.location.href = 'index.html';
-            }
-        }
-
-        // Créer le PDF
-        function generatePDF() {
-            const doc = new jsPDF();
-            doc.addImage('assets/logo.png', 'PNG', 20, 10, 50, 20); // Logo MPro Incendie
-            doc.setFontSize(20);
-            doc.setTextColor('#e63946');
-            doc.text('Bon d’Intervention - MPro Incendie', 20, 40);
-            doc.setFontSize(12);
-            doc.setTextColor(0);
-
-            // Client
-            doc.text(`Client: ${document.getElementById('clientName').textContent}`, 20, 60);
-            doc.text(`Adresse: ${document.getElementById('clientAdresse').textContent}`, 20, 70);
-            doc.text(`Lieu: ${document.getElementById('lieu').textContent}`, 20, 80);
-            doc.text(`Email: ${document.getElementById('clientEmail').textContent}`, 20, 90);
-
-            // Résumé Extincteurs
-            doc.text('Résumé CRM Extincteurs', 20, 110);
-            let y = 120;
-            const intervention = JSON.parse(localStorage.getItem('currentIntervention'));
-            if (intervention && intervention.crm_extincteurs && intervention.crm_extincteurs.extincteurs) {
-                intervention.crm_extincteurs.extincteurs.forEach(ext => {
-                    const numero = ext.id ? ext.id.replace('EXT-', '') : 'N/A';
-                    const emplacement = ext.emplacement ? ext.emplacement.substring(0, 10) + (ext.emplacement.length > 10 ? '...' : '') : 'N/A';
-                    doc.text(`#${numero} - ${ext.type} (${emplacement}) ${ext.operations}${ext.pp ? `[${ext.pp}]` : ''}`, 20, y);
-                    y += 10;
-                });
-            }
-
-            // Détails Intervention
-            doc.text('Détails de l’intervention', 20, y + 10);
-            doc.text(`Date: ${document.getElementById('dateIntervention').textContent}`, 20, y + 20);
-            doc.text(`Technicien: ${document.getElementById('technician').textContent}`, 20, y + 30);
-            doc.text(`Durée: ${document.getElementById('duree').textContent} heures`, 20, y + 40);
-            y += 50;
-
-            // Prestations
-            doc.text('Prestations & Matériel', 20, y);
-            y += 10;
-            prestations.forEach(p => {
-                doc.text(`${p.designation} - Qté: ${p.quantite} - PU HT: ${p.puHT}€ - Total: ${p.totalHT.toFixed(2)}€`, 20, y);
-                y += 10;
-            });
-
-            // Totaux
-            const totalHT = prestations.reduce((sum, p) => sum + p.totalHT, 0);
-            const tva = totalHT * 0.2;
-            const totalTTC = totalHT + tva;
-            doc.text(`Total HT: ${totalHT.toFixed(2)} €`, 20, y + 10);
-            doc.text(`TVA 20%: ${tva.toFixed(2)} €`, 20, y + 20);
-            doc.text(`Total TTC: ${totalTTC.toFixed(2)} €`, 20, y + 30);
-
-            // Modalités
-            doc.text('Modalités de règlement', 20, y + 50);
-            const delai = document.getElementById('delaiPaiement').value === 'custom' ? 
-                document.getElementById('customDelai').value : document.getElementById('delaiPaiement').value;
-            const moyen = document.getElementById('moyenPaiement').value === 'custom' ? 
-                document.getElementById('customMoyen').value : document.getElementById('moyenPaiement').value;
-            doc.text(`Délai: ${delai || 'Non spécifié'}`, 20, y + 60);
-            doc.text(`Moyen: ${moyen || 'Non spécifié'}`, 20, y + 70);
-            doc.text(`Observations: ${document.getElementById('reglementObservations').value || 'Aucune'}`, 20, y + 80);
-            y += 90;
-
-            // Signatures
-            const clientSignature = document.getElementById('clientSignature').src;
-            const technicienSignature = document.getElementById('technicienSignature').src;
-            if (clientSignature && clientSignature !== '') {
-                doc.addImage(clientSignature, 'PNG', 20, y, 80, 40);
-                doc.text('Signature Client', 20, y + 50);
-            }
-            if (technicienSignature && technicienSignature !== '') {
-                doc.addImage(technicienSignature, 'PNG', 110, y, 80, 40);
-                doc.text('Signature Technicien', 110, y + 50);
-            }
-
-            doc.save('bon_intervention.pdf');
-        }
-
-        // Envoyer l’email
-        function sendEmail() {
-            const clientEmail = document.getElementById('clientEmail').textContent;
-            if (clientEmail === 'Non sélectionné' || !clientEmail.includes('@')) {
-                alert('Il faut un email valide pour le client.');
-                return;
-            }
-            emailjs.init('VOTRE_USER_ID'); // Remplacer par ton code EmailJS
-            const templateParams = {
-                to_email: clientEmail,
-                subject: 'Bon d’Intervention - MPro Incendie',
-                message: `Bonjour,\nVeuillez trouver ci-joint le bon d’intervention.\nTotal TTC: ${document.getElementById('totalTTC').textContent}\nCordialement,\nMPro Incendie`
-            };
-            emailjs.send('VOTRE_SERVICE_ID', 'VOTRE_TEMPLATE_ID', templateParams) // Remplacer par tes codes EmailJS
-                .then(() => alert('Email envoyé avec succès !'))
-                .catch(() => alert('Erreur lors de l’envoi de l’email.'));
         }
     </script>
 </body>
