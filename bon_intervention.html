@@ -183,7 +183,7 @@
             document.getElementById('clientAdresse').textContent = intervention.clientAdresse || 'Non sélectionnée';
             document.getElementById('lieu').textContent = intervention.lieu || 'Non sélectionné';
             document.getElementById('clientEmail').textContent = intervention.clientEmail || 'Non sélectionné';
-            document.getElementById('dateIntervention').textContent = intervention.date || new Date().toLocaleDateString('fr-FR'); // Bug fix: Date du jour
+            document.getElementById('dateIntervention').textContent = intervention.date || new Date().toLocaleDateString('fr-FR');
             document.getElementById('technician').textContent = intervention.technician || 'Non spécifié';
             document.getElementById('duree').textContent = intervention.duree || '0';
             document.getElementById('reglementObservations').value = intervention.reglementObservations || '';
@@ -251,17 +251,24 @@
                             ${articles.map(article => `<option value="${article}">`).join('')}
                         </datalist>
                     </td>
-                    <td data-label="Qté" class="prestation-row">
-                        <input type="number" id="quantite-${index}" value="${prestation.quantite}" min="1" ${prestation.isLocked ? 'readonly' : ''}>
-                    </td>
-                    <td data-label="PU HT (€)" class="prestation-row">
-                        <input type="number" id="puHT-${index}" value="${prestation.puHT}" min="0" step="0.01" ${prestation.isLocked ? 'readonly' : ''}>
-                    </td>
-                    <td data-label="Total HT (€)" class="prestation-row">
-                        ${prestation.totalHT.toFixed(2)} €
+                    <td data-label="Quantité/Prix/Total" class="prestation-row">
+                        <div class="prestation-fields">
+                            <div class="field">
+                                <span class="mobile-label">Qté</span>
+                                <input type="number" id="quantite-${index}" value="${prestation.quantite}" min="1" ${prestation.isLocked ? 'readonly' : ''}>
+                            </div>
+                            <div class="field">
+                                <span class="mobile-label">PU HT (€)</span>
+                                <input type="number" id="puHT-${index}" value="${prestation.puHT}" min="0" step="0.01" ${prestation.isLocked ? 'readonly' : ''}>
+                            </div>
+                            <div class="field">
+                                <span class="mobile-label">Total HT (€)</span>
+                                <span>${prestation.totalHT.toFixed(2)} €</span>
+                            </div>
+                        </div>
                     </td>
                 `;
-                const actionsDiv = document.createElement('div');
+                const actionsDiv = document.createElement('td');
                 actionsDiv.className = 'prestation-actions';
                 actionsDiv.innerHTML = `
                     <button onclick="toggleEdit(${index})" title="Modifier">✏️</button>
@@ -270,7 +277,6 @@
                 `;
                 row.appendChild(actionsDiv);
                 tableBody.appendChild(row);
-                // Ajouter les événements avec debouncing (Bug 2)
                 document.getElementById(`designation-${index}`).addEventListener('input', debounce((e) => updatePrestation(index, 'designation', e.target.value), 300));
                 document.getElementById(`quantite-${index}`).addEventListener('input', debounce((e) => updatePrestation(index, 'quantite', e.target.value), 300));
                 document.getElementById(`puHT-${index}`).addEventListener('input', debounce((e) => updatePrestation(index, 'puHT', e.target.value), 300));
@@ -285,7 +291,7 @@
             prestations[index].totalHT = prestations[index].quantite * prestations[index].puHT;
             const row = document.querySelectorAll('#prestationsList tr')[index];
             if (row) {
-                row.querySelector('td:last-child').textContent = prestations[index].totalHT.toFixed(2) + ' €';
+                row.querySelector('.prestation-fields .field:last-child span').textContent = prestations[index].totalHT.toFixed(2) + ' €';
             }
             calculateTotals();
             saveDraft();
@@ -339,7 +345,7 @@
             document.getElementById('signatureDialog').style.display = 'block';
             document.getElementById('signatureOverlay').style.display = 'block';
             const canvas = document.getElementById('signatureCanvas');
-            canvas.width = canvas.offsetWidth; // Adapter à l’écran
+            canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetWidth / 2;
             signaturePad = new SignaturePad(canvas, {
                 penColor: 'black',
