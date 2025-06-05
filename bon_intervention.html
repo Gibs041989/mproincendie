@@ -17,7 +17,7 @@
             <p><strong>Client :</strong> <span id="clientName">Non sélectionné</span></p>
             <p><strong>Adresse :</strong> <span id="clientAdresse">Non sélectionnée</span></p>
             <p><strong>Lieu d’intervention :</strong> <span id="lieu">Non sélectionné</span></p>
-            <p><strong>Email :</strong> <span id="clientEmail">Non sélectionné</span></p>
+            <p><strong>Email :</strong> <span id="clientEmail"></span></p>
         </div>
 
         <div class="nav-buttons">
@@ -44,8 +44,8 @@
         
         <div class="section">
             <h2>📅 Détails de l’intervention</h2>
-            <p><strong>Date d’intervention :</strong> <span id="dateIntervention">Non spécifiée</span></p>
-            <p><strong>Technicien :</strong> <span id="technician">Non spécifié</span></p>
+            <p><strong>Date d’intervention :</strong> <span id="dateIntervention"></span></p>
+            <p><strong>Technicien :</strong> <span id="technician"></span></p>
             <p><strong>Durée (heures) :</strong> <span id="duree">0</span></p>
         </div>
         
@@ -75,7 +75,7 @@
         <div class="section">
             <h2>💳 Modalités de règlement</h2>
             <label for="delaiPaiement">Délais de règlement :</label>
-            <select id="delaiPaiement" onchange="toggleCustomDelai(); saveDraft()">
+            <select id="delaiPaiement" onchange="toggleCustom('delaiPaiement'); saveDraft()">
                 <option value="Immédiat à l’intervention">Immédiat à l’intervention</option>
                 <option value="À réception de facture">À réception de facture</option>
                 <option value="Sous 30 jours à réception de facture">Sous 30 jours à réception de facture</option>
@@ -84,7 +84,7 @@
             <input type="text" id="customDelai" style="display: none;" placeholder="Délai personnalisé" oninput="saveDraft()">
             
             <label for="moyenPaiement">Moyen de règlement :</label>
-            <select id="moyenPaiement" onchange="toggleCustomMoyen(); saveDraft()">
+            <select id="moyenPaiement" onchange="toggleCustom('moyenPaiement'); saveDraft()">
                 <option value="Chèque">Chèque</option>
                 <option value="Virement">Virement</option>
                 <option value="Espèces">Espèces</option>
@@ -182,7 +182,7 @@
             document.getElementById('clientName').textContent = intervention.client || 'Non sélectionné';
             document.getElementById('clientAdresse').textContent = intervention.clientAdresse || 'Non sélectionnée';
             document.getElementById('lieu').textContent = intervention.lieu || 'Non sélectionné';
-            document.getElementById('clientEmail').textContent = intervention.clientEmail || 'Non sélectionné';
+            document.getElementById('clientEmail').textContent = intervention.clientEmail || '';
             document.getElementById('dateIntervention').textContent = intervention.date || new Date().toLocaleDateString('fr-FR');
             document.getElementById('technician').textContent = intervention.technician || 'Non spécifié';
             document.getElementById('duree').textContent = intervention.duree || '0';
@@ -267,15 +267,12 @@
                             </div>
                         </div>
                     </td>
+                    <td class="prestation-actions">
+                        <button onclick="toggleEdit(${index})" title="Modifier">✏️</button>
+                        <button onclick="validatePrestation(${index})" title="Valider">✅</button>
+                        <button onclick="removePrestation(${index})" title="Supprimer">🗑️</button>
+                    </td>
                 `;
-                const actionsDiv = document.createElement('td');
-                actionsDiv.className = 'prestation-actions';
-                actionsDiv.innerHTML = `
-                    <button onclick="toggleEdit(${index})" title="Modifier">✏️</button>
-                    <button onclick="validatePrestation(${index})" title="Valider">✅</button>
-                    <button onclick="removePrestation(${index})" title="Supprimer">🗑️</button>
-                `;
-                row.appendChild(actionsDiv);
                 tableBody.appendChild(row);
                 document.getElementById(`designation-${index}`).addEventListener('input', debounce((e) => updatePrestation(index, 'designation', e.target.value), 300));
                 document.getElementById(`quantite-${index}`).addEventListener('input', debounce((e) => updatePrestation(index, 'quantite', e.target.value), 300));
@@ -325,17 +322,11 @@
             document.getElementById('totalTTC').textContent = totalTTC.toFixed(2) + ' €';
         }
 
-        // Afficher/masquer le champ personnalisé pour délai
-        function toggleCustomDelai() {
-            document.getElementById('customDelai').style.display = 
-                document.getElementById('delaiPaiement').value === 'custom' ? 'block' : 'none';
-            saveDraft();
-        }
-
-        // Afficher/masquer le champ personnalisé pour moyen
-        function toggleCustomMoyen() {
-            document.getElementById('customMoyen').style.display = 
-                document.getElementById('moyenPaiement').value === 'custom' ? 'block' : 'none';
+        // Afficher/masquer les champs personnalisés
+        function toggleCustom(type) {
+            const customInput = document.getElementById(`custom${type.charAt(0).toUpperCase() + type.slice(1)}`);
+            const select = document.getElementById(type);
+            customInput.style.display = select.value === 'custom' ? 'block' : 'none';
             saveDraft();
         }
 
@@ -411,6 +402,23 @@
                 prestations: prestations
             };
             localStorage.setItem('currentIntervention', JSON.stringify(intervention));
+        }
+
+        // Valider l’intervention (stub)
+        function validerIntervention() {
+            alert('Intervention validée (fonctionnalité à implémenter)');
+        }
+
+        // Générer PDF (stub)
+        function generatePDF() {
+            const doc = new jsPDF();
+            doc.text('Bon d’Intervention MPro Incendie', 10, 10);
+            doc.save('bon_intervention.pdf');
+        }
+
+        // Envoyer email (stub)
+        function sendEmail() {
+            alert('Email envoyé (fonctionnalité à implémenter avec EmailJS)');
         }
     </script>
 </body>
