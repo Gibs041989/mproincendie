@@ -1,4 +1,5 @@
-/* styles.css - Ton code original avec ajustements pour le tableau */
+```css
+/* styles.css - Styles pour MPro Incendie avec corrections pour bugs */
 
 /* Importation d'une police moderne */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
@@ -61,7 +62,7 @@ h2 {
     color: #333;
     margin-bottom: 20px;
     padding-bottom: 8px;
-    border-bottom: 2px solid #e63946; /* Rouge pour cohérence */
+    border-bottom: 2px solid #e63946;
 }
 
 h3 {
@@ -135,7 +136,7 @@ th, td {
 }
 
 th {
-    background-color: #9ca3af; /* Gris plus clair */
+    background-color: #9ca3af;
     color: #ffffff;
     font-weight: 500;
 }
@@ -221,7 +222,7 @@ button:active {
 
 /* Boutons principaux */
 button.primary {
-    background-color: #e63946; /* Rouge du logo */
+    background-color: #e63946;
     color: #ffffff;
     font-size: 16px;
     padding: 12px 24px;
@@ -234,7 +235,7 @@ button.primary:hover {
 
 /* Boutons secondaires */
 button.secondary {
-    background-color: #9ca3af; /* Gris plus clair */
+    background-color: #9ca3af;
     color: #ffffff;
 }
 
@@ -260,7 +261,7 @@ button.neutral:hover, a.neutral:hover {
     position: fixed;
     bottom: 70px;
     right: 10px;
-    background: #10b981; /* Vert */
+    background: #10b981;
     color: white;
     border-radius: 50%;
     width: 50px;
@@ -338,7 +339,7 @@ button.neutral:hover, a.neutral:hover {
     z-index: 1000;
 }
 
-/* Styles responsives */
+/* Bug 1 : Regrouper Qté, PU HT, Total HT sur une ligne sur mobile */
 @media (max-width: 600px) {
     .container {
         padding: 15px;
@@ -419,6 +420,33 @@ button.neutral:hover, a.neutral:hover {
     #prestationsTable td:nth-child(3):before { content: "PU HT (€)"; }
     #prestationsTable td:nth-child(4):before { content: "Total HT (€)"; }
 
+    #prestationsTable .prestation-row {
+        display: flex;
+        gap: 10px;
+        margin-top: 8px;
+    }
+
+    #prestationsTable .prestation-row td {
+        display: inline-block;
+        padding: 6px;
+    }
+
+    #prestationsTable .prestation-row td:nth-child(1) { width: 25%; }
+    #prestationsTable .prestation-row td:nth-child(2) { width: 35%; }
+    #prestationsTable .prestation-row td:nth-child(3) { width: 40%; }
+
+    #prestationsTable .prestation-actions {
+        display: block;
+        text-align: center;
+        margin-top: 10px;
+        padding: 8px 0;
+    }
+
+    #prestationsTable .prestation-actions button {
+        margin: 0 5px;
+        font-size: 16px;
+    }
+
     #prestationsTable input {
         font-size: 14px;
         padding: 8px;
@@ -436,4 +464,36 @@ button.neutral:hover, a.neutral:hover {
         height: 45px;
         font-size: 20px;
     }
+}
+
+/* Bug 3 : Styles pour la fenêtre de signature */
+#signatureDialog {
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+}
+
+#signatureDialog h3 {
+    margin-bottom: 10px;
+}
+
+#signatureCanvas {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2 / 1;
+    border: 1px solid #ddd;
+}
+
+#signatureDialog a {
+    display: inline-block;
+    margin: 10px 5px;
+    padding: 8px 16px;
+    background-color: #e63946;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+#signatureDialog a:hover {
+    background-color: #d00000;
 }
