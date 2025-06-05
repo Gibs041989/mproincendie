@@ -23,7 +23,7 @@ body {
 .container {
     max-width: 1200px;
     margin: 30px auto;
-    padding: 30px 30px 80px; /* Padding-bottom pour bouton flottant */
+    padding: 30px 30px 80px;
     background-color: #ffffff;
     border-radius: 12px;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
@@ -51,7 +51,7 @@ header a:hover {
 h1 {
     font-size: 32px;
     font-weight: 700;
-    color: #e63946; /* Rouge du logo */
+    color: #e63946;
     margin-bottom: 30px;
     text-align: center;
 }
@@ -162,10 +162,10 @@ td {
     line-height: 1.4;
 }
 
-#prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { width: 40%; } /* Désignation */
-#prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { width: 15%; } /* Qté */
-#prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) { width: 20%; } /* PU HT */
-#prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) { width: 25%; } /* Total HT */
+#prestationsTable th:nth-child(1), #prestationsTable td:nth-child(1) { width: 40%; }
+#prestationsTable th:nth-child(2), #prestationsTable td:nth-child(2) { width: 60%; }
+#prestationsTable th:nth-child(3), #prestationsTable td:nth-child(3) { display: none; } /* Caché, géré dans prestation-row */
+#prestationsTable th:nth-child(4), #prestationsTable td:nth-child(4) { display: none; } /* Caché, géré dans prestation-row */
 
 #prestationsTable input {
     padding: 8px;
@@ -406,34 +406,48 @@ button.neutral:hover, a.neutral:hover {
         font-size: 14px;
     }
 
-    #prestationsTable td:before {
-        content: attr(data-label);
+    #prestationsTable td:nth-child(1) { /* Désignation */
         display: block;
-        font-size: 14px;
+    }
+
+    #prestationsTable td:nth-child(2) { /* Quantité/Prix/Total */
+        display: block;
+        padding: 0;
+    }
+
+    #prestationsTable .prestation-fields {
+        display: flex;
+        gap: 8px;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+    }
+
+    #prestationsTable .prestation-fields .field {
+        flex: 1;
+        min-width: 0;
+    }
+
+    #prestationsTable .prestation-fields .field:nth-child(1) { flex: 0 0 25%; } /* Qté */
+    #prestationsTable .prestation-fields .field:nth-child(2) { flex: 0 0 35%; } /* PU HT */
+    #prestationsTable .prestation-fields .field:nth-child(3) { flex: 0 0 40%; } /* Total HT */
+
+    #prestationsTable .prestation-fields .mobile-label {
+        display: block;
+        font-size: 12px;
         font-weight: bold;
         color: #555;
         margin-bottom: 4px;
     }
 
-    #prestationsTable td:nth-child(1):before { content: "Désignation"; }
-    #prestationsTable td:nth-child(2):before { content: "Qté"; }
-    #prestationsTable td:nth-child(3):before { content: "PU HT (€)"; }
-    #prestationsTable td:nth-child(4):before { content: "Total HT (€)"; }
-
-    #prestationsTable .prestation-row {
-        display: flex;
-        gap: 10px;
-        margin-top: 8px;
-    }
-
-    #prestationsTable .prestation-row td {
-        display: inline-block;
+    #prestationsTable .prestation-fields input,
+    #prestationsTable .prestation-fields span {
+        width: 100%;
+        font-size: 14px;
         padding: 6px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        display: block;
     }
-
-    #prestationsTable .prestation-row td:nth-child(1) { width: 25%; }
-    #prestationsTable .prestation-row td:nth-child(2) { width: 35%; }
-    #prestationsTable .prestation-row td:nth-child(3) { width: 40%; }
 
     #prestationsTable .prestation-actions {
         display: block;
@@ -445,11 +459,15 @@ button.neutral:hover, a.neutral:hover {
     #prestationsTable .prestation-actions button {
         margin: 0 5px;
         font-size: 16px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #e63946;
     }
 
     #prestationsTable input {
         font-size: 14px;
-        padding: 8px;
+        padding: 6px;
         height: 34px;
         width: 100%;
     }
