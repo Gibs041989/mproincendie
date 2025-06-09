@@ -163,7 +163,7 @@
             "Contrôle désenfumage"
         ];
 
-        // Debouncing pour la saisie (Bug 4)
+        // Debouncing pour la saisie
         let debounceTimeout;
         function debounce(func, wait) {
             return function (...args) {
@@ -178,7 +178,6 @@
             updatePrestationsTable();
             loadExtincteurSummary();
             saveDraft();
-            // Enregistrement automatique toutes les 5 secondes
             setInterval(saveDraft, 5000);
         };
 
@@ -250,7 +249,7 @@
             saveDraft();
         }
 
-        // Mettre à jour le tableau des prestations (Bug 1 & 4)
+        // Mettre à jour le tableau des prestations
         function updatePrestationsTable() {
             const tableBody = document.getElementById('prestationsList');
             tableBody.innerHTML = '';
@@ -287,7 +286,7 @@
             saveDraft();
         }
 
-        // Mettre à jour une prestation (Bug 4)
+        // Mettre à jour une prestation
         function updatePrestation(index, field, value) {
             prestations[index][field] = field === 'designation' ? value : parseFloat(value) || 0;
             prestations[index].totalHT = prestations[index].quantite * prestations[index].puHT;
@@ -338,7 +337,7 @@
             saveDraft();
         }
 
-        // Ouvrir le panneau de signature (Bug 3)
+        // Ouvrir le panneau de signature
         function openSignatureDialog(type) {
             currentSignatureType = type;
             document.getElementById('signatureDialog').style.display = 'block';
@@ -352,7 +351,7 @@
             });
         }
 
-        // Effacer la signature (Bug 3)
+        // Effacer la signature
         function clearSignature(type) {
             if (type) {
                 const img = document.getElementById(type + 'Signature');
@@ -376,7 +375,7 @@
             document.getElementById('signatureOverlay').style.display = 'none';
         }
 
-        // Valider la signature (Bug 3)
+        // Valider la signature
         function validateSignature() {
             if (signaturePad && !signaturePad.isEmpty()) {
                 const img = document.getElementById(currentSignatureType + 'Signature');
