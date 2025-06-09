@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -7,65 +6,188 @@
     <title>Bon d'Intervention - MPro Incendie</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        /* Styles pour le tableau sur mobile */
+        @media (max-width: 600px) {
+            #prestationsTable tbody tr {
+                display: block;
+                margin-bottom: 10px;
+                border-bottom: 1px solid #ddd;
+            }
+            #prestationsTable tbody tr td {
+                display: block;
+                text-align: left;
+                padding: 5px;
+            }
+            #prestationsTable tbody tr td:nth-child(1) { /* Désignation */
+                width: 100%;
+            }
+            #prestationsTable tbody tr td:nth-child(2) { /* Qté */
+                display: inline-block;
+                width: 20%;
+            }
+            #prestationsTable tbody tr td:nth-child(3) { /* PU HT */
+                display: inline-block;
+                width: 30%;
+            }
+            #prestationsTable tbody tr td:nth-child(4) { /* Total HT */
+                display: inline-block;
+                width: 30%;
+            }
+            #prestationsTable tbody tr td:nth-child(5) { /* Actions */
+                display: block;
+                width: 100%;
+                text-align: right;
+            }
+            #prestationsTable tbody tr td:nth-child(5) a {
+                margin-left: 10px;
+                font-size: 18px;
+                color: #e63946;
+            }
+        }
+        /* Styles pour les boutons en pied de page */
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .action-buttons a {
+            padding: 10px 20px;
+            background-color: #e63946;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+        @media (max-width: 600px) {
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .action-buttons a {
+                width: 80%;
+                text-align: center;
+            }
+        }
+        /* Styles pour le bouton flottant et la fenêtre de navigation */
+        .floating-nav-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #e63946;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .nav-window {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+        .nav-window a {
+            display: block;
+            padding: 8px;
+            color: #e63946;
+            text-decoration: none;
+            text-align: center;
+        }
+        .nav-window a:hover {
+            background-color: #f0f0f0;
+        }
+        /* Styles pour les boutons CRM */
+        .crm-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .crm-buttons a {
+            padding: 10px 20px;
+            background-color: #10b981;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+        @media (max-width: 600px) {
+            .crm-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .crm-buttons a {
+                width: 80%;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>🔥 Bon d'Intervention</h1>
         
-        <div class="section">
+        <div>
             <h2>🧾 Client</h2>
-            <p><strong>Client :</strong> <span id="clientName">Non sélectionné</span></p>
-            <p><strong>Adresse :</strong> <span id="clientAdresse">Non sélectionnée</span></p>
-            <p><strong>Lieu d’intervention :</strong> <span id="lieu">Non sélectionné</span></p>
-            <p><strong>Email :</strong> <span id="clientEmail"></span></p>
+            <p>Client : <span id="clientName">Non sélectionné</span></p>
+            <p>Adresse : <span id="clientAdresse">Non sélectionnée</span></p>
+            <p>Lieu d’intervention : <span id="lieu">Non sélectionné</span></p>
+            <p>Email : <span id="clientEmail">Non sélectionné</span></p>
         </div>
 
-        <div class="nav-buttons">
-            <a href="crm_extincteurs.html">CRM EXTINCTEURS</a>
-            <a href="crm_baes.html">CRM BAES</a>
-            <a href="crm_ria.html">CRM RIA</a>
-            <a href="crm_desenfumage.html">CRM DÉSENFUMAGE</a>
+        <div class="crm-buttons">
+            <a href="crm_extincteurs.html">Vérifier extincteurs</a>
+            <a href="crm_baes.html">Vérifier BAES</a>
+            <a href="crm_ria.html">Vérifier RIA</a>
+            <a href="crm_desenfumage.html">Vérifier désenfumage</a>
         </div>
         
-        <div class="section">
+        <div>
             <h2>📋 Résumé CRM Extincteurs</h2>
             <table id="extincteurSummaryTable">
-                <thead>
-                    <tr>
-                        <th>Nº</th>
-                        <th>Type</th>
-                        <th>Sect.</th>
-                        <th>Opé.</th>
-                    </tr>
-                </thead>
+                <tr>
+                    <th>Nº</th>
+                    <th>Type</th>
+                    <th>Sect.</th>
+                    <th>Opé.</th>
+                </tr>
                 <tbody id="extincteurSummaryList"></tbody>
             </table>
         </div>
         
-        <div class="section">
+        <div>
             <h2>📅 Détails de l’intervention</h2>
-            <p><strong>Date d’intervention :</strong> <span id="dateIntervention"></span></p>
-            <p><strong>Technicien :</strong> <span id="technician"></span></p>
-            <p><strong>Durée (heures) :</strong> <span id="duree">0</span></p>
+            <p>Date d’intervention : <span id="dateIntervention">Non spécifiée</span></p>
+            <p>Technicien : <span id="technician">Non spécifié</span></p>
+            <p>Durée (heures) : <span id="duree">0</span></p>
         </div>
         
-        <div class="section">
+        <div>
             <h2>📋 Prestations & Matériel</h2>
-            <div class="table-container">
-                <table id="prestationsTable">
-                    <thead>
-                        <tr>
-                            <th>Désignation</th>
-                            <th>Qté</th>
-                            <th>PU HT</th>
-                            <th>Total HT</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="prestationsList"></tbody>
-                </table>
-            </div>
-            <button onclick="addPrestation()" class="primary">➕ Ajouter une ligne</button>
+            <table id="prestationsTable">
+                <tr>
+                    <th>Désignation</th>
+                    <th>Qté</th>
+                    <th>PU HT</th>
+                    <th>Total HT</th>
+                    <th></th>
+                </tr>
+                <tbody id="prestationsList"></tbody>
+            </table>
+            <p><a href="#" onclick="addPrestation()">➕ Ajouter une ligne</a></p>
             <table id="totalsTable">
                 <tr><th>Total HT</th><td id="totalHT">0.00 €</td></tr>
                 <tr><th>TVA 20%</th><td id="tva">0.00 €</td></tr>
@@ -73,62 +195,56 @@
             </table>
         </div>
         
-        <div class="section">
+        <div>
             <h2>💳 Modalités de règlement</h2>
-            <label for="delaiPaiement">Délais de règlement :</label>
-            <select id="delaiPaiement" onchange="toggleCustom('delaiPaiement'); saveDraft()">
+            <p>Délais de règlement :</p>
+            <select id="delaiPaiement" onchange="toggleCustomDelai(); saveDraft()">
                 <option value="Immédiat à l’intervention">Immédiat à l’intervention</option>
                 <option value="À réception de facture">À réception de facture</option>
                 <option value="Sous 30 jours à réception de facture">Sous 30 jours à réception de facture</option>
                 <option value="custom">Saisie libre</option>
             </select>
-            <input type="text" id="customDelai" style="display: none;" placeholder="Délai personnalisé" oninput="saveDraft()">
-            
-            <label for="moyenPaiement">Moyen de règlement :</label>
-            <select id="moyenPaiement" onchange="toggleCustom('moyenPaiement'); saveDraft()">
+            <p><input type="text" id="customDelai" style="display: none;" placeholder="Délai personnalisé" oninput="saveDraft()"></p>
+            <p>Moyen de règlement :</p>
+            <select id="moyenPaiement" onchange="toggleCustomMoyen(); saveDraft()">
                 <option value="Chèque">Chèque</option>
                 <option value="Virement">Virement</option>
                 <option value="Espèces">Espèces</option>
                 <option value="custom">Saisie libre</option>
             </select>
-            <input type="text" id="customMoyen" style="display: none;" placeholder="Moyen personnalisé" oninput="saveDraft()">
-            
-            <label for="reglementObservations">Observations :</label>
+            <p><input type="text" id="customMoyen" style="display: none;" placeholder="Moyen personnalisé" oninput="saveDraft()"></p>
+            <p>Observations :</p>
             <textarea id="reglementObservations" oninput="saveDraft()"></textarea>
         </div>
         
-        <div class="section">
+        <div>
             <h2>✍️ Signatures</h2>
             <div>
-                <h3>Client</h3>
-                <a href="#" onclick="openSignatureDialog('client')">Signer</a>
+                <p>Client</p>
+                <p><a href="#" onclick="openSignatureDialog('client')">Signer</a></p>
                 <img id="clientSignature" style="display: none; width: 200px; height: 100px;">
-                <a href="#" id="clearClientSignature" style="display: none; margin-left: 10px; color: #e63946;" onclick="clearSignature('client')">Corriger</a>
             </div>
             <div>
-                <h3>Technicien</h3>
-                <a href="#" onclick="openSignatureDialog('technicien')">Signer</a>
+                <p>Technicien</p>
+                <p><a href="#" onclick="openSignatureDialog('technicien')">Signer</a></p>
                 <img id="technicienSignature" style="display: none; width: 200px; height: 100px;">
-                <a href="#" id="clearTechnicienSignature" style="display: none; margin-left: 10px; color: #e63946;" onclick="clearSignature('technicien')">Corriger</a>
             </div>
         </div>
         
-        <div class="nav-buttons action-buttons">
-            <a href="#" onclick="validerIntervention()" class="primary">✅ Valider</a>
-            <a href="#" onclick="saveDraft()" class="secondary">💾 Brouillon</a>
-            <a href="#" onclick="generatePDF()" class="secondary">📄 PDF</a>
-            <a href="#" onclick="sendEmail()" class="secondary">📩 Email</a>
-            <a href="index.html" class="neutral">⬅️ Retour</a>
+        <div class="action-buttons">
+            <a href="#" onclick="validerIntervention()">✅ Valider</a>
+            <a href="#" onclick="saveDraft()">💾 Brouillon</a>
+            <a href="#" onclick="generatePDF()">📄 PDF</a>
+            <a href="#" onclick="sendEmail()">📩 Email</a>
+            <a href="index.html">⬅️ Retour</a>
         </div>
         
         <div id="signatureDialog" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000;">
-            <h3>Signature</h3>
+            <p>Signature</p>
             <canvas id="signatureCanvas" width="300" height="150" style="border: 1px solid #ddd;"></canvas>
-            <div>
-                <a href="#" onclick="clearSignature()">Effacer</a>
-                <a href="#" onclick="closeSignatureDialog()">Annuler</a>
-                <a href="#" onclick="validateSignature()">Valider</a>
-            </div>
+            <p><a href="#" onclick="clearSignature()">Effacer</a></p>
+            <p><a href="#" onclick="closeSignatureDialog()">Annuler</a></p>
+            <p><a href="#" onclick="validateSignature()">Valider</a></p>
         </div>
         <div id="signatureOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999;"></div>
         
@@ -137,7 +253,7 @@
             <a href="#" onclick="closePage()">✖ Fermer</a>
             <a href="index.html">Accueil</a>
             <a href="client.html">Clients</a>
-            <a href="intervention.html">Interventions</a>
+            <a href="bon_intervention.html">Interventions</a>
             <a href="parametres.html">Paramètres</a>
         </div>
     </div>
@@ -146,50 +262,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
     <script>
-        // Initialisation des variables
         let prestations = JSON.parse(localStorage.getItem('prestations')) || [];
         let signaturePad, currentSignatureType;
         const { jsPDF } = window.jspdf;
-        let interventionId = new URLSearchParams(window.location.search).get('id') || Date.now().toString();
 
-        // Liste statique des articles
-        const articles = [
-            "Extincteur Eau 6L",
-            "Extincteur CO2 2kg",
-            "Recharge Eau 6L",
-            "Recharge CO2",
-            "Vérification BAES",
-            "Maintenance RIA",
-            "Contrôle désenfumage"
-        ];
-
-        // Debouncing pour la saisie
-        let debounceTimeout;
-        function debounce(func, wait) {
-            return function (...args) {
-                clearTimeout(debounceTimeout);
-                debounceTimeout = setTimeout(() => func.apply(this, args), wait);
-            };
-        }
-
-        // Initialisation
+        // Quand la page charge
         window.onload = () => {
             loadInterventionData();
             updatePrestationsTable();
             loadExtincteurSummary();
             saveDraft();
-            setInterval(saveDraft, 5000);
         };
 
-        // Charger les données
+        // Charger les informations sauvegardées
         function loadInterventionData() {
-            const interventions = JSON.parse(localStorage.getItem('interventions_brouillons')) || [];
-            const intervention = interventions.find(i => i.id === interventionId) || {};
+            const intervention = JSON.parse(localStorage.getItem('currentIntervention')) || {};
             document.getElementById('clientName').textContent = intervention.client || 'Non sélectionné';
             document.getElementById('clientAdresse').textContent = intervention.clientAdresse || 'Non sélectionnée';
             document.getElementById('lieu').textContent = intervention.lieu || 'Non sélectionné';
-            document.getElementById('clientEmail').textContent = intervention.clientEmail || '';
-            document.getElementById('dateIntervention').textContent = intervention.date || new Date().toLocaleDateString('fr-FR');
+            document.getElementById('clientEmail').textContent = intervention.clientEmail || 'Non sélectionné';
+            document.getElementById('dateIntervention').textContent = intervention.date || 'Non spécifiée';
             document.getElementById('technician').textContent = intervention.technician || 'Non spécifié';
             document.getElementById('duree').textContent = intervention.duree || '0';
             document.getElementById('reglementObservations').value = intervention.reglementObservations || '';
@@ -210,20 +302,16 @@
             if (intervention.clientSignature) {
                 document.getElementById('clientSignature').src = intervention.clientSignature;
                 document.getElementById('clientSignature').style.display = 'block';
-                document.getElementById('clearClientSignature').style.display = 'inline-block';
             }
             if (intervention.technicienSignature) {
                 document.getElementById('technicienSignature').src = intervention.technicienSignature;
                 document.getElementById('technicienSignature').style.display = 'block';
-                document.getElementById('clearTechnicienSignature').style.display = 'inline-block';
             }
-            prestations = intervention.prestations || prestations;
         }
 
-        // Charger le résumé des extincteurs
+        // Charger les extincteurs depuis CRM_extincteurs
         function loadExtincteurSummary() {
-            const interventions = JSON.parse(localStorage.getItem('interventions_brouillons')) || [];
-            const intervention = interventions.find(i => i.id === interventionId) || {};
+            const intervention = JSON.parse(localStorage.getItem('currentIntervention'));
             const tableBody = document.getElementById('extincteurSummaryList');
             tableBody.innerHTML = '';
             if (intervention && intervention.crm_extincteurs && intervention.crm_extincteurs.extincteurs) {
@@ -242,81 +330,99 @@
             }
         }
 
-        // Ajouter une prestation
+        // Ajouter une ligne de prestation
         function addPrestation() {
             prestations.push({ designation: '', quantite: 1, puHT: 0, totalHT: 0, isLocked: false });
             updatePrestationsTable();
-            saveDraft();
         }
 
         // Mettre à jour le tableau des prestations
-        function updatePrestationsTable() {
-            const tableBody = document.getElementById('prestationsList');
-            tableBody.innerHTML = '';
-            prestations.forEach((prestation, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td data-label="Désignation">
-                        <input type="text" id="designation-${index}" value="${prestation.designation}" list="articles" style="width: 100%;" ${prestation.isLocked ? 'readonly' : ''}>
-                        <datalist id="articles">
-                            ${articles.map(article => `<option value="${article}">`).join('')}
-                        </datalist>
-                    </td>
-                    <td data-label="Qté">
-                        <input type="number" id="quantite-${index}" value="${prestation.quantite}" min="1" style="width: 100%;" ${prestation.isLocked ? 'readonly' : ''}>
-                    </td>
-                    <td data-label="PU HT (€)">
-                        <input type="number" id="puHT-${index}" value="${prestation.puHT}" min="0" step="0.01" style="width: 100%;" ${prestation.isLocked ? 'readonly' : ''}>
-                    </td>
-                    <td data-label="Total HT (€)">
-                        ${prestation.totalHT.toFixed(2)} €
-                    </td>
-                    <td data-label="Actions" class="prestation-actions">
-                        <button onclick="toggleEdit(${index})" title="Modifier">✏️</button>
-                        <button onclick="validatePrestation(${index})" title="Valider">✅</button>
-                        <button onclick="removePrestation(${index})" title="Supprimer">🗑️</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-                document.getElementById(`designation-${index}`).addEventListener('input', debounce((e) => updatePrestation(index, 'designation', e.target.value), 300));
-                document.getElementById(`quantite-${index}`).addEventListener('input', debounce((e) => updatePrestation(index, 'quantite', e.target.value), 300));
-                document.getElementById(`puHT-${index}`).addEventListener('input', debounce((e) => updatePrestation(index, 'puHT', e.target.value), 300));
-            });
-            calculateTotals();
-            saveDraft();
-        }
+        
+function updatePrestationsTable() {
+    const tableBody = document.getElementById('prestationsList');
+    tableBody.innerHTML = '';
 
-        // Mettre à jour une prestation
-        function updatePrestation(index, field, value) {
+    prestations.forEach((prestation, index) => {
+        const row = document.createElement('tr');
+
+        const td1 = document.createElement('td');
+        td1.setAttribute('data-label', 'Désignation');
+        td1.innerHTML = `<input type="text" value="\${prestation.designation}" 
+                          oninput="updatePrestation(\${index}, 'designation', this.value)" 
+                          \${prestation.isLocked ? 'readonly' : ''}>`;
+
+        const td2 = document.createElement('td');
+        td2.setAttribute('data-label', 'Qté');
+        td2.innerHTML = `<input type="number" value="\${prestation.quantite}" min="1" 
+                          oninput="updatePrestation(\${index}, 'quantite', this.value)" 
+                          \${prestation.isLocked ? 'readonly' : ''}>`;
+
+        const td3 = document.createElement('td');
+        td3.setAttribute('data-label', 'PU HT (€)');
+        td3.innerHTML = `<input type="number" value="\${prestation.puHT}" min="0" step="0.01" 
+                          oninput="updatePrestation(\${index}, 'puHT', this.value)" 
+                          \${prestation.isLocked ? 'readonly' : ''}>`;
+
+        const td4 = document.createElement('td');
+        td4.setAttribute('data-label', 'Total HT (€)');
+        td4.textContent = prestation.totalHT.toFixed(2) + ' €';
+
+        const td5 = document.createElement('td');
+        td5.setAttribute('data-label', 'Actions');
+        td5.innerHTML = `
+            <div style="display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap;">
+                <a href="#" onclick="toggleEdit(\${index})" title="Modifier">✏️</a>
+                <a href="#" onclick="validatePrestation(\${index})" title="Valider">✅</a>
+                <a href="#" onclick="removePrestation(\${index})" title="Supprimer">🗑️</a>
+            </div>
+        `;
+
+        row.appendChild(td1);
+        row.appendChild(td2);
+        row.appendChild(td3);
+        row.appendChild(td4);
+        row.appendChild(td5);
+
+        tableBody.appendChild(row);
+    });
+
+    calculateTotals();
+    saveDraft();
+}
+
+function validatePrestation(index) {
+    prestations[index].isLocked = true;
+    updatePrestationsTable();
+}
+
+function toggleEdit(index) {
+    prestations[index].isLocked = !prestations[index].isLocked;
+    updatePrestationsTable();
+}
+
+
+function index, field, value) {
             prestations[index][field] = field === 'designation' ? value : parseFloat(value) || 0;
             prestations[index].totalHT = prestations[index].quantite * prestations[index].puHT;
-            const row = document.querySelectorAll('#prestationsList tr')[index];
-            if (row) {
-                row.querySelector('td:nth-child(4)').textContent = prestations[index].totalHT.toFixed(2) + ' €';
-            }
-            calculateTotals();
-            saveDraft();
+            updatePrestationsTable();
         }
 
-        // Valider une prestation
+        // Valider une prestation (verrouiller)
         function validatePrestation(index) {
             prestations[index].isLocked = true;
             updatePrestationsTable();
-            saveDraft();
         }
 
-        // Activer/désactiver l’édition
+        // Activer/désactiver l’édition (déverrouiller)
         function toggleEdit(index) {
             prestations[index].isLocked = !prestations[index].isLocked;
             updatePrestationsTable();
-            saveDraft();
         }
 
         // Supprimer une prestation
         function removePrestation(index) {
             prestations.splice(index, 1);
             updatePrestationsTable();
-            saveDraft();
         }
 
         // Calculer les totaux
@@ -329,11 +435,17 @@
             document.getElementById('totalTTC').textContent = totalTTC.toFixed(2) + ' €';
         }
 
-        // Afficher/masquer les champs personnalisés
-        function toggleCustom(type) {
-            const customInput = document.getElementById(`custom${type.charAt(0).toUpperCase() + type.slice(1)}`);
-            const select = document.getElementById(type);
-            customInput.style.display = select.value === 'custom' ? 'block' : 'none';
+        // Afficher/masquer le champ personnalisé pour délai
+        function toggleCustomDelai() {
+            document.getElementById('customDelai').style.display = 
+                document.getElementById('delaiPaiement').value === 'custom' ? 'block' : 'none';
+            saveDraft();
+        }
+
+        // Afficher/masquer le champ personnalisé pour moyen
+        function toggleCustomMoyen() {
+            document.getElementById('customMoyen').style.display = 
+                document.getElementById('moyenPaiement').value === 'custom' ? 'block' : 'none';
             saveDraft();
         }
 
@@ -343,29 +455,12 @@
             document.getElementById('signatureDialog').style.display = 'block';
             document.getElementById('signatureOverlay').style.display = 'block';
             const canvas = document.getElementById('signatureCanvas');
-            canvas.width = canvas.offsetWidth;
-            canvas.height = canvas.offsetWidth / 2;
-            signaturePad = new SignaturePad(canvas, {
-                penColor: 'black',
-                backgroundColor: 'white'
-            });
+            signaturePad = new SignaturePad(canvas);
         }
 
         // Effacer la signature
-        function clearSignature(type) {
-            if (type) {
-                const img = document.getElementById(type + 'Signature');
-                img.src = '';
-                img.style.display = 'none';
-                document.getElementById('clear' + type.charAt(0).toUpperCase() + type.slice(1) + 'Signature').style.display = 'none';
-                const intervention = JSON.parse(localStorage.getItem('currentIntervention')) || {};
-                intervention[type + 'Signature'] = '';
-                localStorage.setItem('currentIntervention', JSON.stringify(intervention));
-                saveDraft();
-                openSignatureDialog(type);
-            } else {
-                signaturePad.clear();
-            }
+        function clearSignature() {
+            signaturePad.clear();
         }
 
         // Fermer le panneau de signature
@@ -377,15 +472,10 @@
 
         // Valider la signature
         function validateSignature() {
-            if (signaturePad && !signaturePad.isEmpty()) {
+            if (!signaturePad.isEmpty()) {
                 const img = document.getElementById(currentSignatureType + 'Signature');
-                const dataURL = signaturePad.toDataURL();
-                img.src = dataURL;
+                img.src = signaturePad.toDataURL();
                 img.style.display = 'block';
-                document.getElementById('clear' + currentSignatureType.charAt(0).toUpperCase() + currentSignatureType.slice(1) + 'Signature').style.display = 'inline-block';
-                const intervention = JSON.parse(localStorage.getItem('currentIntervention')) || {};
-                intervention[currentSignatureType + 'Signature'] = dataURL;
-                localStorage.setItem('currentIntervention', JSON.stringify(intervention));
                 saveDraft();
             }
             closeSignatureDialog();
@@ -404,8 +494,7 @@
 
         // Sauvegarder le brouillon
         function saveDraft() {
-            const intervention = {
-                id: interventionId,
+            const interventionData = {
                 client: document.getElementById('clientName').textContent,
                 clientAdresse: document.getElementById('clientAdresse').textContent,
                 lieu: document.getElementById('lieu').textContent,
@@ -413,6 +502,7 @@
                 date: document.getElementById('dateIntervention').textContent,
                 technician: document.getElementById('technician').textContent,
                 duree: document.getElementById('duree').textContent,
+                prestations: prestations,
                 delaiPaiement: document.getElementById('delaiPaiement').value,
                 customDelai: document.getElementById('customDelai').value,
                 moyenPaiement: document.getElementById('moyenPaiement').value,
@@ -420,44 +510,185 @@
                 reglementObservations: document.getElementById('reglementObservations').value,
                 clientSignature: document.getElementById('clientSignature').src,
                 technicienSignature: document.getElementById('technicienSignature').src,
-                prestations: prestations,
-                status: 'brouillon'
+                crm_extincteurs: JSON.parse(localStorage.getItem('currentIntervention'))?.crm_extincteurs || {},
+                timestamp: new Date().toISOString()
             };
-            let interventions = JSON.parse(localStorage.getItem('interventions_brouillons')) || [];
-            const index = interventions.findIndex(i => i.id === interventionId);
-            if (index >= 0) {
-                interventions[index] = intervention;
-            } else {
-                interventions.push(intervention);
-            }
-            localStorage.setItem('interventions_brouillons', JSON.stringify(interventions));
-            localStorage.setItem('currentIntervention', JSON.stringify(intervention));
+            let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
+            drafts['bon_intervention'] = interventionData;
+            localStorage.setItem('drafts', JSON.stringify(drafts));
+            localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
         }
 
         // Valider l’intervention
         function validerIntervention() {
-            let interventions = JSON.parse(localStorage.getItem('interventions_brouillons')) || [];
-            const index = interventions.findIndex(i => i.id === interventionId);
-            if (index >= 0) {
-                interventions[index].status = 'validé';
-                localStorage.setItem('interventions_brouillons', JSON.stringify(interventions));
+            const client = document.getElementById('clientName').textContent;
+            const date = document.getElementById('dateIntervention').textContent;
+            const technician = document.getElementById('technician').textContent;
+            const clientSignature = document.getElementById('clientSignature').src;
+            const technicienSignature = document.getElementById('technicienSignature').src;
+
+            let isValid = true;
+
+            if (!client || client === 'Non sélectionné') {
+                alert('Il faut choisir un client.');
+                isValid = false;
             }
-            alert('Intervention validée !');
-            window.location.href = 'intervention.html';
+            if (!date || date === 'Non spécifiée') {
+                alert('Il faut indiquer une date.');
+                isValid = false;
+            }
+            if (!technician || technician === 'Non spécifié') {
+                alert('Il faut indiquer un technicien.');
+                isValid = false;
+            }
+            if (!clientSignature || clientSignature === '') {
+                alert('Il faut une signature pour le client.');
+                isValid = false;
+            }
+            if (!technicienSignature || technicienSignature === '') {
+                alert('Il faut une signature pour le technicien.');
+                isValid = false;
+            }
+            if (prestations.length === 0) {
+                alert('Il faut ajouter au moins une prestation.');
+                isValid = false;
+            }
+
+            if (isValid) {
+                const interventionData = {
+                    client: client,
+                    clientAdresse: document.getElementById('clientAdresse').textContent,
+                    lieu: document.getElementById('lieu').textContent,
+                    clientEmail: document.getElementById('clientEmail').textContent,
+                    date: date,
+                    technician: technician,
+                    duree: document.getElementById('duree').textContent,
+                    prestations: prestations,
+                    delaiPaiement: document.getElementById('delaiPaiement').value,
+                    customDelai: document.getElementById('customDelai').value,
+                    moyenPaiement: document.getElementById('moyenPaiement').value,
+                    customMoyen: document.getElementById('customMoyen').value,
+                    reglementObservations: document.getElementById('reglementObservations').value,
+                    clientSignature: clientSignature,
+                    technicienSignature: technicienSignature,
+                    crm_extincteurs: JSON.parse(localStorage.getItem('currentIntervention'))?.crm_extincteurs || {},
+                    timestamp: new Date().toISOString()
+                };
+
+                // Sauvegarder dans l’historique client
+                let clientHistory = JSON.parse(localStorage.getItem('clientHistory')) || {};
+                const clientId = JSON.parse(localStorage.getItem('currentIntervention'))?.clientId || client;
+                if (!clientHistory[clientId]) clientHistory[clientId] = [];
+                clientHistory[clientId].push(interventionData);
+                localStorage.setItem('clientHistory', JSON.stringify(clientHistory));
+
+                // Nettoyer les brouillons
+                let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
+                delete drafts['bon_intervention'];
+                localStorage.setItem('drafts', JSON.stringify(drafts));
+                localStorage.removeItem('currentIntervention');
+                localStorage.removeItem('prestations');
+
+                alert('Bon d’intervention validé avec succès !');
+                window.location.href = 'index.html';
+            }
         }
 
-        // Générer PDF (stub)
+        // Créer le PDF
         function generatePDF() {
             const doc = new jsPDF();
-            doc.text('Bon d’Intervention MPro Incendie', 10, 10);
+            doc.addImage('assets/logo.png', 'PNG', 20, 10, 50, 20); // Logo MPro Incendie
+            doc.setFontSize(20);
+            doc.setTextColor('#e63946');
+            doc.text('Bon d’Intervention - MPro Incendie', 20, 40);
+            doc.setFontSize(12);
+            doc.setTextColor(0);
+
+            // Client
+            doc.text(`Client: ${document.getElementById('clientName').textContent}`, 20, 60);
+            doc.text(`Adresse: ${document.getElementById('clientAdresse').textContent}`, 20, 70);
+            doc.text(`Lieu: ${document.getElementById('lieu').textContent}`, 20, 80);
+            doc.text(`Email: ${document.getElementById('clientEmail').textContent}`, 20, 90);
+
+            // Résumé Extincteurs
+            doc.text('Résumé CRM Extincteurs', 20, 110);
+            let y = 120;
+            const intervention = JSON.parse(localStorage.getItem('currentIntervention'));
+            if (intervention && intervention.crm_extincteurs && intervention.crm_extincteurs.extincteurs) {
+                intervention.crm_extincteurs.extincteurs.forEach(ext => {
+                    const numero = ext.id ? ext.id.replace('EXT-', '') : 'N/A';
+                    const emplacement = ext.emplacement ? ext.emplacement.substring(0, 10) + (ext.emplacement.length > 10 ? '...' : '') : 'N/A';
+                    doc.text(`#${numero} - ${ext.type} (${emplacement}) ${ext.operations}${ext.pp ? `[${ext.pp}]` : ''}`, 20, y);
+                    y += 10;
+                });
+            }
+
+            // Détails Intervention
+            doc.text('Détails de l’intervention', 20, y + 10);
+            doc.text(`Date: ${document.getElementById('dateIntervention').textContent}`, 20, y + 20);
+            doc.text(`Technicien: ${document.getElementById('technician').textContent}`, 20, y + 30);
+            doc.text(`Durée: ${document.getElementById('duree').textContent} heures`, 20, y + 40);
+            y += 50;
+
+            // Prestations
+            doc.text('Prestations & Matériel', 20, y);
+            y += 10;
+            prestations.forEach(p => {
+                doc.text(`${p.designation} - Qté: ${p.quantite} - PU HT: ${p.puHT}€ - Total: ${p.totalHT.toFixed(2)}€`, 20, y);
+                y += 10;
+            });
+
+            // Totaux
+            const totalHT = prestations.reduce((sum, p) => sum + p.totalHT, 0);
+            const tva = totalHT * 0.2;
+            const totalTTC = totalHT + tva;
+            doc.text(`Total HT: ${totalHT.toFixed(2)} €`, 20, y + 10);
+            doc.text(`TVA 20%: ${tva.toFixed(2)} €`, 20, y + 20);
+            doc.text(`Total TTC: ${totalTTC.toFixed(2)} €`, 20, y + 30);
+
+            // Modalités
+            doc.text('Modalités de règlement', 20, y + 50);
+            const delai = document.getElementById('delaiPaiement').value === 'custom' ? 
+                document.getElementById('customDelai').value : document.getElementById('delaiPaiement').value;
+            const moyen = document.getElementById('moyenPaiement').value === 'custom' ? 
+                document.getElementById('customMoyen').value : document.getElementById('moyenPaiement').value;
+            doc.text(`Délai: ${delai || 'Non spécifié'}`, 20, y + 60);
+            doc.text(`Moyen: ${moyen || 'Non spécifié'}`, 20, y + 70);
+            doc.text(`Observations: ${document.getElementById('reglementObservations').value || 'Aucune'}`, 20, y + 80);
+            y += 90;
+
+            // Signatures
+            const clientSignature = document.getElementById('clientSignature').src;
+            const technicienSignature = document.getElementById('technicienSignature').src;
+            if (clientSignature && clientSignature !== '') {
+                doc.addImage(clientSignature, 'PNG', 20, y, 80, 40);
+                doc.text('Signature Client', 20, y + 50);
+            }
+            if (technicienSignature && technicienSignature !== '') {
+                doc.addImage(technicienSignature, 'PNG', 110, y, 80, 40);
+                doc.text('Signature Technicien', 110, y + 50);
+            }
+
             doc.save('bon_intervention.pdf');
         }
 
-        // Envoyer email (stub)
+        // Envoyer l’email
         function sendEmail() {
-            alert('Email envoyé (fonctionnalité à implémenter avec EmailJS)');
+            const clientEmail = document.getElementById('clientEmail').textContent;
+            if (clientEmail === 'Non sélectionné' || !clientEmail.includes('@')) {
+                alert('Il faut un email valide pour le client.');
+                return;
+            }
+            emailjs.init('VOTRE_USER_ID'); // Remplacer par ton code EmailJS
+            const templateParams = {
+                to_email: clientEmail,
+                subject: 'Bon d’Intervention - MPro Incendie',
+                message: `Bonjour,\nVeuillez trouver ci-joint le bon d’intervention.\nTotal TTC: ${document.getElementById('totalTTC').textContent}\nCordialement,\nMPro Incendie`
+            };
+            emailjs.send('VOTRE_SERVICE_ID', 'VOTRE_TEMPLATE_ID', templateParams) // Remplacer par tes codes EmailJS
+                .then(() => alert('Email envoyé avec succès !'))
+                .catch(() => alert('Erreur lors de l’envoi de l’email.'));
         }
     </script>
 </body>
 </html>
-```
