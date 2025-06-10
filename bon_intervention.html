@@ -347,21 +347,21 @@ function updatePrestationsTable() {
 
         const td1 = document.createElement('td');
         td1.setAttribute('data-label', 'Désignation');
-        td1.innerHTML = `<input type="text" value="\${prestation.designation}" 
-                          oninput="updatePrestation(\${index}, 'designation', this.value)" 
-                          \${prestation.isLocked ? 'readonly' : ''}>`;
+        td1.innerHTML = `<input type="text" value="${prestation.designation}" 
+                          oninput="updatePrestation(${index}, 'designation', this.value)" 
+                          ${prestation.isLocked ? 'readonly' : ''}>`;
 
         const td2 = document.createElement('td');
         td2.setAttribute('data-label', 'Qté');
-        td2.innerHTML = `<input type="number" value="\${prestation.quantite}" min="1" 
-                          oninput="updatePrestation(\${index}, 'quantite', this.value)" 
-                          \${prestation.isLocked ? 'readonly' : ''}>`;
+        td2.innerHTML = `<input type="number" value="${prestation.quantite}" min="1" 
+                          oninput="updatePrestation(${index}, 'quantite', this.value)" 
+                          ${prestation.isLocked ? 'readonly' : ''}>`;
 
         const td3 = document.createElement('td');
         td3.setAttribute('data-label', 'PU HT (€)');
-        td3.innerHTML = `<input type="number" value="\${prestation.puHT}" min="0" step="0.01" 
-                          oninput="updatePrestation(\${index}, 'puHT', this.value)" 
-                          \${prestation.isLocked ? 'readonly' : ''}>`;
+        td3.innerHTML = `<input type="number" value="${prestation.puHT}" min="0" step="0.01" 
+                          oninput="updatePrestation(${index}, 'puHT', this.value)" 
+                          ${prestation.isLocked ? 'readonly' : ''}>`;
 
         const td4 = document.createElement('td');
         td4.setAttribute('data-label', 'Total HT (€)');
@@ -371,9 +371,9 @@ function updatePrestationsTable() {
         td5.setAttribute('data-label', 'Actions');
         td5.innerHTML = `
             <div style="display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap;">
-                <a href="#" onclick="toggleEdit(\${index})" title="Modifier">✏️</a>
-                <a href="#" onclick="validatePrestation(\${index})" title="Valider">✅</a>
-                <a href="#" onclick="removePrestation(\${index})" title="Supprimer">🗑️</a>
+                <a href="#" onclick="toggleEdit(${index})" title="Modifier">✏️</a>
+                <a href="#" onclick="validatePrestation(${index})" title="Valider">✅</a>
+                <a href="#" onclick="removePrestation(${index})" title="Supprimer">🗑️</a>
             </div>
         `;
 
