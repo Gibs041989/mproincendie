@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -9,40 +10,56 @@
     <style>
         /* Styles pour le tableau sur mobile */
         @media (max-width: 600px) {
+            #prestationsTable {
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+            }
             #prestationsTable tbody tr {
                 display: block;
                 margin-bottom: 10px;
                 border-bottom: 1px solid #ddd;
+                width: 100%;
             }
             #prestationsTable tbody tr td {
                 display: block;
                 text-align: left;
                 padding: 5px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            #prestationsTable tbody tr td:before {
+                content: attr(data-label);
+                font-weight: bold;
+                color: #555;
+                display: block;
+                margin-bottom: 2px;
             }
             #prestationsTable tbody tr td:nth-child(1) { /* Désignation */
                 width: 100%;
             }
             #prestationsTable tbody tr td:nth-child(2) { /* Qté */
-                display: inline-block;
-                width: 20%;
+                width: 100%;
             }
             #prestationsTable tbody tr td:nth-child(3) { /* PU HT */
-                display: inline-block;
-                width: 30%;
+                width: 100%;
             }
             #prestationsTable tbody tr td:nth-child(4) { /* Total HT */
-                display: inline-block;
-                width: 30%;
+                width: 100%;
             }
             #prestationsTable tbody tr td:nth-child(5) { /* Actions */
-                display: block;
                 width: 100%;
-                text-align: right;
+                text-align: center;
             }
             #prestationsTable tbody tr td:nth-child(5) a {
-                margin-left: 10px;
+                margin: 0 5px;
                 font-size: 18px;
                 color: #e63946;
+                text-decoration: none;
+            }
+            #prestationsTable input {
+                width: 100%;
+                max-width: 100%;
             }
         }
         /* Styles pour les boutons en pied de page */
@@ -134,6 +151,16 @@
                 text-align: center;
             }
         }
+        /* Styles pour les signatures */
+        #clearClientSignature, #clearTechnicienSignature {
+            margin-left: 10px;
+            color: #e63946;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        #clearClientSignature:hover, #clearTechnicienSignature:hover {
+            color: #d00000;
+        }
     </style>
 </head>
 <body>
@@ -183,7 +210,7 @@
                     <th>Qté</th>
                     <th>PU HT</th>
                     <th>Total HT</th>
-                    <th></th>
+                    <th>Actions</th>
                 </tr>
                 <tbody id="prestationsList"></tbody>
             </table>
@@ -223,11 +250,13 @@
                 <p>Client</p>
                 <p><a href="#" onclick="openSignatureDialog('client')">Signer</a></p>
                 <img id="clientSignature" style="display: none; width: 200px; height: 100px;">
+                <a href="#" id="clearClientSignature" style="display: none;" onclick="clearSignature('client')">Corriger</a>
             </div>
             <div>
                 <p>Technicien</p>
                 <p><a href="#" onclick="openSignatureDialog('technicien')">Signer</a></p>
                 <img id="technicienSignature" style="display: none; width: 200px; height: 100px;">
+                <a href="#" id="clearTechnicienSignature" style="display: none;" onclick="clearSignature('technicien')">Corriger</a>
             </div>
         </div>
         
@@ -253,7 +282,7 @@
             <a href="#" onclick="closePage()">✖ Fermer</a>
             <a href="index.html">Accueil</a>
             <a href="client.html">Clients</a>
-            <a href="bon_intervention.html">Interventions</a>
+            <a href="intervention.html">Interventions</a>
             <a href="parametres.html">Paramètres</a>
         </div>
     </div>
@@ -265,23 +294,46 @@
         let prestations = JSON.parse(localStorage.getItem('prestations')) || [];
         let signaturePad, currentSignatureType;
         const { jsPDF } = window.jspdf;
+        let interventionId = new URLSearchParams(window.location.search).get('id') || Date.now().toString();
 
-        // Quand la page charge
+        // Liste statique des articles
+        const articles = [
+            "Extincteur Eau 6L",
+            "Extincteur CO2 2kg",
+            "Recharge Eau 6L",
+            "Recharge CO2",
+            "Vérification BAES",
+            "Maintenance RIA",
+            "Contrôle désenfumage"
+        ];
+
+        // Debouncing pour la saisie
+        let debounceTimeout;
+        function debounce(func, wait) {
+            return function (...args) {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        // Initialisation
         window.onload = () => {
             loadInterventionData();
             updatePrestationsTable();
             loadExtincteurSummary();
             saveDraft();
+            setInterval(saveDraft, 5000);
         };
 
-        // Charger les informations sauvegardées
+        // Charger les données
         function loadInterventionData() {
-            const intervention = JSON.parse(localStorage.getItem('currentIntervention')) || {};
+            const interventions = JSON.parse(localStorage.getItem('interventions_brouillons')) || [];
+            const intervention = interventions.find(i => i.id === interventionId) || {};
             document.getElementById('clientName').textContent = intervention.client || 'Non sélectionné';
             document.getElementById('clientAdresse').textContent = intervention.clientAdresse || 'Non sélectionnée';
             document.getElementById('lieu').textContent = intervention.lieu || 'Non sélectionné';
             document.getElementById('clientEmail').textContent = intervention.clientEmail || 'Non sélectionné';
-            document.getElementById('dateIntervention').textContent = intervention.date || 'Non spécifiée';
+            document.getElementById('dateIntervention').textContent = intervention.date || new Date().toLocaleDateString('fr-FR');
             document.getElementById('technician').textContent = intervention.technician || 'Non spécifié';
             document.getElementById('duree').textContent = intervention.duree || '0';
             document.getElementById('reglementObservations').value = intervention.reglementObservations || '';
@@ -302,16 +354,20 @@
             if (intervention.clientSignature) {
                 document.getElementById('clientSignature').src = intervention.clientSignature;
                 document.getElementById('clientSignature').style.display = 'block';
+                document.getElementById('clearClientSignature').style.display = 'inline-block';
             }
             if (intervention.technicienSignature) {
                 document.getElementById('technicienSignature').src = intervention.technicienSignature;
                 document.getElementById('technicienSignature').style.display = 'block';
+                document.getElementById('clearTechnicienSignature').style.display = 'inline-block';
             }
+            prestations = intervention.prestations || prestations;
         }
 
-        // Charger les extincteurs depuis CRM_extincteurs
+        // Charger le résumé des extincteurs
         function loadExtincteurSummary() {
-            const intervention = JSON.parse(localStorage.getItem('currentIntervention'));
+            const interventions = JSON.parse(localStorage.getItem('interventions_brouillons')) || [];
+            const intervention = interventions.find(i => i.id === interventionId) || {};
             const tableBody = document.getElementById('extincteurSummaryList');
             tableBody.innerHTML = '';
             if (intervention && intervention.crm_extincteurs && intervention.crm_extincteurs.extincteurs) {
@@ -330,99 +386,81 @@
             }
         }
 
-        // Ajouter une ligne de prestation
+        // Ajouter une prestation
         function addPrestation() {
             prestations.push({ designation: '', quantite: 1, puHT: 0, totalHT: 0, isLocked: false });
             updatePrestationsTable();
+            saveDraft();
         }
 
         // Mettre à jour le tableau des prestations
-        
-function updatePrestationsTable() {
-    const tableBody = document.getElementById('prestationsList');
-    tableBody.innerHTML = '';
-
-    prestations.forEach((prestation, index) => {
-        const row = document.createElement('tr');
-
-        const td1 = document.createElement('td');
-        td1.setAttribute('data-label', 'Désignation');
-        td1.innerHTML = `<input type="text" value="${prestation.designation}" 
-                          oninput="updatePrestation(${index}, 'designation', this.value)" 
-                          ${prestation.isLocked ? 'readonly' : ''}>`;
-
-        const td2 = document.createElement('td');
-        td2.setAttribute('data-label', 'Qté');
-        td2.innerHTML = `<input type="number" value="${prestation.quantite}" min="1" 
-                          oninput="updatePrestation(${index}, 'quantite', this.value)" 
-                          ${prestation.isLocked ? 'readonly' : ''}>`;
-
-        const td3 = document.createElement('td');
-        td3.setAttribute('data-label', 'PU HT (€)');
-        td3.innerHTML = `<input type="number" value="${prestation.puHT}" min="0" step="0.01" 
-                          oninput="updatePrestation(${index}, 'puHT', this.value)" 
-                          ${prestation.isLocked ? 'readonly' : ''}>`;
-
-        const td4 = document.createElement('td');
-        td4.setAttribute('data-label', 'Total HT (€)');
-        td4.textContent = prestation.totalHT.toFixed(2) + ' €';
-
-        const td5 = document.createElement('td');
-        td5.setAttribute('data-label', 'Actions');
-        td5.innerHTML = `
-            <div style="display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap;">
-                <a href="#" onclick="toggleEdit(${index})" title="Modifier">✏️</a>
-                <a href="#" onclick="validatePrestation(${index})" title="Valider">✅</a>
-                <a href="#" onclick="removePrestation(${index})" title="Supprimer">🗑️</a>
-            </div>
-        `;
-
-        row.appendChild(td1);
-        row.appendChild(td2);
-        row.appendChild(td3);
-        row.appendChild(td4);
-        row.appendChild(td5);
-
-        tableBody.appendChild(row);
-    });
-
-    calculateTotals();
-    saveDraft();
-}
-
-function validatePrestation(index) {
-    prestations[index].isLocked = true;
-    updatePrestationsTable();
-}
-
-function toggleEdit(index) {
-    prestations[index].isLocked = !prestations[index].isLocked;
-    updatePrestationsTable();
-}
-
-
-function index, field, value) {
-            prestations[index][field] = field === 'designation' ? value : parseFloat(value) || 0;
-            prestations[index].totalHT = prestations[index].quantite * prestations[index].puHT;
-            updatePrestationsTable();
+        function updatePrestationsTable() {
+            const tableBody = document.getElementById('prestationsList');
+            tableBody.innerHTML = '';
+            prestations.forEach((prestation, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td data-label="Désignation">
+                        <input type="text" id="designation-${index}" value="${prestation.designation}" list="articles" style="width: 100%;" ${prestation.isLocked ? 'readonly' : ''}>
+                        <datalist id="articles">
+                            ${articles.map(article => `<option value="${article}">`).join('')}
+                        </datalist>
+                    </td>
+                    <td data-label="Qté">
+                        <input type="number" id="quantite-${index}" value="${prestation.quantite}" min="1" style="width: 100%;" ${prestation.isLocked ? 'readonly' : ''}>
+                    </td>
+                    <td data-label="PU HT (€)">
+                        <input type="number" id="puHT-${index}" value="${prestation.puHT}" min="0" step="0.01" style="width: 100%;" ${prestation.isLocked ? 'readonly' : ''}>
+                    </td>
+                    <td data-label="Total HT (€)">
+                        ${prestation.totalHT.toFixed(2)} €
+                    </td>
+                    <td data-label="Actions" class="prestation-actions">
+                        <a href="#" onclick="toggleEdit(${index})" title="Modifier">✏️</a>
+                        <a href="#" onclick="validatePrestation(${index})" title="Valider">✅</a>
+                        <a href="#" onclick="removePrestation(${index})" title="Supprimer">🗑️</a>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+                document.getElementById(`designation-${index}`).addEventListener('input', debounce((e) => updatePrestation(index, 'designation', e.target.value), 300));
+                document.getElementById(`quantite-${index}`).addEventListener('input', debounce((e) => updatePrestation(index, 'quantite', e.target.value), 300));
+                document.getElementById(`puHT-${index}`).addEventListener('input', debounce((e) => updatePrestation(index, 'puHT', e.target.value), 300));
+            });
+            calculateTotals();
+            saveDraft();
         }
 
-        // Valider une prestation (verrouiller)
+        // Mettre à jour une prestation
+        function updatePrestation(index, field, value) {
+            prestations[index][field] = field === 'designation' ? value : parseFloat(value) || 0;
+            prestations[index].totalHT = prestations[index].quantite * prestations[index].puHT;
+            const row = document.querySelectorAll('#prestationsList tr')[index];
+            if (row) {
+                row.querySelector('td:nth-child(4)').textContent = prestations[index].totalHT.toFixed(2) + ' €';
+            }
+            calculateTotals();
+            saveDraft();
+        }
+
+        // Valider une prestation
         function validatePrestation(index) {
             prestations[index].isLocked = true;
             updatePrestationsTable();
+            saveDraft();
         }
 
-        // Activer/désactiver l’édition (déverrouiller)
+        // Activer/désactiver l’édition
         function toggleEdit(index) {
             prestations[index].isLocked = !prestations[index].isLocked;
             updatePrestationsTable();
+            saveDraft();
         }
 
         // Supprimer une prestation
         function removePrestation(index) {
             prestations.splice(index, 1);
             updatePrestationsTable();
+            saveDraft();
         }
 
         // Calculer les totaux
@@ -455,12 +493,29 @@ function index, field, value) {
             document.getElementById('signatureDialog').style.display = 'block';
             document.getElementById('signatureOverlay').style.display = 'block';
             const canvas = document.getElementById('signatureCanvas');
-            signaturePad = new SignaturePad(canvas);
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetWidth / 2;
+            signaturePad = new SignaturePad(canvas, {
+                penColor: 'black',
+                backgroundColor: 'white'
+            });
         }
 
         // Effacer la signature
-        function clearSignature() {
-            signaturePad.clear();
+        function clearSignature(type) {
+            if (type) {
+                const img = document.getElementById(type + 'Signature');
+                img.src = '';
+                img.style.display = 'none';
+                document.getElementById('clear' + type.charAt(0).toUpperCase() + type.slice(1) + 'Signature').style.display = 'none';
+                const intervention = JSON.parse(localStorage.getItem('currentIntervention')) || {};
+                intervention[type + 'Signature'] = '';
+                localStorage.setItem('currentIntervention', JSON.stringify(intervention));
+                saveDraft();
+                openSignatureDialog(type);
+            } else {
+                signaturePad.clear();
+            }
         }
 
         // Fermer le panneau de signature
@@ -472,10 +527,12 @@ function index, field, value) {
 
         // Valider la signature
         function validateSignature() {
-            if (!signaturePad.isEmpty()) {
+            if (signaturePad && !signaturePad.isEmpty()) {
                 const img = document.getElementById(currentSignatureType + 'Signature');
-                img.src = signaturePad.toDataURL();
+                const dataURL = signaturePad.toDataURL();
+                img.src = dataURL;
                 img.style.display = 'block';
+                document.getElementById('clear' + currentSignatureType.charAt(0).toUpperCase() + currentSignatureType.slice(1) + 'Signature').style.display = 'inline-block';
                 saveDraft();
             }
             closeSignatureDialog();
@@ -494,7 +551,8 @@ function index, field, value) {
 
         // Sauvegarder le brouillon
         function saveDraft() {
-            const interventionData = {
+            const intervention = {
+                id: interventionId,
                 client: document.getElementById('clientName').textContent,
                 clientAdresse: document.getElementById('clientAdresse').textContent,
                 lieu: document.getElementById('lieu').textContent,
@@ -502,7 +560,6 @@ function index, field, value) {
                 date: document.getElementById('dateIntervention').textContent,
                 technician: document.getElementById('technician').textContent,
                 duree: document.getElementById('duree').textContent,
-                prestations: prestations,
                 delaiPaiement: document.getElementById('delaiPaiement').value,
                 customDelai: document.getElementById('customDelai').value,
                 moyenPaiement: document.getElementById('moyenPaiement').value,
@@ -510,13 +567,20 @@ function index, field, value) {
                 reglementObservations: document.getElementById('reglementObservations').value,
                 clientSignature: document.getElementById('clientSignature').src,
                 technicienSignature: document.getElementById('technicienSignature').src,
+                prestations: prestations,
                 crm_extincteurs: JSON.parse(localStorage.getItem('currentIntervention'))?.crm_extincteurs || {},
+                status: 'brouillon',
                 timestamp: new Date().toISOString()
             };
-            let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
-            drafts['bon_intervention'] = interventionData;
-            localStorage.setItem('drafts', JSON.stringify(drafts));
-            localStorage.setItem('currentIntervention', JSON.stringify(interventionData));
+            let interventions = JSON.parse(localStorage.getItem('interventions_brouillons')) || [];
+            const index = interventions.findIndex(i => i.id === interventionId);
+            if (index >= 0) {
+                interventions[index] = intervention;
+            } else {
+                interventions.push(intervention);
+            }
+            localStorage.setItem('interventions_brouillons', JSON.stringify(interventions));
+            localStorage.setItem('currentIntervention', JSON.stringify(intervention));
         }
 
         // Valider l’intervention
@@ -556,6 +620,7 @@ function index, field, value) {
 
             if (isValid) {
                 const interventionData = {
+                    id: interventionId,
                     client: client,
                     clientAdresse: document.getElementById('clientAdresse').textContent,
                     lieu: document.getElementById('lieu').textContent,
@@ -572,8 +637,18 @@ function index, field, value) {
                     clientSignature: clientSignature,
                     technicienSignature: technicienSignature,
                     crm_extincteurs: JSON.parse(localStorage.getItem('currentIntervention'))?.crm_extincteurs || {},
+                    status: 'validé',
                     timestamp: new Date().toISOString()
                 };
+
+                let interventions = JSON.parse(localStorage.getItem('interventions_brouillons')) || [];
+                const index = interventions.findIndex(i => i.id === interventionId);
+                if (index >= 0) {
+                    interventions[index] = interventionData;
+                } else {
+                    interventions.push(interventionData);
+                }
+                localStorage.setItem('interventions_brouillons', JSON.stringify(interventions));
 
                 // Sauvegarder dans l’historique client
                 let clientHistory = JSON.parse(localStorage.getItem('clientHistory')) || {};
@@ -582,37 +657,34 @@ function index, field, value) {
                 clientHistory[clientId].push(interventionData);
                 localStorage.setItem('clientHistory', JSON.stringify(clientHistory));
 
-                // Nettoyer les brouillons
-                let drafts = JSON.parse(localStorage.getItem('drafts')) || {};
-                delete drafts['bon_intervention'];
-                localStorage.setItem('drafts', JSON.stringify(drafts));
                 localStorage.removeItem('currentIntervention');
                 localStorage.removeItem('prestations');
 
                 alert('Bon d’intervention validé avec succès !');
-                window.location.href = 'index.html';
+                window.location.href = 'intervention.html';
             }
         }
 
         // Créer le PDF
         function generatePDF() {
             const doc = new jsPDF();
-            doc.addImage('assets/logo.png', 'PNG', 20, 10, 50, 20); // Logo MPro Incendie
+            doc.addImage('assets/logo.png', 'PNG', 20, 10, 30, 10);
             doc.setFontSize(20);
             doc.setTextColor('#e63946');
-            doc.text('Bon d’Intervention - MPro Incendie', 20, 40);
+            doc.text('Bon d’Intervention - MPro Incendie', 20, 30);
             doc.setFontSize(12);
             doc.setTextColor(0);
 
             // Client
-            doc.text(`Client: ${document.getElementById('clientName').textContent}`, 20, 60);
-            doc.text(`Adresse: ${document.getElementById('clientAdresse').textContent}`, 20, 70);
-            doc.text(`Lieu: ${document.getElementById('lieu').textContent}`, 20, 80);
-            doc.text(`Email: ${document.getElementById('clientEmail').textContent}`, 20, 90);
+            doc.text(`Client: ${document.getElementById('clientName').textContent}`, 20, 40);
+            doc.text(`Adresse: ${document.getElementById('clientAdresse').textContent}`, 20, 50);
+            doc.text(`Lieu: ${document.getElementById('lieu').textContent}`, 20, 60);
+            doc.text(`Email: ${document.getElementById('clientEmail').textContent}`, 20, 70);
 
             // Résumé Extincteurs
-            doc.text('Résumé CRM Extincteurs', 20, 110);
-            let y = 120;
+            let y = 80;
+            doc.text('Résumé CRM Extincteurs', 20, y);
+            y += 10;
             const intervention = JSON.parse(localStorage.getItem('currentIntervention'));
             if (intervention && intervention.crm_extincteurs && intervention.crm_extincteurs.extincteurs) {
                 intervention.crm_extincteurs.extincteurs.forEach(ext => {
@@ -624,11 +696,13 @@ function index, field, value) {
             }
 
             // Détails Intervention
-            doc.text('Détails de l’intervention', 20, y + 10);
-            doc.text(`Date: ${document.getElementById('dateIntervention').textContent}`, 20, y + 20);
-            doc.text(`Technicien: ${document.getElementById('technician').textContent}`, 20, y + 30);
-            doc.text(`Durée: ${document.getElementById('duree').textContent} heures`, 20, y + 40);
-            y += 50;
+            y += 10;
+            doc.text('Détails de l’intervention', 20, y);
+            y += 10;
+            doc.text(`Date: ${document.getElementById('dateIntervention').textContent}`, 20, y);
+            doc.text(`Technicien: ${document.getElementById('technician').textContent}`, 20, y + 10);
+            doc.text(`Durée: ${document.getElementById('duree').textContent} heures`, 20, y + 20);
+            y += 30;
 
             // Prestations
             doc.text('Prestations & Matériel', 20, y);
@@ -642,20 +716,23 @@ function index, field, value) {
             const totalHT = prestations.reduce((sum, p) => sum + p.totalHT, 0);
             const tva = totalHT * 0.2;
             const totalTTC = totalHT + tva;
-            doc.text(`Total HT: ${totalHT.toFixed(2)} €`, 20, y + 10);
-            doc.text(`TVA 20%: ${tva.toFixed(2)} €`, 20, y + 20);
-            doc.text(`Total TTC: ${totalTTC.toFixed(2)} €`, 20, y + 30);
+            y += 10;
+            doc.text(`Total HT: ${totalHT.toFixed(2)} €`, 20, y);
+            doc.text(`TVA 20%: ${tva.toFixed(2)} €`, 20, y + 10);
+            doc.text(`Total TTC: ${totalTTC.toFixed(2)} €`, 20, y + 20);
 
             // Modalités
-            doc.text('Modalités de règlement', 20, y + 50);
+            y += 30;
+            doc.text('Modalités de règlement', 20, y);
+            y += 10;
             const delai = document.getElementById('delaiPaiement').value === 'custom' ? 
                 document.getElementById('customDelai').value : document.getElementById('delaiPaiement').value;
             const moyen = document.getElementById('moyenPaiement').value === 'custom' ? 
                 document.getElementById('customMoyen').value : document.getElementById('moyenPaiement').value;
-            doc.text(`Délai: ${delai || 'Non spécifié'}`, 20, y + 60);
-            doc.text(`Moyen: ${moyen || 'Non spécifié'}`, 20, y + 70);
-            doc.text(`Observations: ${document.getElementById('reglementObservations').value || 'Aucune'}`, 20, y + 80);
-            y += 90;
+            doc.text(`Délai: ${delai || 'Non spécifié'}`, 20, y);
+            doc.text(`Moyen: ${moyen || 'Non spécifié'}`, 20, y + 10);
+            doc.text(`Observations: ${document.getElementById('reglementObservations').value || 'Aucune'}`, 20, y + 20);
+            y += 30;
 
             // Signatures
             const clientSignature = document.getElementById('clientSignature').src;
@@ -679,13 +756,13 @@ function index, field, value) {
                 alert('Il faut un email valide pour le client.');
                 return;
             }
-            emailjs.init('VOTRE_USER_ID'); // Remplacer par ton code EmailJS
+            emailjs.init('YOUR_USER_ID'); // Remplacer par ton code EmailJS
             const templateParams = {
                 to_email: clientEmail,
                 subject: 'Bon d’Intervention - MPro Incendie',
                 message: `Bonjour,\nVeuillez trouver ci-joint le bon d’intervention.\nTotal TTC: ${document.getElementById('totalTTC').textContent}\nCordialement,\nMPro Incendie`
             };
-            emailjs.send('VOTRE_SERVICE_ID', 'VOTRE_TEMPLATE_ID', templateParams) // Remplacer par tes codes EmailJS
+            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams) // Remplacer par tes codes EmailJS
                 .then(() => alert('Email envoyé avec succès !'))
                 .catch(() => alert('Erreur lors de l’envoi de l’email.'));
         }
